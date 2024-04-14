@@ -48,6 +48,7 @@ class WebAutomation(BaseModel):
                         base_image=image_cfg.image_path,
                         log_filename=log_filename,
                         screenshot=screenshot,
+                        screenshot_option=screenshot_option,
                     )
                     loc, button_shape = find_matched.find()
                     if loc and button_shape:

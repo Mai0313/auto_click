@@ -14,6 +14,10 @@ class FindMatched(BaseModel):
     base_image: str = Field(..., description="The path to the image to be matched")
     log_filename: str = Field(..., description="The path to save the matched image")
     screenshot: Union[Image.Image, bytes]
+    screenshot_option: bool = Field(
+        ...,
+        description="The option to take a screenshot; true for save screenshot, false for not save screenshot",
+    )
 
     @model_validator(mode="after")
     def get_screenshot_image(self):
@@ -57,8 +61,9 @@ class FindMatched(BaseModel):
             button_h = button_image.shape[0]
             top_left = max_loc
             bottom_right = (top_left[0] + button_w, top_left[1] + button_h)
-            color_screenshot = self.color_screenshot.copy()
-            cv2.rectangle(color_screenshot, top_left, bottom_right, (0, 0, 255), 2)
-            cv2.imwrite(self.log_filename, color_screenshot)
+            if self.screenshot_option:
+                color_screenshot = self.color_screenshot.copy()
+                cv2.rectangle(color_screenshot, top_left, bottom_right, (0, 0, 255), 2)
+                cv2.imwrite(self.log_filename, color_screenshot)
             return max_loc, button_image.shape
         return None, None
