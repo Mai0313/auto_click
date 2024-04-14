@@ -4,8 +4,7 @@ from typing import Optional
 from PIL import ImageGrab
 from pydantic import Field, BaseModel
 import pygetwindow as gw
-from playwright.sync_api import Browser
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Browser, sync_playwright
 from pygetwindow._pygetwindow_win import Win32Window
 
 

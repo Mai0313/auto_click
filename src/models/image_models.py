@@ -6,4 +6,4 @@ class Settings(BaseModel):
     image_name: str
     image_path: str
     image_click_delay: int
-    screenshot: bool
+    screenshot_option: bool

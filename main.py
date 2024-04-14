@@ -40,6 +40,10 @@ class WebAutomation(BaseModel):
             if screenshot is not None:
                 for image_config in self.image_configs:
                     image_cfg = Settings(**image_config)
+                    image_name = image_cfg.image_name
+                    image_path = image_cfg.image_path
+                    image_click_delay = image_cfg.image_click_delay
+                    screenshot_option = image_cfg.screenshot_option
                     find_matched = FindMatched(
                         base_image=image_cfg.image_path,
                         log_filename=log_filename,
@@ -57,7 +61,7 @@ class WebAutomation(BaseModel):
                             button_center_y = loc[1] + button_shape[0] / 2
                             page.mouse.click(button_center_x, button_center_y)
                         break
-            time.sleep(5)
+                    time.sleep(image_click_delay)
 
 
 if __name__ == "__main__":
