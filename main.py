@@ -41,26 +41,29 @@ def capture_screen(window_title: str):
         width, height = window.size
         bbox = (x, y, x + width, y + height)
         screenshot = ImageGrab.grab(bbox=bbox)
-        return screenshot
+        btn_position = (x, y)
+        return screenshot, btn_position
     except Exception as e:
         console.log(f"Error capturing screen: {e}")
-        return None
+        return None, None
 
 
 def main(pic_samples: list, log_dir: str, window_title: str):
     while True:
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         log_filename = f"{log_dir}/{now}.png"
-        screenshot = capture_screen(window_title)
+        screenshot, (win_x, win_y) = capture_screen(window_title)  # 獲取窗口左上角坐標
         if screenshot is not None:
             for pic_sample in pic_samples:
                 loc, button_shape = find_and_click_button(pic_sample, log_filename, screenshot)
                 if loc and button_shape:
-                    button_center_x = loc[0] + button_shape[1] / 2
-                    button_center_y = loc[1] + button_shape[0] / 2
+                    button_center_x = loc[0] + button_shape[1] / 2 + win_x
+                    button_center_y = loc[1] + button_shape[0] / 2 + win_y
                     pyautogui.moveTo(button_center_x, button_center_y)
                     # pyautogui.click()
-                    console.log(f"Clicked on button found at {loc}")
+                    console.log(
+                        f"Clicked on button found at {loc}, real click position: ({button_center_x}, {button_center_y})"
+                    )
                     break
         time.sleep(5)
 
