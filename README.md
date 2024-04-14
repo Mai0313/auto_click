@@ -12,7 +12,7 @@
 
 ## Description
 
-This is a repo Template for you to use in your AI Project, all actions have been set.
+This is a information grabber for pictures. It can be used to extract information from pictures and store them in a database.
 
 ## Installation
 
