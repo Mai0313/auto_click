@@ -1,3 +1,10 @@
+pygetwindow
+pillow
+pyautogui
+opencv-python
+rich
+pydantic
+
 #### Development Related ####
 ipykernel
 ipywidgets
