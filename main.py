@@ -60,8 +60,8 @@ class WebAutomation(BaseModel):
                             button_center_x = loc[0] + button_shape[1] / 2
                             button_center_y = loc[1] + button_shape[0] / 2
                             page.mouse.click(button_center_x, button_center_y)
-                        break
-                    time.sleep(image_click_delay)
+                        time.sleep(image_click_delay)
+            time.sleep(5)
 
 
 if __name__ == "__main__":
