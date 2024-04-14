@@ -1,74 +1,78 @@
+import os
 import time
+from typing import Union
 import datetime
 
-from PIL import ImageGrab
-import cv2
-import numpy as np
+from pydantic import Field, BaseModel, computed_field, field_validator, model_validator
 import pyautogui
-import pygetwindow as gw
-from rich.console import Console
-
-console = Console()
-
-
-def find_and_click_button(image_path: str, log_filename: str, screenshot: str):
-    button_image = cv2.imread(image_path, 0)
-    if button_image is None:
-        raise Exception(f"Unable to load button image from path: {image_path}")
-    screenshot_gray = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2GRAY)
-    result = cv2.matchTemplate(screenshot_gray, button_image, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-    threshold = 0.9
-    if max_val > threshold:
-        button_w = button_image.shape[1]
-        button_h = button_image.shape[0]
-        top_left = max_loc
-        bottom_right = (top_left[0] + button_w, top_left[1] + button_h)
-        cv2.rectangle(screenshot_gray, top_left, bottom_right, 255, 2)
-        cv2.imwrite(log_filename, screenshot_gray)
-        return max_loc, button_image.shape
-    return None, None
+from src.get_screen import GetScreen
+from src.find_matched import FindMatched
+from playwright.sync_api import sync_playwright
 
 
-def capture_screen(window_title: str):
-    try:
-        window = gw.getWindowsWithTitle(window_title)[0]
-        if window.isMinimized:
-            window.restore()
-        window.activate()
-        time.sleep(0.1)
-        x, y = window.topleft
-        width, height = window.size
-        bbox = (x, y, x + width, y + height)
-        screenshot = ImageGrab.grab(bbox=bbox)
-        btn_position = (x, y)
-        return screenshot, btn_position
-    except Exception as e:
-        console.log(f"Error capturing screen: {e}")
-        return None, None
+class WebAutomation(BaseModel):
+    pic_samples: list
+    log_dir: str
+    target: str = Field(..., description="This field can be either a window title or a URL.")
 
+    @model_validator(mode="after")
+    def create_folder(self):
+        os.makedirs(self.log_dir, exist_ok=True)
+        return self
 
-def main(pic_samples: list, log_dir: str, window_title: str):
-    while True:
-        now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_filename = f"{log_dir}/{now}.png"
-        screenshot, (win_x, win_y) = capture_screen(window_title)  # 獲取窗口左上角坐標
-        if screenshot is not None:
-            for pic_sample in pic_samples:
-                loc, button_shape = find_and_click_button(pic_sample, log_filename, screenshot)
-                if loc and button_shape:
-                    button_center_x = loc[0] + button_shape[1] / 2 + win_x
-                    button_center_y = loc[1] + button_shape[0] / 2 + win_y
-                    pyautogui.moveTo(button_center_x, button_center_y)
-                    # pyautogui.click()
-                    console.log(
-                        f"Clicked on button found at {loc}, real click position: ({button_center_x}, {button_center_y})"
-                    )
-                    break
-        time.sleep(5)
+    @model_validator(mode="after")
+    def validate_pic_samples(self):
+        for pic_sample in self.pic_samples:
+            if not os.path.exists(pic_sample):
+                raise ValueError(f"{pic_sample} not found")
+        return self
+
+    def main(self):
+        if not self.target.startswith("http"):
+            while True:
+                now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                log_filename = f"{self.log_dir}/{now}.png"
+                screenshot, (win_x, win_y) = GetScreen.from_exist_window(self.target)
+                if screenshot is not None:
+                    for pic_sample in self.pic_samples:
+                        find_matched = FindMatched(
+                            base_image=pic_sample, log_filename=log_filename, screenshot=screenshot
+                        )
+                        loc, button_shape = find_matched.find()
+                        if loc and button_shape:
+                            button_center_x = loc[0] + button_shape[1] / 2 + win_x
+                            button_center_y = loc[1] + button_shape[0] / 2 + win_y
+                            pyautogui.moveTo(button_center_x, button_center_y)
+                            # pyautogui.click()
+                            break
+                time.sleep(5)
+
+        else:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=False)
+                while True:
+                    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    log_filename = f"{self.log_dir}/{now}.png"
+                    screenshot, page = GetScreen.from_new_window(browser, self.target)
+                    if screenshot is not None:
+                        for pic_sample in self.pic_samples:
+                            find_matched = FindMatched(
+                                base_image=pic_sample,
+                                log_filename=log_filename,
+                                screenshot=screenshot,
+                            )
+                            loc, button_shape = find_matched.find()
+                            if loc and button_shape:
+                                button_center_x = loc[0] + button_shape[1] / 2
+                                button_center_y = loc[1] + button_shape[0] / 2
+                                page.mouse.click(button_center_x, button_center_y)
+                                break
+                    time.sleep(5)
 
 
 if __name__ == "__main__":
     pic_samples = ["./data/samples/confirm.png"]
     log_dir = "./data/logs"
-    main(pic_samples, log_dir, "雀魂麻将")
+    target = "雀魂麻将"
+    auto_web = WebAutomation(pic_samples=pic_samples, log_dir=log_dir, target=target)
+    auto_web.main()

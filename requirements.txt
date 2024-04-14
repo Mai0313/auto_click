@@ -1,5 +1,6 @@
 pygetwindow
 pillow
+playwright
 pyautogui
 opencv-python
 rich
