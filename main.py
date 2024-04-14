@@ -43,7 +43,7 @@ class WebAutomation(BaseModel):
                             button_center_x = loc[0] + button_shape[1] / 2 + win_x
                             button_center_y = loc[1] + button_shape[0] / 2 + win_y
                             pyautogui.moveTo(button_center_x, button_center_y)
-                            # pyautogui.click()
+                            pyautogui.click()
                             break
                 time.sleep(5)
 
@@ -71,7 +71,12 @@ class WebAutomation(BaseModel):
 
 
 if __name__ == "__main__":
-    pic_samples = ["./data/samples/confirm.png"]
+    pic_samples = [
+        "./data/samples/confirm.png",
+        "./data/samples/ranking.png",
+        "./data/samples/tong.png",
+        "data/samples/play_4.png",
+    ]
     log_dir = "./data/logs"
     target = "雀魂麻将"
     auto_web = WebAutomation(pic_samples=pic_samples, log_dir=log_dir, target=target)
