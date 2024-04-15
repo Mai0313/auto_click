@@ -27,3 +27,8 @@
   image_path: "./data/samples/match_end.png"
   image_click_delay: 0
   screenshot_option: True
+
+- image_name: "獲得獎勵"
+  image_path: "./data/samples/reward_gain.png"
+  image_click_delay: 0
+  screenshot_option: False
