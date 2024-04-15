@@ -61,7 +61,7 @@ class FindMatched(BaseModel):
             button_h = button_image.shape[0]
             top_left = max_loc
             bottom_right = (top_left[0] + button_w, top_left[1] + button_h)
-            if self.screenshot_option:
+            if self.screenshot_option is True:
                 color_screenshot = self.color_screenshot.copy()
                 cv2.rectangle(color_screenshot, top_left, bottom_right, (0, 0, 255), 2)
                 cv2.imwrite(self.log_filename, color_screenshot)

@@ -22,3 +22,8 @@
   image_path: "./data/samples/hule.png"
   image_click_delay: 0
   screenshot_option: True
+
+- image_name: "對局結束"
+  image_path: "./data/samples/match_end.png"
+  image_click_delay: 0
+  screenshot_option: True
