@@ -32,3 +32,13 @@
   image_path: "./data/samples/reward_gain.png"
   image_click_delay: 0
   screenshot_option: False
+
+- image_name: "簽到v1"
+  image_path: "./data/samples/assign_v1.png"
+  image_click_delay: 0
+  screenshot_option: False
+
+- image_name: "簽到v2"
+  image_path: "./data/samples/assign_v2.png"
+  image_click_delay: 0
+  screenshot_option: False
