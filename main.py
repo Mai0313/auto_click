@@ -85,5 +85,5 @@ if __name__ == "__main__":
         "進入遊戲",
         "好的",
     ]
-    auto_web = WebAutomation(log_dir=log_dir, target=target, strategy=strategy)
-    auto_web.main()
+    auto_web = WebAutomation(log_dir=log_dir, target=target)
+    auto_web.main(strategy=strategy)
