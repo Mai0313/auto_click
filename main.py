@@ -29,7 +29,7 @@ class WebAutomation(BaseModel):
             settings = yaml.load(file, Loader=yaml.FullLoader)
             return settings
 
-    def main(self):
+    def main(self, strategy: list[str]):
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         log_filename = f"{self.log_dir}/{now}.png"
         while True:
@@ -41,6 +41,8 @@ class WebAutomation(BaseModel):
                 for image_config in self.image_configs:
                     image_cfg = Settings(**image_config)
                     image_name = image_cfg.image_name
+                    if image_name not in strategy:
+                        continue
                     image_path = image_cfg.image_path
                     image_click_delay = image_cfg.image_click_delay
                     screenshot_option = image_cfg.screenshot_option
@@ -68,5 +70,20 @@ class WebAutomation(BaseModel):
 if __name__ == "__main__":
     log_dir = "./data/logs"
     target = "雀魂麻将"
-    auto_web = WebAutomation(log_dir=log_dir, target=target)
+    strategy = [
+        "遊戲結束確認",
+        "開始段位",
+        "金之間",
+        "四人南",
+        "胡了",
+        "對局結束",
+        "獲得獎勵",
+        "簽到v1",
+        "簽到v2",
+        "關閉",
+        "叉叉",
+        "進入遊戲",
+        "好的",
+    ]
+    auto_web = WebAutomation(log_dir=log_dir, target=target, strategy=strategy)
     auto_web.main()

@@ -8,13 +8,28 @@
   image_click_delay: 0
   screenshot_option: False
 
+- image_name: "銅之間"
+  image_path: "./data/samples/tong.png"
+  image_click_delay: 0
+  screenshot_option: False
+
 - image_name: "銀之間"
   image_path: "./data/samples/silver.png"
   image_click_delay: 0
   screenshot_option: False
 
+- image_name: "金之間"
+  image_path: "./data/samples/gold.png"
+  image_click_delay: 0
+  screenshot_option: False
+
 - image_name: "四人東"
-  image_path: "./data/samples/play_start.png"
+  image_path: "./data/samples/east_4p.png"
+  image_click_delay: 30
+  screenshot_option: False
+
+- image_name: "四人南"
+  image_path: "./data/samples/south_4p.png"
   image_click_delay: 30
   screenshot_option: False
 
