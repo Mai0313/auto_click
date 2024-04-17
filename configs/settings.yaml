@@ -42,3 +42,23 @@
   image_path: "./data/samples/assign_v2.png"
   image_click_delay: 0
   screenshot_option: False
+
+- image_name: "關閉"
+  image_path: "./data/samples/turn_off.png"
+  image_click_delay: 0
+  screenshot_option: False
+
+- image_name: "叉叉"
+  image_path: "./data/samples/xx.png"
+  image_click_delay: 0
+  screenshot_option: False
+
+- image_name: "登入"
+  image_path: "./data/samples/turn_off.png"
+  image_click_delay: 0
+  screenshot_option: False
+
+- image_name: "好的"
+  image_path: "./data/samples/haode.png"
+  image_click_delay: 0
+  screenshot_option: False
