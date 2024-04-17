@@ -53,8 +53,8 @@
   image_click_delay: 0
   screenshot_option: False
 
-- image_name: "登入"
-  image_path: "./data/samples/turn_off.png"
+- image_name: "進入遊戲"
+  image_path: "./data/samples/login.png"
   image_click_delay: 0
   screenshot_option: False
 
