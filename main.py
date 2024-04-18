@@ -27,6 +27,7 @@ class WebAutomation(BaseModel):
 
     def main(self):
         while True:
+            additional_delay = True
             if not self.target.startswith("http"):
                 screenshot, win_x, win_y = GetScreen.from_exist_window(self.target)
             else:
@@ -46,14 +47,15 @@ class WebAutomation(BaseModel):
                             button_center_x = loc[0] + button_shape[1] / 2 + win_x
                             button_center_y = loc[1] + button_shape[0] / 2 + win_y
                             pyautogui.moveTo(button_center_x, button_center_y)
-                            # pyautogui.click()
+                            pyautogui.click()
                         elif self.target.startswith("http"):
                             button_center_x = loc[0] + button_shape[1] / 2
                             button_center_y = loc[1] + button_shape[0] / 2
-                            # page.mouse.click(button_center_x, button_center_y)
+                            page.mouse.click(button_center_x, button_center_y)
                         time.sleep(image_cfg.image_click_delay)
-                break
-            # time.sleep(5)
+                        additional_delay = False
+            if additional_delay is True:
+                time.sleep(5)
 
 
 if __name__ == "__main__":
