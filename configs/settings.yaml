@@ -83,6 +83,18 @@
   screenshot_option: False
   confidence: 0.9
 
+- image_name: "玉之間"
+  image_path: "./data/samples/yu.png"
+  image_click_delay: 0
+  screenshot_option: False
+  confidence: 0.9
+
+- image_name: "王座之間"
+  image_path: "./data/samples/king.png"
+  image_click_delay: 0
+  screenshot_option: False
+  confidence: 0.9
+
 # 這段二選一
 - image_name: "四人東"
   image_path: "./data/samples/east_4p.png"
