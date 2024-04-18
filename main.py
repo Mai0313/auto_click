@@ -17,6 +17,7 @@ class WebAutomation(BaseModel):
     check_list: list[str] = Field(
         ..., description="The check list, it should be a list of image names"
     )
+    auto_click: bool = Field(..., description="Whether to click the button automatically")
 
     @computed_field
     @property
@@ -43,15 +44,18 @@ class WebAutomation(BaseModel):
                     )
                     loc, button_shape = find_matched.find()
                     if loc and button_shape:
-                        if not self.target.startswith("http"):
-                            button_center_x = loc[0] + button_shape[1] / 2 + win_x
-                            button_center_y = loc[1] + button_shape[0] / 2 + win_y
-                            pyautogui.moveTo(button_center_x, button_center_y)
-                            pyautogui.click()
-                        elif self.target.startswith("http"):
-                            button_center_x = loc[0] + button_shape[1] / 2
-                            button_center_y = loc[1] + button_shape[0] / 2
-                            page.mouse.click(button_center_x, button_center_y)
+                        # This condition should be placed here since we need to know if it detects the image.
+                        # Even if you don't want to click the button, you still need to wait.
+                        if self.auto_click is True:
+                            if not self.target.startswith("http"):
+                                button_center_x = loc[0] + button_shape[1] / 2 + win_x
+                                button_center_y = loc[1] + button_shape[0] / 2 + win_y
+                                pyautogui.moveTo(button_center_x, button_center_y)
+                                pyautogui.click()
+                            elif self.target.startswith("http"):
+                                button_center_x = loc[0] + button_shape[1] / 2
+                                button_center_y = loc[1] + button_shape[0] / 2
+                                page.mouse.click(button_center_x, button_center_y)
                         time.sleep(image_cfg.image_click_delay)
                         additional_delay = False
             if additional_delay is True:
@@ -74,7 +78,8 @@ if __name__ == "__main__":
         "好的",
     ]
     additional_check_list = ["金之間", "四人南"]
+    auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]
-    auto_web = WebAutomation(target=target, check_list=check_list)
+    auto_web = WebAutomation(target=target, check_list=check_list, auto_click=auto_click)
     auto_web.main()
