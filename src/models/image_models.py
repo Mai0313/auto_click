@@ -7,3 +7,4 @@ class Settings(BaseModel):
     image_path: str
     image_click_delay: int
     screenshot_option: bool
+    confidence: float
