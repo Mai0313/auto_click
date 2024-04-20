@@ -1,9 +1,3 @@
-- image_name: "遊戲結束確認"
-  image_path: "./data/samples/confirm.png"
-  image_click_delay: 0
-  screenshot_option: False
-  confidence: 0.9
-
 - image_name: "開始段位"
   image_path: "./data/samples/ranking.png"
   image_click_delay: 0
@@ -30,6 +24,18 @@
 
 - image_name: "獲得獎勵"
   image_path: "./data/samples/reward_gain.png"
+  image_click_delay: 0
+  screenshot_option: False
+  confidence: 0.9
+
+- image_name: "遊戲結束確認"
+  image_path: "./data/samples/confirm.png"
+  image_click_delay: 0
+  screenshot_option: False
+  confidence: 0.9
+
+- image_name: "遊戲結束確認2"
+  image_path: "./data/samples/confirm2.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9

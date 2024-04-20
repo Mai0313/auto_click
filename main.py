@@ -77,7 +77,7 @@ if __name__ == "__main__":
         "進入遊戲",
         "好的",
     ]
-    additional_check_list = ["金之間", "四人南"]
+    additional_check_list = ["玉之間", "四人南"]
     auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]
