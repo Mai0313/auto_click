@@ -50,7 +50,8 @@ class WebAutomation(BaseModel):
                             if not self.target.startswith("http"):
                                 button_center_x = loc[0] + button_shape[1] / 2 + win_x
                                 button_center_y = loc[1] + button_shape[0] / 2 + win_y
-                                pyautogui.moveTo(button_center_x, button_center_y)
+                                # pyautogui.scroll(image_cfg.scroll, x=button_center_x, y=button_center_y)
+                                pyautogui.moveTo(x=button_center_x, y=button_center_y)
                                 pyautogui.click()
                             elif self.target.startswith("http"):
                                 button_center_x = loc[0] + button_shape[1] / 2
@@ -76,6 +77,7 @@ if __name__ == "__main__":
         "叉叉",
         "進入遊戲",
         "好的",
+        # "一般場",
     ]
     additional_check_list = ["玉之間", "四人南"]
     auto_click = True

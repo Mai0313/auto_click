@@ -3,103 +3,127 @@
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "胡了"
   image_path: "./data/samples/hule.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "對局結束"
   image_path: "./data/samples/match_end.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "結算畫面"
   image_path: "./data/samples/score.png"
   image_click_delay: 0
   screenshot_option: True
   confidence: 0.9
+  scroll: 0
 
 - image_name: "獲得獎勵"
   image_path: "./data/samples/reward_gain.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "遊戲結束確認"
   image_path: "./data/samples/confirm.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "遊戲結束確認2"
   image_path: "./data/samples/confirm2.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "簽到"
   image_path: "./data/samples/assign_v2.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "關閉"
   image_path: "./data/samples/turn_off.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "叉叉"
   image_path: "./data/samples/xx.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "進入遊戲"
   image_path: "./data/samples/login.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "好的"
   image_path: "./data/samples/haode.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 # 這段三選一
+- image_name: "一般場"
+  image_path: "./data/samples/normal.png"
+  image_click_delay: 5
+  screenshot_option: False
+  confidence: 0.9
+  scroll: -100
+
 - image_name: "銅之間"
   image_path: "./data/samples/tong.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "銀之間"
   image_path: "./data/samples/silver.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "金之間"
   image_path: "./data/samples/gold.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "玉之間"
   image_path: "./data/samples/yu.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "王座之間"
   image_path: "./data/samples/king.png"
   image_click_delay: 0
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 # 這段二選一
 - image_name: "四人東"
@@ -107,9 +131,11 @@
   image_click_delay: 30
   screenshot_option: False
   confidence: 0.9
+  scroll: 0
 
 - image_name: "四人南"
   image_path: "./data/samples/south_4p.png"
   image_click_delay: 30
   screenshot_option: False
   confidence: 0.9
+  scroll: 0

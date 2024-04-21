@@ -8,3 +8,4 @@ class Settings(BaseModel):
     image_click_delay: int
     screenshot_option: bool
     confidence: float
+    scroll: int
