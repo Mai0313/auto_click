@@ -67,6 +67,7 @@ if __name__ == "__main__":
     target = "雀魂麻将"
     base_check_list = [
         "遊戲結束確認",
+        "遊戲結束確認2",
         "開始段位",
         "胡了",
         "對局結束",
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         "好的",
         # "一般場",
     ]
-    additional_check_list = ["玉之間", "四人南"]
+    additional_check_list = ["銅之間", "三人東"]
     auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]
