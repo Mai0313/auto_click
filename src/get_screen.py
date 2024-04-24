@@ -26,22 +26,30 @@ class GetScreen(BaseModel):
             return None, None, None
 
     @classmethod
-    def from_new_window(cls, target_url: str):
+    def from_remote_window(cls, url: str):
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-                java_script_enabled=True,
-                accept_downloads=False,
-                has_touch=False,
-                is_mobile=False,
-                locale="zh-TW",
-                permissions=[],
-                geolocation=None,
-                color_scheme="light",
-                timezone_id="Asia/Shanghai",
-            )
-            page = context.new_page()
-            page.goto(target_url)
-            screenshot = page.screenshot(path="./data/logs/screenshot.png")
-            return screenshot, page, browser
+            if "localhost" in url:
+                browser = p.chromium.connect_over_cdp(url)
+                contexts = browser.contexts
+                context = contexts[0]
+                page = context.pages[0]
+                screenshot = page.screenshot()
+                return screenshot, page, browser
+            else:
+                browser = p.chromium.launch(headless=False)
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+                    java_script_enabled=True,
+                    accept_downloads=False,
+                    has_touch=False,
+                    is_mobile=False,
+                    locale="zh-TW",
+                    permissions=[],
+                    geolocation=None,
+                    color_scheme="light",
+                    timezone_id="Asia/Shanghai",
+                )
+                page = context.new_page()
+                page.goto(url)
+                screenshot = page.screenshot()
+                return screenshot, page, browser

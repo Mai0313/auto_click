@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Union
+from typing import Union, Optional
 import datetime
 
 import yaml
@@ -13,7 +13,9 @@ from src.models.image_models import Settings
 
 
 class WebAutomation(BaseModel):
-    target: str = Field(..., description="This field can be either a window title or a URL.")
+    target: str = Field(
+        ..., description="This field can be either a window title or a URL or cdp url."
+    )
     check_list: list[str] = Field(
         ..., description="The check list, it should be a list of image names"
     )
@@ -29,10 +31,10 @@ class WebAutomation(BaseModel):
     def main(self):
         while True:
             additional_delay = True
-            if not self.target.startswith("http"):
+            if "localhost" not in self.target:
                 screenshot, win_x, win_y = GetScreen.from_exist_window(self.target)
             else:
-                screenshot, page, browser = GetScreen.from_new_window(self.target)
+                screenshot, page, browser = GetScreen.from_remote_window(self.target)
             if screenshot is not None:
                 for image_config in self.image_configs:
                     image_cfg = Settings(**image_config)
@@ -47,16 +49,16 @@ class WebAutomation(BaseModel):
                         # This condition should be placed here since we need to know if it detects the image.
                         # Even if you don't want to click the button, you still need to wait.
                         if self.auto_click is True:
-                            if not self.target.startswith("http"):
+                            if "localhost" in self.target:
+                                button_center_x = loc[0] + button_shape[1] / 2
+                                button_center_y = loc[1] + button_shape[0] / 2
+                                page.mouse.click(button_center_x, button_center_y)
+                            else:
                                 button_center_x = loc[0] + button_shape[1] / 2 + win_x
                                 button_center_y = loc[1] + button_shape[0] / 2 + win_y
                                 # pyautogui.scroll(image_cfg.scroll, x=button_center_x, y=button_center_y)
                                 pyautogui.moveTo(x=button_center_x, y=button_center_y)
                                 pyautogui.click()
-                            elif self.target.startswith("http"):
-                                button_center_x = loc[0] + button_shape[1] / 2
-                                button_center_y = loc[1] + button_shape[0] / 2
-                                page.mouse.click(button_center_x, button_center_y)
                         time.sleep(image_cfg.image_click_delay)
                         additional_delay = False
             if additional_delay is True:
@@ -65,6 +67,7 @@ class WebAutomation(BaseModel):
 
 if __name__ == "__main__":
     target = "雀魂麻将"
+    # target = "http://localhost:9222"
     base_check_list = [
         "遊戲結束確認",
         "遊戲結束確認2",
@@ -80,7 +83,7 @@ if __name__ == "__main__":
         "好的",
         # "一般場",
     ]
-    additional_check_list = ["銅之間", "三人東"]
+    additional_check_list = ["銀之間", "三人東"]
     auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]
