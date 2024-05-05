@@ -83,7 +83,7 @@ if __name__ == "__main__":
         "好的",
         # "一般場",
     ]
-    additional_check_list = ["銀之間", "三人東"]
+    additional_check_list = ["玉之間", "四人南"]
     auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]

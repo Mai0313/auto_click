@@ -143,7 +143,7 @@
 - image_name: "三人東"
   image_path: "./data/samples/east_3p.png"
   image_click_delay: 30
-  screenshot_option: True
+  screenshot_option: False
   confidence: 0.95
   scroll: 0
 
