@@ -24,7 +24,7 @@ class WebAutomation(BaseModel):
     @computed_field
     @property
     def image_configs(self) -> list[dict]:
-        with open("./configs/settings.yaml", encoding="utf-8") as file:
+        with open("./configs/mahjong.yaml", encoding="utf-8") as file:
             settings = yaml.load(file, Loader=yaml.FullLoader)
         return settings
 
