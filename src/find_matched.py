@@ -66,7 +66,7 @@ class FindMatched(BaseModel):
         result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-        if max_val > 0.1:  # self.image_cfg.confidence:
+        if max_val > self.image_cfg.confidence:
             button_w = button_image.shape[1]
             button_h = button_image.shape[0]
             top_left = max_loc
