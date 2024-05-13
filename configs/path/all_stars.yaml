@@ -30,7 +30,7 @@
   image_path: "./data/allstars/start.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
   scroll: 0
 
 # - image_name: "取消配對"
@@ -44,12 +44,12 @@
   image_path: "./data/allstars/click2quit.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
   scroll: 0
 
 - image_name: "返回大廳"
   image_path: "./data/allstars/back2lobby.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
   scroll: 0
