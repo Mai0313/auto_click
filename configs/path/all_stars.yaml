@@ -40,8 +40,8 @@
 #   confidence: 0.6
 #   scroll: 0
 
-- image_name: "任意按鍵返回大廳"
-  image_path: "./data/allstars/click2quit.png"
+- image_name: "點擊空白區域繼續"
+  image_path: "./data/allstars/click2continue.png"
   image_click_delay: 0
   screenshot_option: True
   confidence: 0.8
