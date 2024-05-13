@@ -2,33 +2,54 @@
   image_path: "./data/allstars/enter_game.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.1
+  confidence: 0.8
   scroll: 0
 
-- image_name: "開始遊戲"
+- image_name: "切換到王朝"
+  image_path: "./data/allstars/switch_game_mode.png"
+  image_click_delay: 0
+  screenshot_option: True
+  confidence: 0.8
+  scroll: 0
+
+- image_name: "選擇王朝模式"
+  image_path: "./data/allstars/lbj3v3.png"
+  image_click_delay: 0
+  screenshot_option: True
+  confidence: 0.8
+  scroll: 0
+
+- image_name: "選擇"
+  image_path: "./data/allstars/select.png"
+  image_click_delay: 0
+  screenshot_option: True
+  confidence: 0.8
+  scroll: 0
+
+- image_name: "開始配對"
   image_path: "./data/allstars/start.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
   scroll: 0
 
 - image_name: "取消配對"
   image_path: "./data/allstars/cancel.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
-  scroll: 0
-
-- image_name: "返回大廳"
-  image_path: "./data/allstars/back2lobby.png"
-  image_click_delay: 0
-  screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
   scroll: 0
 
 - image_name: "任意按鍵返回大廳"
   image_path: "./data/allstars/click2quit.png"
   image_click_delay: 0
   screenshot_option: True
-  confidence: 0.7
+  confidence: 0.8
+  scroll: 0
+
+- image_name: "返回大廳"
+  image_path: "./data/allstars/back2lobby.png"
+  image_click_delay: 0
+  screenshot_option: True
+  confidence: 0.8
   scroll: 0
