@@ -24,7 +24,7 @@ class WebAutomation(BaseModel):
     @computed_field
     @property
     def image_configs(self) -> list[dict]:
-        with open("./configs/mahjong.yaml", encoding="utf-8") as file:
+        with open("./configs/path/mahjong.yaml", encoding="utf-8") as file:
             settings = yaml.load(file, Loader=yaml.FullLoader)
         return settings
 
@@ -66,24 +66,12 @@ class WebAutomation(BaseModel):
 
 
 if __name__ == "__main__":
-    target = "雀魂麻将"
-    # target = "http://localhost:9222"
-    base_check_list = [
-        "遊戲結束確認",
-        "遊戲結束確認2",
-        "開始段位",
-        "胡了",
-        "對局結束",
-        "結算畫面",
-        # "獲得獎勵",
-        "簽到",
-        "關閉",
-        "叉叉",
-        "進入遊戲",
-        "好的",
-        # "一般場",
-    ]
-    additional_check_list = ["玉之間", "四人南"]
+    from omegaconf import OmegaConf
+
+    target = "雀魂麻将"  # "http://localhost:9222"
+    config = OmegaConf.load("configs/settings/mahjong.yaml")
+    base_check_list = config.base_check_list
+    additional_check_list = config.additional_check_list
     auto_click = True
 
     check_list = [*base_check_list, *additional_check_list]
