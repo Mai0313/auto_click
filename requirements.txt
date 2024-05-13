@@ -5,10 +5,10 @@ pyautogui
 opencv-python
 rich
 pydantic
+adbutils
 
 #### Development Related ####
+poetry
 ipykernel
 ipywidgets
 pre-commit
-pytest
-sh

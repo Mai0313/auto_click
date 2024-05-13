@@ -1,3 +1,32 @@
+[tool.poetry]
+name = "auto-click"
+version = "0.1.0"
+description = ""
+authors = ["Wei <mai@mai0313.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pygetwindow = "^0.0.9"
+pillow = "^10.3.0"
+playwright = "^1.43.0"
+pyautogui = "^0.9.54"
+opencv-python = "^4.9.0.80"
+rich = "^13.7.1"
+pydantic = "^2.7.1"
+adbutils = "^2.6.2"
+
+
+[tool.poetry.group.dev.dependencies]
+poetry = "^1.8.3"
+ipykernel = "^6.29.4"
+ipywidgets = "^8.1.2"
+pre-commit = "^3.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.pytest.ini_options]
 addopts = [
   "--color=yes",
