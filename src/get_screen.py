@@ -2,8 +2,10 @@ import time
 from typing import Optional
 
 from PIL import ImageGrab
+from adbutils import adb
 from pydantic import Field, BaseModel
 import pygetwindow as gw
+from adbutils._device import AdbDevice
 from playwright.sync_api import Browser, sync_playwright
 from pygetwindow._pygetwindow_win import Win32Window
 
@@ -24,6 +26,16 @@ class GetScreen(BaseModel):
             return screenshot, x, y
         except Exception:
             return None, None, None
+
+    @classmethod
+    def from_adb_device(cls, url: str) -> tuple[bytes, AdbDevice, None]:
+        device = adb.device()
+        current_app = device.app_current()
+        if current_app.package != url:
+            device.app_start(url)
+
+        screenshot = device.screenshot()
+        return screenshot, device, None
 
     @classmethod
     def from_remote_window(cls, url: str):

@@ -8,7 +8,6 @@ from pydantic import Field, BaseModel, computed_field, field_validator, model_va
 import pyautogui
 from src.get_screen import GetScreen
 from src.find_matched import FindMatched
-from playwright.sync_api import sync_playwright
 from src.models.image_models import Settings
 
 
@@ -16,6 +15,7 @@ class WebAutomation(BaseModel):
     target: str = Field(
         ..., description="This field can be either a window title or a URL or cdp url."
     )
+    image_config_path: str
     check_list: list[str] = Field(
         ..., description="The check list, it should be a list of image names"
     )
@@ -24,17 +24,19 @@ class WebAutomation(BaseModel):
     @computed_field
     @property
     def image_configs(self) -> list[dict]:
-        with open("./configs/path/mahjong.yaml", encoding="utf-8") as file:
+        with open(self.image_config_path, encoding="utf-8") as file:
             settings = yaml.load(file, Loader=yaml.FullLoader)
         return settings
 
     def main(self):
         while True:
             additional_delay = True
-            if "localhost" not in self.target:
-                screenshot, win_x, win_y = GetScreen.from_exist_window(self.target)
+            if "localhost" in self.target:
+                screenshot, page, _ = GetScreen.from_remote_window(self.target)
+            elif "com." in self.target:
+                screenshot, device, _ = GetScreen.from_adb_device(self.target)
             else:
-                screenshot, page, browser = GetScreen.from_remote_window(self.target)
+                screenshot, win_x, win_y = GetScreen.from_exist_window(self.target)
             if screenshot is not None:
                 for image_config in self.image_configs:
                     image_cfg = Settings(**image_config)
@@ -46,17 +48,18 @@ class WebAutomation(BaseModel):
                     )
                     loc, button_shape = find_matched.find()
                     if loc and button_shape:
-                        # This condition should be placed here since we need to know if it detects the image.
-                        # Even if you don't want to click the button, you still need to wait.
                         if self.auto_click is True:
                             if "localhost" in self.target:
                                 button_center_x = loc[0] + button_shape[1] / 2
                                 button_center_y = loc[1] + button_shape[0] / 2
                                 page.mouse.click(button_center_x, button_center_y)
+                            elif "com." in self.target:
+                                button_center_x = loc[0] + button_shape[1] / 2
+                                button_center_y = loc[1] + button_shape[0] / 2
+                                device.click(button_center_x, button_center_y)
                             else:
                                 button_center_x = loc[0] + button_shape[1] / 2 + win_x
                                 button_center_y = loc[1] + button_shape[0] / 2 + win_y
-                                # pyautogui.scroll(image_cfg.scroll, x=button_center_x, y=button_center_y)
                                 pyautogui.moveTo(x=button_center_x, y=button_center_y)
                                 pyautogui.click()
                         time.sleep(image_cfg.image_click_delay)
@@ -68,12 +71,25 @@ class WebAutomation(BaseModel):
 if __name__ == "__main__":
     from omegaconf import OmegaConf
 
-    target = "雀魂麻将"  # "http://localhost:9222"
-    config = OmegaConf.load("configs/settings/mahjong.yaml")
-    base_check_list = config.base_check_list
-    additional_check_list = config.additional_check_list
-    auto_click = True
+    # target = "雀魂麻将"  # "http://localhost:9222"
+    # config = OmegaConf.load("./configs/settings/mahjong.yaml")
+    # base_check_list = config.base_check_list
+    # image_config_path = "./configs/path/mahjong.yaml"
+    # additional_check_list = config.additional_check_list
+    # auto_click = True
+    # check_list = [*base_check_list, *additional_check_list]
 
-    check_list = [*base_check_list, *additional_check_list]
-    auto_web = WebAutomation(target=target, check_list=check_list, auto_click=auto_click)
+    target = "com.longe.allstarhmt"
+    config = OmegaConf.load("./configs/settings/all_stars.yaml")
+    base_check_list = config.base_check_list
+    image_config_path = "./configs/path/all_stars.yaml"
+    auto_click = True
+    check_list = base_check_list
+
+    auto_web = WebAutomation(
+        target=target,
+        image_config_path=image_config_path,
+        check_list=check_list,
+        auto_click=auto_click,
+    )
     auto_web.main()
