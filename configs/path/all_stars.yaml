@@ -28,7 +28,7 @@
 
 - image_name: "開始配對"
   image_path: "./data/allstars/start.png"
-  image_click_delay: 0
+  image_click_delay: 20
   screenshot_option: True
   confidence: 0.8
   scroll: 0
