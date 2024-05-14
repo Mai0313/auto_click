@@ -38,13 +38,12 @@ class RemoteContoller(BaseModel):
         button_center_x: int,
         button_center_y: int,
     ) -> None:
-        x, y = button_center_x / 2, button_center_y / 2
         if isinstance(device, Page):
-            device.mouse.click(x=x, y=y)
+            device.mouse.click(x=button_center_x, y=button_center_y)
         elif isinstance(device, AdbDevice):
-            device.click(x=x, y=y)
+            device.click(x=button_center_x, y=button_center_y)
         else:
-            pyautogui.moveTo(x=x + device.shift_x, y=y + device.shift_y)
+            pyautogui.moveTo(x=button_center_x + device.shift_x, y=button_center_y + device.shift_y)
             pyautogui.click()
 
     def main(self) -> None:
@@ -62,13 +61,13 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                    console.print(f"{config_dict.image_name} has been found and clicked.")
+                    console.log(f"{config_dict.image_name} has been found and clicked.")
                     time.sleep(config_dict.delay_after_click)
-                    console.print(
+                    console.log(
                         f"Waiting {config_dict.delay_after_click} seconds before the next check."
                     )
             time.sleep(self.config_model.global_interval)
-            console.print(
+            console.log(
                 f"Waiting {self.config_model.global_interval} seconds before the next loop."
             )
 
