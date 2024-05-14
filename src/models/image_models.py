@@ -1,5 +1,4 @@
-import yaml
-from pydantic import Field, BaseModel, model_validator
+from pydantic import BaseModel
 
 
 class Settings(BaseModel):

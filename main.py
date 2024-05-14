@@ -1,17 +1,14 @@
-import os
 import time
-from typing import Union, Optional
-import datetime
 
 import yaml
-from pydantic import Field, BaseModel, computed_field, field_validator, model_validator
+from pydantic import Field, BaseModel, computed_field
 import pyautogui
 from src.get_screen import GetScreen
 from src.find_matched import FindMatched
 from src.models.image_models import Settings
 
 
-class WebAutomation(BaseModel):
+class RemoteContoller(BaseModel):
     target: str = Field(
         ..., description="This field can be either a window title or a URL or cdp url."
     )
@@ -28,23 +25,21 @@ class WebAutomation(BaseModel):
             settings = yaml.load(file, Loader=yaml.FullLoader)
         return settings
 
-    def main(self):
+    def main(self) -> None:
         while True:
             additional_delay = True
             if "localhost" in self.target:
-                screenshot, page, _ = GetScreen.from_remote_window(self.target)
+                screenshot, page = GetScreen.from_remote_window(self.target)
             elif "com." in self.target:
-                screenshot, device, _ = GetScreen.from_adb_device(self.target)
+                screenshot, device = GetScreen.from_adb_device(self.target)
             else:
-                screenshot, win_x, win_y = GetScreen.from_exist_window(self.target)
+                screenshot, shift_position = GetScreen.from_exist_window(self.target)
             if screenshot is not None:
                 for image_config in self.image_configs:
                     image_cfg = Settings(**image_config)
 
                     find_matched = FindMatched(
-                        image_cfg=image_cfg,
-                        check_list=self.check_list,
-                        screenshot=screenshot,
+                        image_cfg=image_cfg, check_list=self.check_list, screenshot=screenshot
                     )
                     loc, button_shape = find_matched.find()
                     if loc and button_shape:
@@ -58,8 +53,12 @@ class WebAutomation(BaseModel):
                                 button_center_y = loc[1] + button_shape[0] / 2
                                 device.click(button_center_x, button_center_y)
                             else:
-                                button_center_x = loc[0] + button_shape[1] / 2 + win_x
-                                button_center_y = loc[1] + button_shape[0] / 2 + win_y
+                                button_center_x = (
+                                    loc[0] + button_shape[1] / 2 + shift_position.shift_x
+                                )
+                                button_center_y = (
+                                    loc[1] + button_shape[0] / 2 + shift_position.shift_y
+                                )
                                 pyautogui.moveTo(x=button_center_x, y=button_center_y)
                                 pyautogui.click()
                         time.sleep(image_cfg.image_click_delay)
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     auto_click = True
     check_list = base_check_list
 
-    auto_web = WebAutomation(
+    auto_web = RemoteContoller(
         target=target,
         image_config_path=image_config_path,
         check_list=check_list,

@@ -23,7 +23,7 @@ class FindMatched(BaseModel):
     screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
 
     @model_validator(mode="after")
-    def get_screenshot_image(self):
+    def get_screenshot_image(self) -> Union[Image.Image, bytes]:
         if isinstance(self.screenshot, bytes):
             image_stream = BytesIO(self.screenshot)
             return Image.open(image_stream)
@@ -51,7 +51,7 @@ class FindMatched(BaseModel):
         log_filename = f"{log_dir}/{now}.png"
         return log_filename
 
-    def find(self):
+    def find(self) -> tuple[Union[cv2.typing.Point, None], Union[tuple[int, int], None]]:
         if not os.path.exists(self.image_cfg.image_path):
             raise Exception(f"Unable to find button image from path: {self.image_cfg.image_path}")
         if self.image_cfg.image_name not in self.check_list:
