@@ -23,7 +23,7 @@ class RemoteContoller(BaseModel):
                 screenshot, device = GetScreen.from_adb_device(self.target, 16416)
             else:
                 screenshot, shift_position = GetScreen.from_exist_window(self.target)
-            if screenshot is not None:
+            if screenshot:
                 for image_config_dict in self.config_model.image_list:
                     find_matched = FindMatched(
                         image_cfg=image_config_dict,
@@ -60,12 +60,10 @@ if __name__ == "__main__":
     from omegaconf import OmegaConf
 
     # target = "雀魂麻将"  # "http://localhost:9222"
-    # config = OmegaConf.load("./configs/settings/mahjong.yaml")
-    # base_check_list = config.base_check_list
-    # image_config_path = "./configs/path/mahjong.yaml"
-    # additional_check_list = config.additional_check_list
-    # auto_click = True
-    # check_list = [*base_check_list, *additional_check_list]
+    # config = OmegaConf.load("./configs/mahjong.yaml")
+    # config_model = ConfigModel(**config)
+    # check_list = [*config_model.base_check_list, *config_model.additional_check_list]
+    # config_model.base_check_list = check_list
 
     target = "com.longe.allstarhmt"
     config = OmegaConf.load("./configs/all_stars.yaml")
