@@ -1,4 +1,6 @@
 auto_click: false
+loops: 100
+global_interval: 5
 
 base_check_list:
   - 開始配對
@@ -14,18 +16,15 @@ image_list:
     image_click_delay: 20
     screenshot_option: True
     confidence: 0.8
-    scroll: 0
 
   - image_name: "點擊空白區域繼續"
     image_path: "./data/allstars/click2continue.png"
     image_click_delay: 0
     screenshot_option: True
     confidence: 0.8
-    scroll: 0
 
   - image_name: "返回大廳"
     image_path: "./data/allstars/back2lobby.png"
     image_click_delay: 0
     screenshot_option: True
     confidence: 0.8
-    scroll: 0

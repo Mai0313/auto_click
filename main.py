@@ -46,7 +46,7 @@ class RemoteContoller(BaseModel):
             pyautogui.click()
 
     def main(self) -> None:
-        while True:
+        for _ in range(self.config_model.loops):
             screenshot, device = self.get_device()
             for config_dict in self.config_model.image_list:
                 button_center_x, button_center_y = ImageComparison(
@@ -60,7 +60,8 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                time.sleep(config_dict.image_click_delay)
+                    time.sleep(config_dict.image_click_delay)
+            time.sleep(self.config_model.global_interval)
 
 
 if __name__ == "__main__":
