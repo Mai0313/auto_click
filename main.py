@@ -26,7 +26,7 @@ class RemoteContoller(BaseModel):
             if screenshot is not None:
                 for image_config_dict in self.config_model.image_list:
                     find_matched = FindMatched(
-                        image_cfg=image_config_dict.image_path,
+                        image_cfg=image_config_dict,
                         check_list=self.config_model.base_check_list,
                         screenshot=screenshot,
                     )
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     # check_list = [*base_check_list, *additional_check_list]
 
     target = "com.longe.allstarhmt"
-    config = OmegaConf.load("./configs/settings/all_stars.yaml")
+    config = OmegaConf.load("./configs/all_stars.yaml")
     config_model = ConfigModel(**config)
 
     auto_web = RemoteContoller(target=target, config_model=config_model)
