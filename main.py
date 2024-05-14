@@ -2,7 +2,6 @@ import time
 
 from PIL import Image
 from git import Union
-import yaml
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
