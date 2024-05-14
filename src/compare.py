@@ -7,10 +7,7 @@ import cv2
 import numpy as np
 from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
 import PIL.Image as Image
-from rich.console import Console
 from src.models.image_models import Settings
-
-console = Console()
 
 
 class ImageComparison(BaseModel):
@@ -32,14 +29,9 @@ class ImageComparison(BaseModel):
     @computed_field
     @property
     def screenshot_array(self) -> tuple[np.ndarray, np.ndarray]:
-        if isinstance(self.screenshot, bytes):
-            image_stream = BytesIO(self.screenshot)
-            pil_image = Image.open(image_stream)
-            color_screenshot = np.array(pil_image)
-            gray_screenshot = np.array(pil_image.convert("L"))
-        else:
-            color_screenshot = np.array(self.screenshot)
-            gray_screenshot = cv2.cvtColor(np.array(self.screenshot), cv2.COLOR_RGB2GRAY)
+        color_screenshot = np.array(self.screenshot)
+        color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
+        gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2GRAY)
         return color_screenshot, gray_screenshot
 
     @computed_field
@@ -51,31 +43,36 @@ class ImageComparison(BaseModel):
         log_filename = f"{log_dir}/{now}.png"
         return log_filename
 
-    def find(self) -> tuple[Union[cv2.typing.Point, None], Union[tuple[int, int], None]]:
-        if not os.path.exists(self.image_cfg.image_path):
-            raise Exception(f"Unable to find button image from path: {self.image_cfg.image_path}")
-        if self.image_cfg.image_name not in self.check_list:
-            return None, None
-
+    @computed_field
+    @property
+    def button_image(self) -> cv2.typing.MatLike:
         button_image = cv2.imread(self.image_cfg.image_path, 0)
         if button_image is None:
             raise Exception(f"Unable to load button image from path: {self.image_cfg.image_path}")
+        return button_image
 
-        color_screenshot, gray_screenshot = self.screenshot_array
+    def draw_rectangle(
+        self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point
+    ) -> None:
+        color_screenshot, _ = self.screenshot_array
+        cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+        cv2.imwrite(self.log_filename, color_screenshot)
 
-        result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
+    def find(self) -> tuple[Union[int, None], Union[int, None]]:
+        if self.image_cfg.image_name not in self.check_list:
+            return None, None
+
+        _, gray_screenshot = self.screenshot_array
+
+        result = cv2.matchTemplate(gray_screenshot, self.button_image, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
+        button_center_x = int(max_loc[0] + self.button_image.shape[1])
+        button_center_y = int(max_loc[1] + self.button_image.shape[0])
+        matched_image_position = (button_center_x, button_center_y)
+        if self.image_cfg.screenshot_option is True:
+            self.draw_rectangle(matched_image_position, max_loc)
+
         if max_val > self.image_cfg.confidence:
-            button_w = button_image.shape[1]
-            button_h = button_image.shape[0]
-            top_left = max_loc
-            bottom_right = (top_left[0] + button_w, top_left[1] + button_h)
-            if self.image_cfg.screenshot_option is True:
-                cv2.rectangle(color_screenshot, top_left, bottom_right, (0, 0, 255), 2)
-                cv2.imwrite(self.log_filename, color_screenshot)
-            console.print(
-                f"{self.image_cfg.image_name} Found at {button_image.shape} and screenshot option is {self.image_cfg.screenshot_option}"
-            )
-            return max_loc, button_image.shape
+            return button_center_x, button_center_y
         return None, None
