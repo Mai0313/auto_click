@@ -11,6 +11,7 @@ class Settings(BaseModel):
 
 
 class ConfigModel(BaseModel):
+    auto_click: bool = Field(...)
     base_check_list: list[str] = Field(...)
     additional_check_list: list[str] = Field(...)
-    image_list: list[Settings]
+    image_list: list[Settings] = Field(...)

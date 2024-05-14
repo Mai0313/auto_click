@@ -1,3 +1,5 @@
+auto_click: true
+
 base_check_list:
   - 遊戲結束確認
   - 遊戲結束確認2

@@ -1,3 +1,5 @@
+auto_click: true
+
 base_check_list:
   - 開始配對
   - 點擊空白區域繼續

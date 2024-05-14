@@ -5,7 +5,7 @@ from pydantic import Field, BaseModel, computed_field
 import pyautogui
 from src.get_screen import GetScreen
 from src.find_matched import FindMatched
-from src.models.image_models import Settings
+from src.models.image_models import Settings, ConfigModel
 
 
 class RemoteContoller(BaseModel):
@@ -80,10 +80,10 @@ if __name__ == "__main__":
 
     target = "com.longe.allstarhmt"
     config = OmegaConf.load("./configs/settings/all_stars.yaml")
-    base_check_list = config.base_check_list
+    config = ConfigModel(**config)
     image_config_path = "./configs/path/all_stars.yaml"
     auto_click = True
-    check_list = base_check_list
+    check_list = config.base_check_list
 
     auto_web = RemoteContoller(
         target=target,
