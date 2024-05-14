@@ -4,7 +4,7 @@ import yaml
 from pydantic import Field, BaseModel, computed_field
 import pyautogui
 from src.get_screen import GetScreen
-from src.find_matched import FindMatched
+from src.compare import FindMatched
 from src.models.image_models import Settings, ConfigModel
 
 
