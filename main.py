@@ -37,9 +37,10 @@ class RemoteContoller(BaseModel):
                             elif "com." in self.target:
                                 device.click(button_center_x / 2, button_center_y / 2)
                             else:
-                                button_center_x = button_center_x / 2 + shift_position.shift_x
-                                button_center_y = button_center_y / 2 + shift_position.shift_y
-                                pyautogui.moveTo(x=button_center_x, y=button_center_y)
+                                pyautogui.moveTo(
+                                    x=button_center_x / 2 + shift_position.shift_x,
+                                    y=button_center_y / 2 + shift_position.shift_y,
+                                )
                                 pyautogui.click()
                         time.sleep(image_config_dict.image_click_delay)
 
