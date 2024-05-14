@@ -1,4 +1,4 @@
-auto_click: false
+auto_click: true
 loops: 100
 global_interval: 5
 
