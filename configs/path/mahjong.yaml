@@ -26,13 +26,6 @@
   confidence: 0.9
   scroll: 0
 
-- image_name: "獲得獎勵"
-  image_path: "./data/mahjong/reward_gain.png"
-  image_click_delay: 0
-  screenshot_option: False
-  confidence: 0.9
-  scroll: 0
-
 - image_name: "遊戲結束確認"
   image_path: "./data/mahjong/confirm.png"
   image_click_delay: 0
