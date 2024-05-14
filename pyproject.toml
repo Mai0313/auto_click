@@ -208,8 +208,8 @@ ignore = [
     "W505",
     "N804",
     "E266",
-    # # Unused imports
-    # "F401",
+    # Unused imports
+    "F401",
     # No need annotation for `self`
     "ANN101",
     # No need annotation for `cls`

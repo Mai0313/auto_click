@@ -4,6 +4,7 @@ from PIL import Image, ImageGrab
 from adbutils import adb
 from pydantic import BaseModel
 import pygetwindow as gw
+from pygetwindow import Win32Window
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page, sync_playwright
 
