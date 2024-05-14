@@ -63,9 +63,9 @@ class RemoteContoller(BaseModel):
                         button_center_y=button_center_y,
                     )
                     console.print(f"{config_dict.image_name} has been found and clicked.")
-                    time.sleep(config_dict.image_click_delay)
+                    time.sleep(config_dict.delay_after_click)
                     console.print(
-                        f"Waiting {config_dict.image_click_delay} seconds before the next check."
+                        f"Waiting {config_dict.delay_after_click} seconds before the next check."
                     )
             time.sleep(self.config_model.global_interval)
             console.print(

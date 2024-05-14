@@ -6,7 +6,7 @@ from pydantic import Field, BaseModel
 class Settings(BaseModel):
     image_name: str
     image_path: str
-    image_click_delay: int
+    delay_after_click: int
     screenshot_option: bool
     confidence: float
 
