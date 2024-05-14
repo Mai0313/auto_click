@@ -13,7 +13,7 @@ from src.models.image_models import Settings
 console = Console()
 
 
-class FindMatched(BaseModel):
+class ImageComparison(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: Settings = Field(..., description="The image configuration")

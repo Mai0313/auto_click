@@ -4,7 +4,7 @@ import yaml
 from pydantic import Field, BaseModel, computed_field
 import pyautogui
 from src.get_screen import GetScreen
-from src.compare import FindMatched
+from src.compare import ImageComparison
 from src.models.image_models import Settings, ConfigModel
 
 
@@ -25,7 +25,7 @@ class RemoteContoller(BaseModel):
                 screenshot, shift_position = GetScreen.from_exist_window(self.target)
             if screenshot:
                 for image_config_dict in self.config_model.image_list:
-                    find_matched = FindMatched(
+                    find_matched = ImageComparison(
                         image_cfg=image_config_dict,
                         check_list=self.config_model.base_check_list,
                         screenshot=screenshot,
