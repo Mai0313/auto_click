@@ -20,7 +20,7 @@ class RemoteContoller(BaseModel):
             if "localhost" in self.target:
                 screenshot, page = GetScreen.from_remote_window(self.target)
             elif "com." in self.target:
-                screenshot, device = GetScreen.from_adb_device(self.target)
+                screenshot, device = GetScreen.from_adb_device(self.target, 16416)
             else:
                 screenshot, shift_position = GetScreen.from_exist_window(self.target)
             if screenshot is not None:

@@ -32,9 +32,9 @@ class GetScreen(BaseModel):
         return screenshot, shift_position
 
     @classmethod
-    def from_adb_device(cls, url: str) -> tuple[bytes, AdbDevice]:
+    def from_adb_device(cls, url: str, adb_port: int) -> tuple[bytes, AdbDevice]:
         """For the android device."""
-        adb.connect("127.0.0.1:16416")
+        adb.connect(f"127.0.0.1:{adb_port}")
         device = adb.device()
         current_app = device.app_current()
         if current_app.package != url:
