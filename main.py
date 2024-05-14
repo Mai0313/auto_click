@@ -1,11 +1,18 @@
 import time
 
-import yaml
-from pydantic import Field, BaseModel, computed_field
+from PIL import Image
+from git import Union
+from adbutils import AdbDevice
+from pydantic import Field, BaseModel
 import pyautogui
-from src.get_screen import GetScreen
 from src.compare import ImageComparison
-from src.models.image_models import Settings, ConfigModel
+from rich.console import Console
+from src.get_screen import GetScreen
+from playwright.sync_api import Page
+from src.models.image_models import ConfigModel
+from src.models.output_models import ShiftPosition
+
+console = Console()
 
 
 class RemoteContoller(BaseModel):
@@ -14,46 +21,54 @@ class RemoteContoller(BaseModel):
     )
     config_model: ConfigModel = Field(...)
 
+    def get_device(
+        self,
+    ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
+        if self.target.startswith("http"):
+            return GetScreen.from_remote_window(self.target)
+        elif self.target.startswith("com"):
+            return GetScreen.from_adb_device(self.target, 16416)
+        else:
+            # this will return screenshot, shift_position; not device.
+            return GetScreen.from_exist_window(self.target)
+
+    def click_button(
+        self,
+        device: Union[Page, AdbDevice, ShiftPosition],
+        button_center_x: int,
+        button_center_y: int,
+    ) -> None:
+        if isinstance(device, Page):
+            device.mouse.click(x=button_center_x, y=button_center_y)
+        elif isinstance(device, AdbDevice):
+            device.click(x=button_center_x, y=button_center_y)
+        else:
+            pyautogui.moveTo(
+                x=button_center_x + device.shift_x, y=button_center_y + device.shift_y
+            )
+            pyautogui.click()
+
     def main(self) -> None:
+        # n = 0
         while True:
-            additional_delay = True
-            if "localhost" in self.target:
-                screenshot, page = GetScreen.from_remote_window(self.target)
-            elif "com." in self.target:
-                screenshot, device = GetScreen.from_adb_device(self.target, 16416)
-            else:
-                screenshot, shift_position = GetScreen.from_exist_window(self.target)
-            if screenshot:
-                for image_config_dict in self.config_model.image_list:
-                    find_matched = ImageComparison(
-                        image_cfg=image_config_dict,
-                        check_list=self.config_model.base_check_list,
-                        screenshot=screenshot,
+            screenshot, device = self.get_device()
+            for config_dict in self.config_model.image_list:
+                button_center_x, button_center_y = ImageComparison(
+                    image_cfg=config_dict,
+                    check_list=self.config_model.base_check_list,
+                    screenshot=screenshot,
+                ).find()
+                if button_center_x and button_center_y and self.config_model.auto_click is True:
+                    self.click_button(
+                        device=device,
+                        button_center_x=button_center_x,
+                        button_center_y=button_center_y,
                     )
-                    loc, button_shape = find_matched.find()
-                    if loc and button_shape:
-                        if self.config_model.auto_click is True:
-                            if "localhost" in self.target:
-                                button_center_x = loc[0] + button_shape[1] / 2
-                                button_center_y = loc[1] + button_shape[0] / 2
-                                page.mouse.click(button_center_x, button_center_y)
-                            elif "com." in self.target:
-                                button_center_x = loc[0] + button_shape[1] / 2
-                                button_center_y = loc[1] + button_shape[0] / 2
-                                device.click(button_center_x, button_center_y)
-                            else:
-                                button_center_x = (
-                                    loc[0] + button_shape[1] / 2 + shift_position.shift_x
-                                )
-                                button_center_y = (
-                                    loc[1] + button_shape[0] / 2 + shift_position.shift_y
-                                )
-                                pyautogui.moveTo(x=button_center_x, y=button_center_y)
-                                pyautogui.click()
-                        time.sleep(image_config_dict.image_click_delay)
-                        additional_delay = False
-            if additional_delay is True:
-                time.sleep(5)
+                    console.log(f"{config_dict.image_name} Found.")
+                    # n += 1
+                    # console.log(f"{self.config_model.loops - n + 1} Left")
+                    time.sleep(config_dict.delay_after_click)
+            time.sleep(self.config_model.global_interval)
 
 
 if __name__ == "__main__":
