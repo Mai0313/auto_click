@@ -12,18 +12,7 @@ class RemoteContoller(BaseModel):
     target: str = Field(
         ..., description="This field can be either a window title or a URL or cdp url."
     )
-    image_config_path: str
-    check_list: list[str] = Field(
-        ..., description="The check list, it should be a list of image names"
-    )
-    auto_click: bool = Field(..., description="Whether to click the button automatically")
-
-    @computed_field
-    @property
-    def image_configs(self) -> list[dict]:
-        with open(self.image_config_path, encoding="utf-8") as file:
-            settings = yaml.load(file, Loader=yaml.FullLoader)
-        return settings
+    config_model: ConfigModel = Field(...)
 
     def main(self) -> None:
         while True:
@@ -35,15 +24,15 @@ class RemoteContoller(BaseModel):
             else:
                 screenshot, shift_position = GetScreen.from_exist_window(self.target)
             if screenshot is not None:
-                for image_config in self.image_configs:
-                    image_cfg = Settings(**image_config)
-
+                for image_config_dict in self.config_model.image_list:
                     find_matched = FindMatched(
-                        image_cfg=image_cfg, check_list=self.check_list, screenshot=screenshot
+                        image_cfg=image_config_dict.image_path,
+                        check_list=self.config_model.base_check_list,
+                        screenshot=screenshot,
                     )
                     loc, button_shape = find_matched.find()
                     if loc and button_shape:
-                        if self.auto_click is True:
+                        if self.config_model.auto_click is True:
                             if "localhost" in self.target:
                                 button_center_x = loc[0] + button_shape[1] / 2
                                 button_center_y = loc[1] + button_shape[0] / 2
@@ -61,7 +50,7 @@ class RemoteContoller(BaseModel):
                                 )
                                 pyautogui.moveTo(x=button_center_x, y=button_center_y)
                                 pyautogui.click()
-                        time.sleep(image_cfg.image_click_delay)
+                        time.sleep(image_config_dict.image_click_delay)
                         additional_delay = False
             if additional_delay is True:
                 time.sleep(5)
@@ -80,15 +69,7 @@ if __name__ == "__main__":
 
     target = "com.longe.allstarhmt"
     config = OmegaConf.load("./configs/settings/all_stars.yaml")
-    config = ConfigModel(**config)
-    image_config_path = "./configs/path/all_stars.yaml"
-    auto_click = True
-    check_list = config.base_check_list
+    config_model = ConfigModel(**config)
 
-    auto_web = RemoteContoller(
-        target=target,
-        image_config_path=image_config_path,
-        check_list=check_list,
-        auto_click=auto_click,
-    )
+    auto_web = RemoteContoller(target=target, config_model=config_model)
     auto_web.main()
