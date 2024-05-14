@@ -1,3 +1,11 @@
+base_check_list:
+  - 開始配對
+  - 點擊空白區域繼續
+  - 返回大廳
+
+additional_check_list:
+  - null
+
 image_list:
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
