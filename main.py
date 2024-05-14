@@ -43,11 +43,14 @@ class RemoteContoller(BaseModel):
         elif isinstance(device, AdbDevice):
             device.click(x=button_center_x, y=button_center_y)
         else:
-            pyautogui.moveTo(x=button_center_x + device.shift_x, y=button_center_y + device.shift_y)
+            pyautogui.moveTo(
+                x=button_center_x + device.shift_x, y=button_center_y + device.shift_y
+            )
             pyautogui.click()
 
     def main(self) -> None:
-        for _ in range(self.config_model.loops):
+        # n = 0
+        while True:
             screenshot, device = self.get_device()
             for config_dict in self.config_model.image_list:
                 button_center_x, button_center_y = ImageComparison(
@@ -61,15 +64,11 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                    console.log(f"{config_dict.image_name} has been found and clicked.")
+                    console.log(f"{config_dict.image_name} Found.")
+                    # n += 1
+                    # console.log(f"{self.config_model.loops - n + 1} Left")
                     time.sleep(config_dict.delay_after_click)
-                    console.log(
-                        f"Waiting {config_dict.delay_after_click} seconds before the next check."
-                    )
             time.sleep(self.config_model.global_interval)
-            console.log(
-                f"Waiting {self.config_model.global_interval} seconds before the next loop."
-            )
 
 
 if __name__ == "__main__":
