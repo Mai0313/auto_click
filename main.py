@@ -6,10 +6,13 @@ from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
 from src.compare import ImageComparison
+from rich.console import Console
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
 from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
+
+console = Console()
 
 
 class RemoteContoller(BaseModel):
@@ -59,8 +62,15 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
+                    console.print(f"{config_dict.image_name} has been found and clicked.")
                     time.sleep(config_dict.image_click_delay)
+                    console.print(
+                        f"Waiting {config_dict.image_click_delay} seconds before the next check."
+                    )
             time.sleep(self.config_model.global_interval)
+            console.print(
+                f"Waiting {self.config_model.global_interval} seconds before the next loop."
+            )
 
 
 if __name__ == "__main__":

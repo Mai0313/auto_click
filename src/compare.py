@@ -7,10 +7,7 @@ import cv2
 import numpy as np
 from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
 import PIL.Image as Image
-from rich.console import Console
 from src.models.image_models import Settings
-
-console = Console()
 
 
 class ImageComparison(BaseModel):
@@ -77,6 +74,5 @@ class ImageComparison(BaseModel):
             self.draw_rectangle(matched_image_position, max_loc)
 
         if max_val > self.image_cfg.confidence:
-            console.print(f"{self.image_cfg.image_name} Found at {self.button_image.shape}")
             return button_center_x, button_center_y
         return None, None
