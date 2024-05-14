@@ -7,11 +7,7 @@ import pygetwindow as gw
 from pygetwindow import Win32Window
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page, sync_playwright
-
-
-class ShiftPosition(BaseModel):
-    shift_x: int
-    shift_y: int
+from src.models.output_models import ShiftPosition
 
 
 class GetScreen(BaseModel):
