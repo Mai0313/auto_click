@@ -4,9 +4,11 @@ playwright
 pyautogui
 opencv-python
 rich
-pydantic
 adbutils
 omegaconf
+
+pydantic
+pydantic_settings
 
 #### Development Related ####
 poetry

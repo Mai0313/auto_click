@@ -56,8 +56,11 @@ pyautogui==0.9.54
     # via auto-click
 pydantic==2.7.1
     # via auto-click
+    # via pydantic-settings
 pydantic-core==2.18.2
     # via pydantic
+pydantic-settings==2.2.1
+    # via auto-click
 pyee==11.1.0
     # via playwright
 pyelftools==0.31
@@ -75,6 +78,8 @@ pyrect==0.2.0
     # via pygetwindow
 pyscreeze==0.1.30
     # via pyautogui
+python-dotenv==1.0.1
+    # via pydantic-settings
 pytweening==1.2.0
     # via pyautogui
 pyyaml==6.0.1
