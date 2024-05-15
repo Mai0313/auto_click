@@ -31,6 +31,11 @@ class GetScreen(BaseModel):
     def from_adb_device(cls, url: str, adb_port: int) -> tuple[bytes, AdbDevice]:
         """For the android device."""
         serial = f"127.0.0.1:{adb_port}"
+
+        # # .\binaries\adb.exe connect 127.0.0.1:%port%
+        # import os
+        # os.system(f".\\binaries\\adb.exe connect {serial}")
+
         adb.connect(serial)
         device = adb.device(serial=serial)
         current_app = device.app_current()
