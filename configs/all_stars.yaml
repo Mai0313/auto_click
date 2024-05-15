@@ -4,6 +4,7 @@ global_interval: 5
 
 base_check_list:
   - 開始配對
+  - 確認
   - 點擊空白區域繼續
   - 返回大廳
 
@@ -25,6 +26,12 @@ image_list:
 
   - image_name: "返回大廳"
     image_path: "./data/allstars/back2lobby.png"
+    delay_after_click: 0
+    screenshot_option: True
+    confidence: 0.8
+
+  - image_name: "返回大廳"
+    image_path: "./data/allstars/confirm.png"
     delay_after_click: 0
     screenshot_option: True
     confidence: 0.8

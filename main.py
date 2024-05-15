@@ -1,7 +1,7 @@
 import time
+from typing import Union
 
 from PIL import Image
-from git import Union
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
