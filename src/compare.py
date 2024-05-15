@@ -70,9 +70,9 @@ class ImageComparison(BaseModel):
         button_center_x = int(max_loc[0] + self.button_image.shape[1])
         button_center_y = int(max_loc[1] + self.button_image.shape[0])
         matched_image_position = (button_center_x, button_center_y)
-        if self.image_cfg.screenshot_option is True:
-            self.draw_rectangle(matched_image_position, max_loc)
 
         if max_val > self.image_cfg.confidence:
+            if self.image_cfg.screenshot_option is True:
+                self.draw_rectangle(matched_image_position, max_loc)
             return button_center_x, button_center_y
         return None, None
