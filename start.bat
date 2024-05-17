@@ -1,4 +1,5 @@
-CALL conda activate automa
-.\binaries\adb.exe connect 127.0.0.1:16416
-python main.py
+@REM CALL conda activate automa
+rye sync
+.\binaries\adb.exe connect 16416
+rye run python main.py
 pause
