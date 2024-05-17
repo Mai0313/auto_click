@@ -9,6 +9,7 @@ from src.compare import ImageComparison
 from rich.console import Console
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
+from src.models.env_models import EnvironmentSettings
 from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
 
@@ -24,10 +25,11 @@ class RemoteContoller(BaseModel):
     def get_device(
         self,
     ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
+        settings = EnvironmentSettings()
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
-            return GetScreen.from_adb_device(self.target, 16416)
+            return GetScreen.from_adb_device(self.target, settings.adb_port)
         else:
             # this will return screenshot, shift_position; not device.
             return GetScreen.from_exist_window(self.target)
