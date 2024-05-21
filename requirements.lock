@@ -8,9 +8,9 @@
 #   with-sources: false
 
 -e file:.
-adbutils==2.6.2
+adbutils==2.7.1
     # via auto-click
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via pydantic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
@@ -48,7 +48,7 @@ pillow==10.3.0
     # via adbutils
     # via auto-click
     # via pyscreeze
-playwright==1.43.0
+playwright==1.44.0
     # via auto-click
 py==1.11.0
     # via retry
@@ -84,7 +84,7 @@ pytweening==1.2.0
     # via pyautogui
 pyyaml==6.0.1
     # via omegaconf
-requests==2.31.0
+requests==2.32.1
     # via adbutils
 retry==0.9.2
     # via adbutils
