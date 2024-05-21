@@ -1,3 +1,4 @@
+import os
 import time
 
 from PIL import Image, ImageGrab
@@ -33,8 +34,7 @@ class GetScreen(BaseModel):
         serial = f"127.0.0.1:{adb_port}"
 
         # # .\binaries\adb.exe connect 127.0.0.1:%port%
-        # import os
-        # os.system(f".\\binaries\\adb.exe connect {serial}")
+        os.system(f".\\binaries\\adb.exe connect {serial}")
 
         adb.connect(serial)
         device = adb.device(serial=serial)
