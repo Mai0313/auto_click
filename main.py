@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Union
 
@@ -14,6 +15,9 @@ from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
 
 console = Console()
+settings = EnvironmentSettings()
+serial = f"127.0.0.1:{settings.adb_port}"
+os.system(f".\\binaries\\adb.exe connect {serial}")
 
 
 class RemoteContoller(BaseModel):
@@ -25,11 +29,10 @@ class RemoteContoller(BaseModel):
     def get_device(
         self,
     ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
-        settings = EnvironmentSettings()
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
-            return GetScreen.from_adb_device(self.target, settings.adb_port)
+            return GetScreen.from_adb_device(self.target, serial)
         else:
             # this will return screenshot, shift_position; not device.
             return GetScreen.from_exist_window(self.target)

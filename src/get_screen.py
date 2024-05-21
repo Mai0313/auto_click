@@ -29,13 +29,8 @@ class GetScreen(BaseModel):
         return screenshot, shift_position
 
     @classmethod
-    def from_adb_device(cls, url: str, adb_port: int) -> tuple[bytes, AdbDevice]:
+    def from_adb_device(cls, url: str, serial: str) -> tuple[bytes, AdbDevice]:
         """For the android device."""
-        serial = f"127.0.0.1:{adb_port}"
-
-        # # .\binaries\adb.exe connect 127.0.0.1:%port%
-        os.system(f".\\binaries\\adb.exe connect {serial}")
-
         adb.connect(serial)
         device = adb.device(serial=serial)
         current_app = device.app_current()
