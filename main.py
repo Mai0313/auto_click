@@ -1,13 +1,13 @@
 import os
 import time
 from typing import Union
+import getpass
 
 from PIL import Image
 import logfire
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
-import getpass
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
@@ -16,18 +16,19 @@ from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
 
 logfire.configure(
-    send_to_logfire = True,
-    token = "t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
-    project_name = "auto-click",
-    trace_sample_rate = 1.0,
-    show_summary = True,
-    data_dir = ".logfire",
-    collect_system_metrics = True,
-    fast_shutdown = True,
-    inspect_arguments = True,
+    send_to_logfire=True,
+    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    project_name="auto-click",
+    service_name=f"{getpass.getuser()}",
+    trace_sample_rate=1.0,
+    show_summary=True,
+    data_dir=".logfire",
+    collect_system_metrics=True,
+    fast_shutdown=True,
+    inspect_arguments=True,
+    pydantic_plugin=logfire.PydanticPlugin(record="all"),
 )
-
-current_username = getpass.getuser()
+logfire.install_auto_tracing(modules=["compare", "get_screen", "sync_api"])
 settings = EnvironmentSettings()
 serial = f"127.0.0.1:{settings.adb_port}"
 os.system(f".\\binaries\\adb.exe connect {serial}")
