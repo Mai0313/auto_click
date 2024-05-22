@@ -3,18 +3,31 @@ import time
 from typing import Union
 
 from PIL import Image
+import logfire
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
+import getpass
 from src.compare import ImageComparison
-from rich.console import Console
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
 from src.models.env_models import EnvironmentSettings
 from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
 
-console = Console()
+logfire.configure(
+    send_to_logfire = True,
+    token = "t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    project_name = "auto-click",
+    trace_sample_rate = 1.0,
+    show_summary = True,
+    data_dir = ".logfire",
+    collect_system_metrics = True,
+    fast_shutdown = True,
+    inspect_arguments = True,
+)
+
+current_username = getpass.getuser()
 settings = EnvironmentSettings()
 serial = f"127.0.0.1:{settings.adb_port}"
 os.system(f".\\binaries\\adb.exe connect {serial}")
@@ -69,9 +82,7 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                    console.log(f"{config_dict.image_name} Found.")
-                    # n += 1
-                    # console.log(f"{self.config_model.loops - n + 1} Left")
+                    logfire.info(f"{config_dict.image_name} Found.")
                     time.sleep(config_dict.delay_after_click)
             time.sleep(self.config_model.global_interval)
 
