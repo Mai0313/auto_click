@@ -12,30 +12,6 @@ additional_check_list:
   - null
 
 image_list:
-  # - image_name: "通行證大廳"
-  #   image_path: "./data/allstars/game_pass.png"
-  #   delay_after_click: 0
-  #   screenshot_option: True
-  #   confidence: 0.8
-
-  # - image_name: "任務"
-  #   image_path: "./data/allstars/mission.png"
-  #   delay_after_click: 0
-  #   screenshot_option: True
-  #   confidence: 0.8
-
-  # - image_name: "一鍵領取"
-  #   image_path: "./data/allstars/click2recieve.png"
-  #   delay_after_click: 0
-  #   screenshot_option: True
-  #   confidence: 0.8
-
-  # - image_name: "xx"
-  #   image_path: "./data/allstars/xx.png"
-  #   delay_after_click: 0
-  #   screenshot_option: True
-  #   confidence: 0.8
-
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
     delay_after_click: 20
