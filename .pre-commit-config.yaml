@@ -1,7 +1,7 @@
 default_language_version:
   python: python3
 
-exclude: binaries
+exclude: binaries|data/allstars_test
 
 default_install_hook_types:
   - pre-commit
@@ -28,6 +28,8 @@ repos:
       # list of supported hooks: https://pre-commit.com/hooks.html
       - id: check-added-large-files
         exclude: poetry.lock
+        # args:
+        #   - --maxkb=1700
       - id: check-ast
       - id: check-yaml
         args:
