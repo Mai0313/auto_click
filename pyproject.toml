@@ -62,6 +62,7 @@ dependencies = [
     "adbutils>=2.6.2",
     "omegaconf>=2.3.0",
     "pydantic-settings>=2.2.1",
+    "logfire[system-metrics]>=0.35.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -308,6 +309,22 @@ line-ending = "auto"
 preview = true
 quote-style = "double"
 skip-magic-trailing-comma = true
+
+# ================== #
+#      Logfire       #
+# ================== #
+[tool.logfire]
+send_to_logfire = true
+token = "t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp"
+project_name = "auto-click"
+trace_sample_rate = 1.0
+show_summary = true
+data_dir = ".logfire"
+collect_system_metrics = true
+id_generator = "uuid"
+ns_timestamp_generator = "time_ns"
+fast_shutdown = true
+inspect_arguments = true
 
 
 # ================== #
