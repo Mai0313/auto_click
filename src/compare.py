@@ -64,7 +64,9 @@ class ImageComparison(BaseModel):
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         cv2.imwrite(self.log_filename, color_screenshot)
         logfire.warn(
-            "The screenshot has been taken under {log_filename}", log_filename=self.log_filename
+            "The screenshot has been taken under {log_filename}",
+            log_filename=self.log_filename,
+            _tags=["Screenshot"],
         )
 
     def find(self) -> tuple[Union[int, None], Union[int, None]]:
