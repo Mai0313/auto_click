@@ -1,8 +1,6 @@
 default_language_version:
   python: python3
 
-exclude: binaries|data/allstars_test
-
 default_install_hook_types:
   - pre-commit
   - pre-push
@@ -15,7 +13,7 @@ default_stages:
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.4.4
+    rev: v0.4.6
     hooks:
       - id: ruff
         types_or: [ python, pyi, jupyter ]
@@ -28,8 +26,6 @@ repos:
       # list of supported hooks: https://pre-commit.com/hooks.html
       - id: check-added-large-files
         exclude: poetry.lock
-        # args:
-        #   - --maxkb=1700
       - id: check-ast
       - id: check-yaml
         args:
@@ -76,7 +72,7 @@ repos:
       - id: nbstripout
 
   # - repo: https://github.com/codespell-project/codespell
-  #   rev: v2.2.6
+  #   rev: v2.3.0
   #   hooks:
   #     - id: codespell
   #       additional_dependencies:
