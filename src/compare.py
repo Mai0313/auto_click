@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
 import PIL.Image as Image
+from src.utils.logger import logfire
 from src.models.image_models import Settings
 
 
@@ -48,6 +49,11 @@ class ImageComparison(BaseModel):
     def button_image(self) -> cv2.typing.MatLike:
         button_image = cv2.imread(self.image_cfg.image_path, 0)
         if button_image is None:
+            logfire.fatal(
+                "Unable to load button image from path: {image_path}",
+                image_path=self.image_cfg.image_path,
+                _tags=["Fatal Error"],
+            )
             raise Exception(f"Unable to load button image from path: {self.image_cfg.image_path}")
         return button_image
 
@@ -57,6 +63,11 @@ class ImageComparison(BaseModel):
         color_screenshot, _ = self.screenshot_array
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         cv2.imwrite(self.log_filename, color_screenshot)
+        logfire.warn(
+            "The screenshot has been taken under {log_filename}",
+            log_filename=self.log_filename,
+            _tags=["Screenshot"],
+        )
 
     def find(self) -> tuple[Union[int, None], Union[int, None]]:
         if self.image_cfg.image_name not in self.check_list:
@@ -72,6 +83,14 @@ class ImageComparison(BaseModel):
         matched_image_position = (button_center_x, button_center_y)
 
         if max_val > self.image_cfg.confidence:
+            logfire.info(
+                "{image_name} Found with confidence: {confidence} > {set_confidence} at position: {matched_image_position}",
+                image_name=self.image_cfg.image_name,
+                set_confidence=self.image_cfg.confidence,
+                confidence=max_val,
+                matched_image_position=matched_image_position,
+                _tags=[self.image_cfg.image_name],
+            )
             if self.image_cfg.screenshot_option is True:
                 self.draw_rectangle(matched_image_position, max_loc)
             return button_center_x, button_center_y

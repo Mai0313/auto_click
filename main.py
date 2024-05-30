@@ -1,10 +1,8 @@
 import os
 import time
 from typing import Union
-import getpass
 
 from PIL import Image
-import logfire
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
@@ -25,20 +23,6 @@ class RemoteContoller(BaseModel):
 
     def __init__(self, target: str, config_model: ConfigModel):
         super().__init__(target=target, config_model=config_model)
-        logfire.configure(
-            send_to_logfire=True,
-            token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
-            project_name="auto-click",
-            service_name=f"{getpass.getuser()}",
-            trace_sample_rate=1.0,
-            show_summary=True,
-            data_dir=".logfire",
-            collect_system_metrics=True,
-            fast_shutdown=True,
-            inspect_arguments=True,
-            pydantic_plugin=logfire.PydanticPlugin(record="all"),
-        )
-        logfire.install_auto_tracing(modules=["compare", "get_screen", "sync_api"])
         settings = EnvironmentSettings()
         self.serial = f"127.0.0.1:{settings.adb_port}"
         os.system(f".\\binaries\\adb.exe connect {self.serial}")
@@ -86,7 +70,6 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                    logfire.info(f"{config_dict.image_name} Found.")
                     time.sleep(config_dict.delay_after_click)
             time.sleep(self.config_model.global_interval)
 
