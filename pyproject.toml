@@ -225,8 +225,6 @@ ignore = [
     "ANN204",
     ]
 
-ignore-init-module-imports = true
-
 [tool.ruff.lint.pycodestyle]
 # Ignore long comments for TODO, FIXME, XXX
 ignore-overlong-task-comments = true
