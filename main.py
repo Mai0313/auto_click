@@ -71,11 +71,6 @@ class RemoteContoller(BaseModel):
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
-                    logfire.info(
-                        "{image_name} Found.",
-                        image_name=config_dict.image_name,
-                        _tags=[config_dict.image_name],
-                    )
                     time.sleep(config_dict.delay_after_click)
             time.sleep(self.config_model.global_interval)
 

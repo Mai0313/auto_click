@@ -98,6 +98,7 @@ opencv-python==4.9.0.80
 opentelemetry-api==1.24.0
     # via opentelemetry-exporter-otlp-proto-http
     # via opentelemetry-instrumentation
+    # via opentelemetry-instrumentation-system-metrics
     # via opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-common==1.24.0
     # via opentelemetry-exporter-otlp-proto-http
@@ -105,12 +106,16 @@ opentelemetry-exporter-otlp-proto-http==1.24.0
     # via logfire
 opentelemetry-instrumentation==0.45b0
     # via logfire
+    # via opentelemetry-instrumentation-system-metrics
+opentelemetry-instrumentation-system-metrics==0.45b0
+    # via logfire
 opentelemetry-proto==1.24.0
     # via opentelemetry-exporter-otlp-proto-common
     # via opentelemetry-exporter-otlp-proto-http
 opentelemetry-sdk==1.24.0
     # via logfire
     # via opentelemetry-exporter-otlp-proto-http
+    # via opentelemetry-instrumentation-system-metrics
 opentelemetry-semantic-conventions==0.45b0
     # via opentelemetry-sdk
 packaging==24.0
@@ -136,6 +141,7 @@ protobuf==4.25.3
     # via opentelemetry-proto
 psutil==5.9.8
     # via ipykernel
+    # via opentelemetry-instrumentation-system-metrics
 pure-eval==0.2.2
     # via stack-data
 py==1.11.0
