@@ -62,7 +62,7 @@ dependencies = [
     "adbutils>=2.6.2",
     "omegaconf>=2.3.0",
     "pydantic-settings>=2.2.1",
-    "logfire[system-metrics]>=0.35.0",
+    "logfire>=0.37.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -325,6 +325,7 @@ id_generator = "uuid"
 ns_timestamp_generator = "time_ns"
 fast_shutdown = true
 inspect_arguments = true
+pydantic_plugin_record = "all"
 
 
 # ================== #
