@@ -8,7 +8,6 @@ from pydantic import Field, BaseModel
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
-from src.utils.logger import logfire
 from playwright.sync_api import Page
 from src.models.env_models import EnvironmentSettings
 from src.models.image_models import ConfigModel

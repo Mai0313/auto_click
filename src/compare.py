@@ -90,7 +90,6 @@ class ImageComparison(BaseModel):
                 confidence=max_val,
                 matched_image_position=matched_image_position,
                 _tags=[self.image_cfg.image_name],
-                _exc_info=self.image_cfg,
             )
             if self.image_cfg.screenshot_option is True:
                 self.draw_rectangle(matched_image_position, max_loc)
