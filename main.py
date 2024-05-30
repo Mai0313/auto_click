@@ -3,16 +3,13 @@ import time
 from typing import Union
 
 from PIL import Image
+from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
-from src.utils.logger import logfire
-from playwright.sync_api import Page
-
-logfire.install_auto_tracing(modules=["src.compare", "src.get_screen", "src.models", "adbutils"])
-
-from adbutils import AdbDevice
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
+from src.utils.logger import logfire
+from playwright.sync_api import Page
 from src.models.env_models import EnvironmentSettings
 from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
