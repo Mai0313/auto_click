@@ -10,7 +10,7 @@ logfire.configure(
     trace_sample_rate=1.0,
     show_summary=True,
     data_dir=".logfire",
-    collect_system_metrics=False,
+    collect_system_metrics=True,
     fast_shutdown=True,
     inspect_arguments=True,
     pydantic_plugin=logfire.PydanticPlugin(record="all"),
