@@ -62,7 +62,7 @@ dependencies = [
     "adbutils>=2.6.2",
     "omegaconf>=2.3.0",
     "pydantic-settings>=2.2.1",
-    "logfire[system-metrics]>=0.35.0",
+    "logfire[system-metrics]>=0.37.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -225,8 +225,6 @@ ignore = [
     "ANN204",
     ]
 
-ignore-init-module-imports = true
-
 [tool.ruff.lint.pycodestyle]
 # Ignore long comments for TODO, FIXME, XXX
 ignore-overlong-task-comments = true
@@ -325,6 +323,7 @@ id_generator = "uuid"
 ns_timestamp_generator = "time_ns"
 fast_shutdown = true
 inspect_arguments = true
+pydantic_plugin_record = "all"
 
 
 # ================== #
