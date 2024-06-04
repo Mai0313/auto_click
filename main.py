@@ -1,31 +1,54 @@
-import os
 import time
-from typing import Union
+from typing import Union, Optional
+import getpass
 
 from PIL import Image
+import logfire
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
-from src.models.env_models import EnvironmentSettings
-from src.models.image_models import ConfigModel
-from src.models.output_models import ShiftPosition
+from src.types.simulator import SimulatorSettings
+from src.types.image_models import ConfigModel
+from src.utils.config_utils import load_config
+from src.types.output_models import ShiftPosition
+from src.utils.command_utils import CommandExecutor
+
+logfire.configure(
+    send_to_logfire=True,
+    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    project_name="auto-click",
+    service_name=f"{getpass.getuser()}",
+    trace_sample_rate=1.0,
+    show_summary=True,
+    data_dir=".logfire",
+    collect_system_metrics=True,
+    fast_shutdown=True,
+    inspect_arguments=True,
+    # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
+)
 
 
 class RemoteContoller(BaseModel):
     target: str = Field(
         ..., description="This field can be either a window title or a URL or cdp url."
     )
-    config_model: ConfigModel = Field(...)
-    serial: str = Field(default_factory=lambda: None)
+    configs: ConfigModel = Field(...)
+    settings: SimulatorSettings = Field(...)
+    serial: Optional[str] = Field(default=None)
 
-    def __init__(self, target: str, config_model: ConfigModel):
-        super().__init__(target=target, config_model=config_model)
-        settings = EnvironmentSettings()
-        self.serial = f"127.0.0.1:{settings.adb_port}"
-        os.system(f".\\binaries\\adb.exe connect {self.serial}")
+    def __init__(self, target: str, configs: ConfigModel, settings: SimulatorSettings):
+        super().__init__(target=target, configs=configs, settings=settings)
+        self.serial = f"127.0.0.1:{self.settings.adb_port}"
+        try:
+            # os.system(f".\\binaries\\adb.exe connect {self.serial}")
+            commands = ["./binaries/adb.exe", "connect", self.serial]
+            command_executor = CommandExecutor(commands=commands)
+            command_executor.run()
+        except Exception as e:
+            logfire.error("Error in connecting to adb: {e}", e=e)
 
     def get_device(
         self,
@@ -55,23 +78,22 @@ class RemoteContoller(BaseModel):
             pyautogui.click()
 
     def main(self) -> None:
-        # n = 0
         while True:
             screenshot, device = self.get_device()
-            for config_dict in self.config_model.image_list:
+            for config_dict in self.configs.image_list:
                 button_center_x, button_center_y = ImageComparison(
                     image_cfg=config_dict,
-                    check_list=self.config_model.base_check_list,
+                    check_list=self.configs.base_check_list,
                     screenshot=screenshot,
                 ).find()
-                if button_center_x and button_center_y and self.config_model.auto_click is True:
+                if button_center_x and button_center_y and self.configs.auto_click is True:
                     self.click_button(
                         device=device,
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
                     time.sleep(config_dict.delay_after_click)
-            time.sleep(self.config_model.global_interval)
+            time.sleep(self.configs.global_interval)
 
 
 if __name__ == "__main__":
@@ -84,8 +106,8 @@ if __name__ == "__main__":
     # config_model.base_check_list = check_list
 
     target = "com.longe.allstarhmt"
-    config = OmegaConf.load("./configs/all_stars.yaml")
-    config_model = ConfigModel(**config)
+    configs = OmegaConf.load("./configs/all_stars.yaml")
+    settings = load_config("./configs/simulator.yaml")
 
-    auto_web = RemoteContoller(target=target, config_model=config_model)
+    auto_web = RemoteContoller(target=target, configs=configs, settings=settings)
     auto_web.main()

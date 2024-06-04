@@ -3,7 +3,7 @@ from typing import Union
 from pydantic import Field, BaseModel
 
 
-class Settings(BaseModel):
+class ImageModel(BaseModel):
     image_name: str
     image_path: str
     delay_after_click: int
@@ -17,4 +17,4 @@ class ConfigModel(BaseModel):
     global_interval: int = Field(...)
     base_check_list: list[str] = Field(...)
     additional_check_list: list[Union[str, None]] = Field(...)
-    image_list: list[Settings] = Field(...)
+    image_list: list[ImageModel] = Field(...)

@@ -16,7 +16,7 @@ antlr4-python3-runtime==4.9.3
     # via omegaconf
 apkutils2==1.0.0
     # via adbutils
-certifi==2024.2.2
+certifi==2024.6.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
@@ -31,15 +31,15 @@ deprecation==2.1.0
     # via adbutils
 executing==2.0.1
     # via logfire
-googleapis-common-protos==1.63.0
+googleapis-common-protos==1.63.1
     # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.0.3
     # via playwright
 idna==3.7
     # via requests
-importlib-metadata==7.0.0
+importlib-metadata==7.1.0
     # via opentelemetry-api
-logfire==0.37.0
+logfire==0.39.0
     # via auto-click
 markdown-it-py==3.0.0
     # via rich
@@ -51,30 +51,30 @@ numpy==1.26.4
     # via opencv-python
 omegaconf==2.3.0
     # via auto-click
-opencv-python==4.9.0.80
+opencv-python==4.10.0.82
     # via auto-click
-opentelemetry-api==1.24.0
+opentelemetry-api==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
     # via opentelemetry-instrumentation
     # via opentelemetry-instrumentation-system-metrics
     # via opentelemetry-sdk
-opentelemetry-exporter-otlp-proto-common==1.24.0
+    # via opentelemetry-semantic-conventions
+opentelemetry-exporter-otlp-proto-common==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-exporter-otlp-proto-http==1.24.0
+opentelemetry-exporter-otlp-proto-http==1.25.0
     # via logfire
-opentelemetry-instrumentation==0.45b0
+opentelemetry-instrumentation==0.46b0
     # via logfire
     # via opentelemetry-instrumentation-system-metrics
-opentelemetry-instrumentation-system-metrics==0.45b0
+opentelemetry-instrumentation-system-metrics==0.46b0
     # via logfire
-opentelemetry-proto==1.24.0
+opentelemetry-proto==1.25.0
     # via opentelemetry-exporter-otlp-proto-common
     # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-sdk==1.24.0
+opentelemetry-sdk==1.25.0
     # via logfire
     # via opentelemetry-exporter-otlp-proto-http
-    # via opentelemetry-instrumentation-system-metrics
-opentelemetry-semantic-conventions==0.45b0
+opentelemetry-semantic-conventions==0.46b0
     # via opentelemetry-sdk
 packaging==24.0
     # via deprecation
@@ -94,12 +94,12 @@ py==1.11.0
     # via retry
 pyautogui==0.9.54
     # via auto-click
-pydantic==2.7.2
+pydantic==2.7.3
     # via auto-click
     # via pydantic-settings
-pydantic-core==2.18.3
+pydantic-core==2.18.4
     # via pydantic
-pydantic-settings==2.2.1
+pydantic-settings==2.3.0
     # via auto-click
 pyee==11.1.0
     # via playwright
@@ -136,7 +136,7 @@ setuptools==70.0.0
     # via opentelemetry-instrumentation
 tomli==2.0.1
     # via logfire
-typing-extensions==4.12.0
+typing-extensions==4.12.1
     # via logfire
     # via opentelemetry-sdk
     # via pydantic
@@ -149,5 +149,5 @@ wrapt==1.16.0
     # via opentelemetry-instrumentation
 xmltodict==0.13.0
     # via apkutils2
-zipp==3.19.0
+zipp==3.19.1
     # via importlib-metadata
