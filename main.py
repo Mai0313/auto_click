@@ -1,27 +1,18 @@
 import os
 import time
-from typing import Union, Optional
+from typing import Union
 
 from PIL import Image
-import yaml
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
+from src.types.simulator import SimulatorSettings
 from src.types.image_models import ConfigModel
+from src.utils.config_utils import load_config
 from src.types.output_models import ShiftPosition
-
-
-def load_config(path: str) -> dict:
-    with open(path) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    return config
-
-
-class SimulatorSettings(BaseModel):
-    adb_port: list[int]
 
 
 class RemoteContoller(BaseModel):
