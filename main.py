@@ -83,6 +83,7 @@ if __name__ == "__main__":
     config = OmegaConf.load("./configs/all_stars.yaml")
     config_model = ConfigModel(**config)
     config = load_config("./configs/simulator.yaml")
+    settings = SimulatorSettings(**config)
 
-    auto_web = RemoteContoller(target=target, config_model=config_model, config=config)
+    auto_web = RemoteContoller(target=target, config_model=config_model, settings=settings)
     auto_web.main()
