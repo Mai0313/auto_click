@@ -1,8 +1,6 @@
-import os
 import time
-from typing import Union
+from typing import Union, Optional
 import getpass
-import subprocess
 
 from PIL import Image
 import logfire
@@ -39,6 +37,18 @@ class RemoteContoller(BaseModel):
     )
     configs: ConfigModel = Field(...)
     settings: SimulatorSettings = Field(...)
+    serial: Optional[str] = Field(default=None)
+
+    def __init__(self, target: str, configs: ConfigModel, settings: SimulatorSettings):
+        super().__init__(target=target, configs=configs, settings=settings)
+        self.serial = f"127.0.0.1:{self.settings.adb_port}"
+        try:
+            # os.system(f".\\binaries\\adb.exe connect {self.serial}")
+            commands = ["./binaries/adb.exe", "connect", self.serial]
+            command_executor = CommandExecutor(commands=commands)
+            command_executor.run()
+        except Exception as e:
+            logfire.error("Error in connecting to adb: {e}", e=e)
 
     def get_device(
         self,
@@ -46,12 +56,7 @@ class RemoteContoller(BaseModel):
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
-            serial = f"127.0.0.1:{self.settings.adb_port}"
-            # os.system(f".\\binaries\\adb.exe connect {serial}")
-            commands = ["./binaries/adb.exe", "connect", serial]
-            command_executor = CommandExecutor(commands=commands)
-            command_executor.run()
-            return GetScreen.from_adb_device(self.target, serial)
+            return GetScreen.from_adb_device(self.target, self.serial)
         else:
             # this will return screenshot, shift_position; not device.
             return GetScreen.from_exist_window(self.target)
