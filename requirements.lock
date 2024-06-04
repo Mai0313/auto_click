@@ -16,6 +16,8 @@ antlr4-python3-runtime==4.9.3
     # via omegaconf
 apkutils2==1.0.0
     # via adbutils
+autorootcwd==1.0.0
+    # via auto-click
 certifi==2024.6.2
     # via requests
 charset-normalizer==3.3.2
@@ -116,10 +118,14 @@ pyperclip==1.8.2
     # via mouseinfo
 pyrect==0.2.0
     # via pygetwindow
+pyrootutils==1.0.4
+    # via autorootcwd
 pyscreeze==0.1.30
     # via pyautogui
 python-dotenv==1.0.1
+    # via autorootcwd
     # via pydantic-settings
+    # via pyrootutils
 pytweening==1.2.0
     # via pyautogui
 pyyaml==6.0.1
@@ -149,5 +155,5 @@ wrapt==1.16.0
     # via opentelemetry-instrumentation
 xmltodict==0.13.0
     # via apkutils2
-zipp==3.19.1
+zipp==3.19.2
     # via importlib-metadata
