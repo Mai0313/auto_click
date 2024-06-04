@@ -31,7 +31,6 @@ class GetScreen(BaseModel):
     @classmethod
     def from_adb_device(cls, url: str, serial: str) -> tuple[bytes, AdbDevice]:
         """For the android device."""
-        adb.connect(serial)
         device = adb.device(serial=serial)
         current_app = device.app_current()
         if current_app.package != url:

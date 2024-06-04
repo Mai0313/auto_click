@@ -1,8 +1,11 @@
 import os
 import time
 from typing import Union
+import getpass
+import subprocess
 
 from PIL import Image
+import logfire
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
@@ -13,13 +16,29 @@ from src.types.simulator import SimulatorSettings
 from src.types.image_models import ConfigModel
 from src.utils.config_utils import load_config
 from src.types.output_models import ShiftPosition
+from src.utils.command_utils import CommandExecutor
+
+logfire.configure(
+    send_to_logfire=True,
+    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    project_name="auto-click",
+    service_name=f"{getpass.getuser()}",
+    trace_sample_rate=1.0,
+    show_summary=True,
+    data_dir=".logfire",
+    collect_system_metrics=True,
+    fast_shutdown=True,
+    inspect_arguments=True,
+    pydantic_plugin=None,
+    # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
+)
 
 
 class RemoteContoller(BaseModel):
     target: str = Field(
         ..., description="This field can be either a window title or a URL or cdp url."
     )
-    config_model: ConfigModel = Field(...)
+    configs: ConfigModel = Field(...)
     settings: SimulatorSettings = Field(...)
 
     def get_device(
@@ -29,7 +48,10 @@ class RemoteContoller(BaseModel):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
             serial = f"127.0.0.1:{self.settings.adb_port}"
-            os.system(f".\\binaries\\adb.exe connect {serial}")
+            # os.system(f".\\binaries\\adb.exe connect {serial}")
+            commands = ["./binaries/adb.exe", "connect", serial]
+            command_executor = CommandExecutor(commands=commands)
+            command_executor.run()
             return GetScreen.from_adb_device(self.target, serial)
         else:
             # this will return screenshot, shift_position; not device.
@@ -54,20 +76,20 @@ class RemoteContoller(BaseModel):
     def main(self) -> None:
         while True:
             screenshot, device = self.get_device()
-            for config_dict in self.config_model.image_list:
+            for config_dict in self.configs.image_list:
                 button_center_x, button_center_y = ImageComparison(
                     image_cfg=config_dict,
-                    check_list=self.config_model.base_check_list,
+                    check_list=self.configs.base_check_list,
                     screenshot=screenshot,
                 ).find()
-                if button_center_x and button_center_y and self.config_model.auto_click is True:
+                if button_center_x and button_center_y and self.configs.auto_click is True:
                     self.click_button(
                         device=device,
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
                     time.sleep(config_dict.delay_after_click)
-            time.sleep(self.config_model.global_interval)
+            time.sleep(self.configs.global_interval)
 
 
 if __name__ == "__main__":
@@ -80,10 +102,8 @@ if __name__ == "__main__":
     # config_model.base_check_list = check_list
 
     target = "com.longe.allstarhmt"
-    config = OmegaConf.load("./configs/all_stars.yaml")
-    config_model = ConfigModel(**config)
-    config = load_config("./configs/simulator.yaml")
-    settings = SimulatorSettings(**config)
+    configs = OmegaConf.load("./configs/all_stars.yaml")
+    settings = load_config("./configs/simulator.yaml")
 
-    auto_web = RemoteContoller(target=target, config_model=config_model, settings=settings)
+    auto_web = RemoteContoller(target=target, configs=configs, settings=settings)
     auto_web.main()
