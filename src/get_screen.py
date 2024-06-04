@@ -8,7 +8,7 @@ import pygetwindow as gw
 from pygetwindow import Win32Window
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page, sync_playwright
-from src.models.output_models import ShiftPosition
+from src.types.output_models import ShiftPosition
 
 
 class GetScreen(BaseModel):
@@ -31,7 +31,6 @@ class GetScreen(BaseModel):
     @classmethod
     def from_adb_device(cls, url: str, serial: str) -> tuple[bytes, AdbDevice]:
         """For the android device."""
-        adb.connect(serial)
         device = adb.device(serial=serial)
         current_app = device.app_current()
         if current_app.package != url:
