@@ -8,13 +8,13 @@ import numpy as np
 from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
 import PIL.Image as Image
 from src.utils.logger import logfire
-from src.types.image_models import Settings
+from src.types.image_models import ImageModel
 
 
 class ImageComparison(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    image_cfg: Settings = Field(..., description="The image configuration")
+    image_cfg: ImageModel = Field(..., description="The image configuration")
     check_list: list[str] = Field(
         ..., description="The check list, it should be a list of image names"
     )
