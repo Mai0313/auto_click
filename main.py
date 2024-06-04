@@ -10,8 +10,8 @@ import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
-from src.models.image_models import ConfigModel
-from src.models.output_models import ShiftPosition
+from src.types.image_models import ConfigModel
+from src.types.output_models import ShiftPosition
 
 
 def load_config(path: str) -> dict:
