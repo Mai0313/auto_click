@@ -1,17 +1,27 @@
 import os
 import time
-from typing import Union
+from typing import Union, Optional
 
 from PIL import Image
+import yaml
 from adbutils import AdbDevice
 from pydantic import Field, BaseModel
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
-from src.models.env_models import EnvironmentSettings
 from src.models.image_models import ConfigModel
 from src.models.output_models import ShiftPosition
+
+
+def load_config(path: str) -> dict:
+    with open(path) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    return config
+
+
+class SimulatorSettings(BaseModel):
+    adb_port: list[int]
 
 
 class RemoteContoller(BaseModel):
@@ -19,13 +29,7 @@ class RemoteContoller(BaseModel):
         ..., description="This field can be either a window title or a URL or cdp url."
     )
     config_model: ConfigModel = Field(...)
-    serial: str = Field(default_factory=lambda: None)
-
-    def __init__(self, target: str, config_model: ConfigModel):
-        super().__init__(target=target, config_model=config_model)
-        settings = EnvironmentSettings()
-        self.serial = f"127.0.0.1:{settings.adb_port}"
-        os.system(f".\\binaries\\adb.exe connect {self.serial}")
+    settings: SimulatorSettings = Field(...)
 
     def get_device(
         self,
@@ -33,7 +37,9 @@ class RemoteContoller(BaseModel):
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
-            return GetScreen.from_adb_device(self.target, self.serial)
+            serial = f"127.0.0.1:{self.settings.adb_port}"
+            os.system(f".\\binaries\\adb.exe connect {serial}")
+            return GetScreen.from_adb_device(self.target, serial)
         else:
             # this will return screenshot, shift_position; not device.
             return GetScreen.from_exist_window(self.target)
@@ -86,6 +92,7 @@ if __name__ == "__main__":
     target = "com.longe.allstarhmt"
     config = OmegaConf.load("./configs/all_stars.yaml")
     config_model = ConfigModel(**config)
+    config = load_config("./configs/simulator.yaml")
 
-    auto_web = RemoteContoller(target=target, config_model=config_model)
+    auto_web = RemoteContoller(target=target, config_model=config_model, config=config)
     auto_web.main()
