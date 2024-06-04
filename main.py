@@ -27,7 +27,7 @@ logfire.configure(
     collect_system_metrics=True,
     fast_shutdown=True,
     inspect_arguments=True,
-    pydantic_plugin=logfire.PydanticPlugin(record="failure"),
+    # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
 )
 
 

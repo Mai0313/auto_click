@@ -18,41 +18,41 @@ image_list:
   - image_name: "進入商店"
     image_path: "./data/allstars/shop.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "派對會員"
     image_path: "./data/allstars/party_member.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "領取"
     image_path: "./data/allstars/get_rewards.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
     delay_after_click: 20
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "點擊空白區域繼續"
     image_path: "./data/allstars/click2continue.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "返回大廳"
     image_path: "./data/allstars/back2lobby.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
 
   - image_name: "返回大廳"
     image_path: "./data/allstars/confirm.png"
     delay_after_click: 0
-    screenshot_option: True
+    screenshot_option: False
     confidence: 0.8
