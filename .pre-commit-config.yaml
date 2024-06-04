@@ -25,7 +25,6 @@ repos:
     hooks:
       # list of supported hooks: https://pre-commit.com/hooks.html
       - id: check-added-large-files
-        exclude: poetry.lock
       - id: check-ast
       - id: check-yaml
         args:

@@ -61,7 +61,6 @@ class RemoteContoller(BaseModel):
             pyautogui.click()
 
     def main(self) -> None:
-        # n = 0
         while True:
             screenshot, device = self.get_device()
             for config_dict in self.config_model.image_list:
