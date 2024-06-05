@@ -46,6 +46,11 @@ jobs:
           pip install pyinstaller
           pyinstaller -F main.py --onefile
 
+      - name: List All Files
+        run: |
+          ls -l -a
+          ls -l -a dist
+
       - name: Move and Rename Executable file
         shell: pwsh
         run: |
@@ -54,16 +59,11 @@ jobs:
           Move-Item -Path ./src -Destination ./dist/
           Move-Item -Path ./data -Destination ./dist/
 
-      - name: List All Files
-        run: |
-          ls -l -a
-          ls -l -a dist
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
         with:
           name: auto_clicker
-          path: dist
+          path: ./dist/
           if-no-files-found: ignore
           retention-days: 1
           compression-level: 6
