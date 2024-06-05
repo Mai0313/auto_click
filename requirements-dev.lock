@@ -10,6 +10,8 @@
 -e file:.
 adbutils==2.7.2
     # via auto-click
+altgraph==0.17.4
+    # via pyinstaller
 annotated-types==0.7.0
     # via pydantic
 antlr4-python3-runtime==4.9.3
@@ -123,8 +125,12 @@ opentelemetry-semantic-conventions==0.46b0
 packaging==24.0
     # via deprecation
     # via ipykernel
+    # via pyinstaller
+    # via pyinstaller-hooks-contrib
 parso==0.8.4
     # via jedi
+pefile==2023.2.7
+    # via pyinstaller
 pillow==10.3.0
     # via adbutils
     # via auto-click
@@ -167,6 +173,9 @@ pygetwindow==0.0.9
 pygments==2.18.0
     # via ipython
     # via rich
+pyinstaller==6.7.0
+pyinstaller-hooks-contrib==2024.6
+    # via pyinstaller
 pymsgbox==1.0.9
     # via pyautogui
 pyperclip==1.8.2
@@ -187,6 +196,8 @@ pytweening==1.2.0
     # via pyautogui
 pywin32==306
     # via jupyter-core
+pywin32-ctypes==0.2.2
+    # via pyinstaller
 pyyaml==6.0.1
     # via omegaconf
     # via pre-commit
@@ -203,6 +214,8 @@ rich==13.7.1
     # via logfire
 setuptools==70.0.0
     # via opentelemetry-instrumentation
+    # via pyinstaller
+    # via pyinstaller-hooks-contrib
 six==1.16.0
     # via asttokens
     # via python-dateutil

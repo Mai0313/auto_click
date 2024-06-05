@@ -78,6 +78,7 @@ dev-dependencies = [
     "ipykernel>=6.29.4",
     "ipywidgets>=8.1.2",
     "pre-commit>=3.7.1",
+    "pyinstaller>=6.7.0",
 ]
 
 [tool.hatch.metadata]
