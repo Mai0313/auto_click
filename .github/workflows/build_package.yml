@@ -47,9 +47,10 @@ jobs:
           pyinstaller -F main.py --onefile
 
       - name: List All Files
+        shell: pwsh
         run: |
-          ls -l -a
-          ls -l -a dist
+          Get-ChildItem -Path .\dist\ -Recurse
+          Get-ChildItem -Path . -Recurse
 
       - name: Move and Rename Executable file
         shell: pwsh
