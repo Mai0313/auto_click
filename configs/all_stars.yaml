@@ -10,6 +10,8 @@ base_check_list:
   - 確認
   - 點擊空白區域繼續
   - 返回大廳
+  - 等級提升
+  - 重新連接確認
 
 additional_check_list:
   - null
@@ -51,8 +53,20 @@ image_list:
     screenshot_option: False
     confidence: 0.8
 
-  - image_name: "返回大廳"
+  - image_name: "確認"
     image_path: "./data/allstars/confirm.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "等級提升"
+    image_path: "./data/allstars/levelup.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "重新連接確認"
+    image_path: "./data/allstars/conmfirm4reconnect.png"
     delay_after_click: 0
     screenshot_option: False
     confidence: 0.8
