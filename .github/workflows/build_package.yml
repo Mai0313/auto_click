@@ -78,7 +78,15 @@ jobs:
           disable-autolabeler: true
 
       - name: Show upload url
-        run: echo ${{ steps.drafter.outputs.upload_url }}
+        shell: pwsh
+        run: |
+          Write-Output "Upload URL: ${{ steps.drafter.outputs.upload_url }}"
+
+      # - name: Download Artifact
+      #   continue-on-error: true
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     path: ${{ github.event.repository.name }}.zip
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
