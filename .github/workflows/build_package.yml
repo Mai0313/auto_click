@@ -66,3 +66,26 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem -Path .
+
+      - name: Release Drafter
+        uses: release-drafter/release-drafter@v6
+        id: drafter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-drafter.yml
+          publish: false
+          disable-autolabeler: true
+
+      - name: Show upload url
+        run: echo ${{ steps.drafter.outputs.upload_url }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.drafter.outputs.upload_url }}
+          asset_path: ./auto_clicker.zip
+          asset_name: auto_clicker.zip
+          asset_content_type: application/zip
