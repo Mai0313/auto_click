@@ -65,5 +65,5 @@ jobs:
         with:
           name: ${{ steps.drafter.outputs.name }}
           tag_name: ${{ steps.drafter.outputs.tag_name }}
-          files: ./${{ github.event.repository.name }}_code.zip
+          files: ${{ github.event.repository.name }}_code.zip
           draft: true
