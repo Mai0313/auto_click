@@ -10,6 +10,9 @@
 name: Build Executable File
 
 on:
+  pull_request:
+    branches:
+      - master
   push:
     tags:
       - v*
