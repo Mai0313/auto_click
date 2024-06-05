@@ -38,6 +38,7 @@ jobs:
           config-name: release-drafter.yml
           publish: false
           disable-autolabeler: true
+          commitish: master
 
       - name: Upload Artifact
         continue-on-error: true

@@ -47,6 +47,7 @@ jobs:
           config-name: release-drafter.yml
           publish: false
           disable-autolabeler: true
+          commitish: master
 
       - name: Packaging to Executable file
         run: |
@@ -91,7 +92,7 @@ jobs:
         with:
           name: ${{ steps.drafter.outputs.name }}
           tag_name: ${{ steps.drafter.outputs.tag_name }}
-          files: ./${{ github.event.repository.name }}.zip
+          files: ${{ github.event.repository.name }}.zip
           draft: true
 
       # - name: Upload Release Asset
