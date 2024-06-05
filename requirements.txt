@@ -12,8 +12,3 @@ pydantic
 
 # Packaging
 pyinstaller
-
-#### Development Related ####
-ipykernel
-ipywidgets
-pre-commit
