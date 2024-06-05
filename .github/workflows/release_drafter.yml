@@ -38,9 +38,7 @@ jobs:
           config-name: release-drafter.yml
           publish: false
           disable-autolabeler: true
-
-      - name: Check upload url
-        run: echo "${{ steps.drafter.outputs.upload_url }}"
+          commitish: master
 
       - name: Upload Artifact
         continue-on-error: true
@@ -59,16 +57,13 @@ jobs:
         with:
           path: ${{ github.event.repository.name }}.zip
 
-      - name: Check Folder
-        run: ls -a -l
-
       - name: Upload Release Assets
         continue-on-error: true
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.drafter.outputs.upload_url }}
-          asset_path: ./${{ github.event.repository.name }}.zip
-          asset_name: ${{ github.event.repository.name }}.zip
-          asset_content_type: application/zip
+          name: ${{ steps.drafter.outputs.name }}
+          tag_name: ${{ steps.drafter.outputs.tag_name }}
+          files: ${{ github.event.repository.name }}.zip
+          draft: true
