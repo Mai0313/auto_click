@@ -16,25 +16,13 @@ on:
     tags:
       - v*
 
-permissions:
-  actions: write
-  checks: write
-  contents: write
-  deployments: write
-  id-token: write
-  issues: write
-  discussions: write
-  packages: write
-  pages: write
-  pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
+permissions: write-all
 
 jobs:
   build_base_images:
     name: Build and Push Base Images
     runs-on: ubuntu-latest
+    permissions: write-all
     # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
 
     steps:
@@ -67,6 +55,7 @@ jobs:
     name: Build and Push Latest Images
     if: github.ref == 'refs/heads/master'
     needs: build_base_images
+    permissions: write-all
     runs-on: ubuntu-latest
     # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
 
@@ -108,6 +97,7 @@ jobs:
     name: Build and Push Release Images
     if: github.ref == 'refs/tags/v*'
     needs: build_base_images
+    permissions: write-all
     runs-on: ubuntu-latest
     # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
 

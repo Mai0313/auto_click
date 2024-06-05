@@ -1,0 +1,47 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Build Package
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    tags:
+      - v*
+
+permissions: write-all
+
+jobs:
+  build_package:
+    name: Build and Push Base Images
+    runs-on: windows-latest
+    # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
+
+    steps:
+      - name: Disable SSL Verify
+        run: git config --global http.sslVerify false
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.1.0
+        with:
+          python-version: '3.10'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Packaging to Executable file
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pyinstaller -F main.py --onefile
