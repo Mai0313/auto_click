@@ -67,33 +67,34 @@ jobs:
         run: |
           Get-ChildItem -Path .
 
-      - name: Release Drafter
-        uses: release-drafter/release-drafter@v6
-        id: drafter
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-name: release-drafter.yml
-          publish: false
-          disable-autolabeler: true
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
       - name: Show upload url
         shell: pwsh
         run: |
-          Write-Output "Upload URL: ${{ steps.drafter.outputs.upload_url }}"
+          Write-Output "Upload URL: ${{ steps.create_release.outputs.upload_url }}"
 
-      # - name: Download Artifact
-      #   continue-on-error: true
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     path: ${{ github.event.repository.name }}.zip
+      - name: Download Artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          path: auto_clicker.zip
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.drafter.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./auto_clicker.zip
           asset_name: auto_clicker.zip
           asset_content_type: application/zip
