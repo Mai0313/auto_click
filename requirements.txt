@@ -1,14 +1,17 @@
-pygetwindow
 pillow
-playwright
-pyautogui
-opencv-python
-rich
+logfire
 adbutils
 omegaconf
+pyautogui
+playwright
+pygetwindow
+opencv-python
 
+# Data Validation
 pydantic
-pydantic_settings
+
+# Packaging
+pyinstaller
 
 #### Development Related ####
 ipykernel
