@@ -62,32 +62,16 @@ jobs:
           compression-level: 6
           overwrite: true
 
-      - name: List All Files
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path .
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Show upload url
-        shell: pwsh
-        run: |
-          Write-Output "Upload URL: ${{ steps.create_release.outputs.upload_url }}"
-
       - name: Download Artifact
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           path: auto_clicker.zip
+
+      - name: List All Files
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path .
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
