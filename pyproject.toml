@@ -52,18 +52,16 @@ authors = [
     { name = "Wei", email = "mai@mai0313.com" }
 ]
 dependencies = [
-    "pygetwindow>=0.0.9",
     "pillow>=10.3.0",
-    "playwright>=1.43.0",
-    "pyautogui>=0.9.54",
-    "opencv-python>=4.9.0.80",
-    "rich>=13.7.1",
-    "pydantic>=2.7.1",
-    "adbutils>=2.6.2",
+    "logfire>=0.40.0",
+    "adbutils>=2.7.2",
     "omegaconf>=2.3.0",
-    "pydantic-settings>=2.2.1",
-    "logfire[system-metrics]>=0.37.0",
-    "autorootcwd>=1.0.0",
+    "pyautogui>=0.9.54",
+    "playwright>=1.44.0",
+    "pygetwindow>=0.0.9",
+    "opencv-python>=4.10.0.82",
+    "pydantic>=2.7.3",
+    "pyinstaller>=6.7.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -74,12 +72,7 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = [
-    "ipykernel>=6.29.4",
-    "ipywidgets>=8.1.2",
-    "pre-commit>=3.7.1",
-    "pyinstaller>=6.7.0",
-]
+dev-dependencies = []
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -325,7 +318,7 @@ id_generator = "uuid"
 ns_timestamp_generator = "time_ns"
 fast_shutdown = true
 inspect_arguments = true
-pydantic_plugin_record = "all"
+pydantic_plugin_record = "failure"
 
 
 # ================== #
