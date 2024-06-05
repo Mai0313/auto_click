@@ -39,15 +39,12 @@ jobs:
           publish: false
           disable-autolabeler: true
 
-      - name: Check upload url
-        run: echo "${{ steps.drafter.outputs.upload_url }}"
-
       - name: Upload Artifact
         continue-on-error: true
         uses: actions/upload-artifact@v4.3.1
         with:
           path: ./*
-          name: ${{ github.event.repository.name }}.zip
+          name: ${{ github.event.repository.name }}_code.zip
           if-no-files-found: warn
           retention-days: 1
           compression-level: 6
@@ -57,10 +54,7 @@ jobs:
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
-          path: ${{ github.event.repository.name }}.zip
-
-      - name: Check Folder
-        run: ls -a -l
+          path: ${{ github.event.repository.name }}_code.zip
 
       - name: Upload Release Assets
         continue-on-error: true
@@ -68,4 +62,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ./${{ github.event.repository.name }}.zip
+          name: ${{ steps.drafter.outputs.name }}
+          tag_name: ${{ steps.drafter.outputs.tag_name }}
+          files: ./${{ github.event.repository.name }}_code.zip
+          draft: true
