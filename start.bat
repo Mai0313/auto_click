@@ -1,3 +1,4 @@
-@echo off
+@REM CALL conda activate automa
 rye sync
-python main.py
+rye run python main.py
+pause
