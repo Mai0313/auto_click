@@ -44,18 +44,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          pyinstaller -F main.py --onefile
+          pyinstaller -F main.py --onefile -n auto_clicker
 
       - name: List All Files
         shell: pwsh
         run: |
-          Get-ChildItem -Path .\dist\ -Recurse
-          Get-ChildItem -Path . -Recurse
+          Get-ChildItem -Path .
 
       - name: Move and Rename Executable file
         shell: pwsh
         run: |
-          Rename-Item -Path ./dist/main.exe -NewName ./dist/auto_clicker.exe
           Move-Item -Path ./configs -Destination ./dist/
           Move-Item -Path ./src -Destination ./dist/
           Move-Item -Path ./data -Destination ./dist/
