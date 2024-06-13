@@ -41,7 +41,7 @@ idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-logfire==0.40.0
+logfire==0.42.0
     # via auto-click
 markdown-it-py==3.0.0
     # via rich
@@ -74,7 +74,7 @@ opentelemetry-sdk==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
 opentelemetry-semantic-conventions==0.46b0
     # via opentelemetry-sdk
-packaging==24.0
+packaging==24.1
     # via deprecation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
@@ -94,7 +94,7 @@ py==1.11.0
     # via retry
 pyautogui==0.9.54
     # via auto-click
-pydantic==2.7.3
+pydantic==2.7.4
     # via auto-click
 pydantic-core==2.18.4
     # via pydantic
@@ -107,9 +107,9 @@ pygetwindow==0.0.9
     # via pyautogui
 pygments==2.18.0
     # via rich
-pyinstaller==6.7.0
+pyinstaller==6.8.0
     # via auto-click
-pyinstaller-hooks-contrib==2024.6
+pyinstaller-hooks-contrib==2024.7
     # via pyinstaller
 pymsgbox==1.0.9
     # via pyautogui
@@ -138,7 +138,7 @@ setuptools==70.0.0
     # via pyinstaller-hooks-contrib
 tomli==2.0.1
     # via logfire
-typing-extensions==4.12.1
+typing-extensions==4.12.2
     # via logfire
     # via opentelemetry-sdk
     # via pydantic
