@@ -1,5 +1,5 @@
 auto_click: true
-adb_port: 16416
+adb_port: 16448
 loops: 100
 global_interval: 5
 
