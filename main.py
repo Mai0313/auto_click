@@ -36,12 +36,11 @@ class RemoteContoller(BaseModel):
         ..., description="This field can be either a window title or a URL or cdp url."
     )
     configs: ConfigModel = Field(...)
-    settings: SimulatorSettings = Field(...)
     serial: Optional[str] = Field(default=None)
 
     def __init__(self, target: str, configs: ConfigModel, settings: SimulatorSettings):
         super().__init__(target=target, configs=configs, settings=settings)
-        self.serial = f"127.0.0.1:{self.settings.adb_port}"
+        self.serial = f"127.0.0.1:{self.configs.adb_port}"
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
             commands = ["./binaries/adb.exe", "connect", self.serial]
@@ -107,7 +106,6 @@ if __name__ == "__main__":
 
     target = "com.longe.allstarhmt"
     configs = OmegaConf.load("./configs/all_stars.yaml")
-    settings = load_config("./configs/simulator.yaml")
 
-    auto_web = RemoteContoller(target=target, configs=configs, settings=settings)
+    auto_web = RemoteContoller(target=target, configs=configs)
     auto_web.main()

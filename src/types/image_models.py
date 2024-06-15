@@ -13,6 +13,7 @@ class ImageModel(BaseModel):
 
 class ConfigModel(BaseModel):
     auto_click: bool = Field(...)
+    adb_port: int = Field(...)
     loops: int = Field(...)
     global_interval: int = Field(...)
     base_check_list: list[str] = Field(...)
