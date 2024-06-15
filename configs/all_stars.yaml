@@ -8,6 +8,7 @@ base_check_list:
   - 確認
   - 點擊空白區域繼續
   - 返回大廳
+  - 返回大廳2
   - 等級提升
   - 重新連接確認
 
@@ -29,6 +30,12 @@ image_list:
 
   - image_name: "返回大廳"
     image_path: "./data/allstars/back2lobby.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "返回大廳2"
+    image_path: "./data/allstars/back2lobby2.png"
     delay_after_click: 0
     screenshot_option: False
     confidence: 0.8
