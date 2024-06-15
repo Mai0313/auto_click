@@ -38,8 +38,8 @@ class RemoteContoller(BaseModel):
     configs: ConfigModel = Field(...)
     serial: Optional[str] = Field(default=None)
 
-    def __init__(self, target: str, configs: ConfigModel, settings: SimulatorSettings):
-        super().__init__(target=target, configs=configs, settings=settings)
+    def __init__(self, target: str, configs: ConfigModel):
+        super().__init__(target=target, configs=configs)
         self.serial = f"127.0.0.1:{self.configs.adb_port}"
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
