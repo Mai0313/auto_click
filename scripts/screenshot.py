@@ -1,15 +1,14 @@
 from adbutils import adb
 from pydantic import BaseModel
 import autorootcwd
-from src.types.simulator import SimulatorSettings
-from src.utils.config_utils import load_config
+from src.types.image_models import ConfigModel
 
 
 class Scripts(BaseModel):
-    settings: SimulatorSettings
+    configs: ConfigModel
 
     def screenshots(self) -> None:
-        serial = f"127.0.0.1:{self.settings.adb_port}"
+        serial = f"127.0.0.1:{self.configs.adb_port}"
         adb.connect(serial)
         d = adb.device(serial=serial)
         running_app = d.app_current()
@@ -20,6 +19,8 @@ class Scripts(BaseModel):
 
 
 if __name__ == "__main__":
-    settings = load_config("./configs/simulator.yaml")
-    scripts = Scripts(settings=settings)
+    from omegaconf import OmegaConf
+
+    configs = OmegaConf.load("./configs/all_stars_cn.yaml")
+    scripts = Scripts(configs=configs)
     scripts.screenshots()

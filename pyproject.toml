@@ -63,6 +63,7 @@ dependencies = [
     "opencv-python>=4.10.0.82",
     "pydantic>=2.7.3",
     "pyinstaller>=6.7.0",
+    "autorootcwd>=1.0.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
