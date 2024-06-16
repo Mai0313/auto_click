@@ -18,6 +18,8 @@ antlr4-python3-runtime==4.9.3
     # via omegaconf
 apkutils2==1.0.0
     # via adbutils
+autorootcwd==1.0.0
+    # via auto-click
 certifi==2024.6.2
     # via requests
 charset-normalizer==3.3.2
@@ -117,8 +119,13 @@ pyperclip==1.8.2
     # via mouseinfo
 pyrect==0.2.0
     # via pygetwindow
+pyrootutils==1.0.4
+    # via autorootcwd
 pyscreeze==0.1.30
     # via pyautogui
+python-dotenv==1.0.1
+    # via autorootcwd
+    # via pyrootutils
 pytweening==1.2.0
     # via pyautogui
 pywin32-ctypes==0.2.2
