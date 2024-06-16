@@ -33,9 +33,9 @@ class GetScreen(BaseModel):
         """For the android device."""
         adb.connect(serial)
         device = adb.device(serial=serial)
-        current_app = device.app_current()
-        if current_app.package != url:
-            device.app_start(url)
+        # current_app = device.app_current()
+        # if current_app.package != url:
+        #     device.app_start(url)
 
         screenshot = device.screenshot()
         return screenshot, device
