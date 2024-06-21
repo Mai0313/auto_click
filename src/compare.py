@@ -1,5 +1,6 @@
 from io import BytesIO
 import os
+import time
 from typing import Union
 import datetime
 
@@ -42,6 +43,7 @@ class ImageComparison(BaseModel):
         os.makedirs(log_dir, exist_ok=True)
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         log_filename = f"{log_dir}/{now}.png"
+        time.sleep(1)
         return log_filename
 
     @computed_field
