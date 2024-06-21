@@ -84,7 +84,7 @@ class RemoteContoller(BaseModel):
                     image_cfg=config_dict,
                     check_list=self.configs.base_check_list,
                     screenshot=screenshot,
-                ).find_orb()
+                ).find()
                 if button_center_x and button_center_y and self.configs.auto_click is True:
                     self.click_button(
                         device=device,
