@@ -84,7 +84,7 @@ class RemoteContoller(BaseModel):
                     image_cfg=config_dict,
                     check_list=self.configs.base_check_list,
                     screenshot=screenshot,
-                ).find()
+                ).find_orb()
                 if button_center_x and button_center_y and self.configs.auto_click is True:
                     self.click_button(
                         device=device,
@@ -96,6 +96,8 @@ class RemoteContoller(BaseModel):
 
 
 if __name__ == "__main__":
+    import sys
+
     from omegaconf import OmegaConf
 
     # target = "雀魂麻将"  # "http://localhost:9222"
@@ -104,8 +106,11 @@ if __name__ == "__main__":
     # check_list = [*config_model.base_check_list, *config_model.additional_check_list]
     # config_model.base_check_list = check_list
 
+    args = sys.argv[1]
     target = "com.longe.allstarhmt"
-    configs = OmegaConf.load("./configs/all_stars.yaml")
-
+    if args == "cn":
+        configs = OmegaConf.load("./configs/games/all_stars_cn.yaml")
+    else:
+        configs = OmegaConf.load("./configs/games/all_stars.yaml")
     auto_web = RemoteContoller(target=target, configs=configs)
     auto_web.main()
