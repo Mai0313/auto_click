@@ -10,50 +10,152 @@
 -e file:.
 adbutils==2.7.2
     # via auto-click
+alembic==1.13.2
+    # via optuna
 altgraph==0.17.4
     # via pyinstaller
 annotated-types==0.7.0
     # via pydantic
 antlr4-python3-runtime==4.9.3
+    # via hydra-core
     # via omegaconf
 apkutils2==1.0.0
     # via adbutils
-certifi==2024.6.2
+asttokens==2.4.1
+    # via stack-data
+attrs==23.2.0
+    # via cmd2
+autopage==0.5.2
+    # via cliff
+autorootcwd==1.0.0
+    # via auto-click
+certifi==2024.7.4
     # via requests
+cfgv==3.4.0
+    # via pre-commit
 charset-normalizer==3.3.2
     # via requests
 cigam==0.0.3
     # via apkutils2
+click==8.1.7
+    # via genbadge
+cliff==4.7.0
+    # via optuna
+cmaes==0.10.0
+    # via optuna
+cmd2==2.4.3
+    # via cliff
+colorama==0.4.6
+    # via click
+    # via colorlog
+    # via ipython
+    # via pytest
+    # via tqdm
+colorlog==6.8.2
+    # via hydra-colorlog
+    # via optuna
+comm==0.2.2
+    # via ipykernel
+    # via ipywidgets
+coverage==7.6.0
+    # via pytest-cov
+debugpy==1.8.2
+    # via ipykernel
 decorator==5.1.1
+    # via ipython
     # via retry
+defusedxml==0.7.1
+    # via genbadge
 deprecated==1.2.14
     # via opentelemetry-api
     # via opentelemetry-exporter-otlp-proto-http
 deprecation==2.1.0
     # via adbutils
+distlib==0.3.8
+    # via virtualenv
+exceptiongroup==1.2.2
+    # via ipython
+    # via pytest
+execnet==2.1.1
+    # via pytest-xdist
 executing==2.0.1
     # via logfire
-googleapis-common-protos==1.63.1
+    # via stack-data
+filelock==3.15.4
+    # via virtualenv
+flake8==7.1.0
+    # via flake8-html
+flake8-html==0.4.3
+    # via genbadge
+genbadge==1.1.1
+googleapis-common-protos==1.63.2
     # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.0.3
     # via playwright
+    # via sqlalchemy
+hydra-colorlog==1.2.0
+    # via auto-click
+hydra-core==1.3.2
+    # via auto-click
+    # via hydra-colorlog
+    # via hydra-optuna-sweeper
+hydra-optuna-sweeper==1.2.0
+    # via auto-click
+identify==2.6.0
+    # via pre-commit
 idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-logfire==0.40.0
+iniconfig==2.0.0
+    # via pytest
+ipykernel==6.29.5
+ipython==8.26.0
+    # via ipykernel
+    # via ipywidgets
+ipywidgets==8.1.3
+jedi==0.19.1
+    # via ipython
+jinja2==3.1.4
+    # via flake8-html
+jupyter-client==8.6.2
+    # via ipykernel
+jupyter-core==5.7.2
+    # via ipykernel
+    # via jupyter-client
+jupyterlab-widgets==3.0.11
+    # via ipywidgets
+logfire==0.46.1
     # via auto-click
+mako==1.3.5
+    # via alembic
 markdown-it-py==3.0.0
     # via rich
+markupsafe==2.1.5
+    # via jinja2
+    # via mako
+matplotlib-inline==0.1.7
+    # via ipykernel
+    # via ipython
+mccabe==0.7.0
+    # via flake8
 mdurl==0.1.2
     # via markdown-it-py
 mouseinfo==0.1.3
     # via pyautogui
-numpy==1.26.4
+nest-asyncio==1.6.0
+    # via ipykernel
+nodeenv==1.9.1
+    # via pre-commit
+numpy==2.0.0
+    # via cmaes
     # via opencv-python
+    # via optuna
+    # via scipy
 omegaconf==2.3.0
     # via auto-click
-opencv-python==4.10.0.82
+    # via hydra-core
+opencv-python==4.10.0.84
     # via auto-click
 opentelemetry-api==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
@@ -74,78 +176,174 @@ opentelemetry-sdk==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
 opentelemetry-semantic-conventions==0.46b0
     # via opentelemetry-sdk
-packaging==24.0
+optuna==2.10.1
+    # via hydra-optuna-sweeper
+packaging==24.1
     # via deprecation
+    # via hydra-core
+    # via ipykernel
+    # via optuna
     # via pyinstaller
     # via pyinstaller-hooks-contrib
+    # via pytest
+parso==0.8.4
+    # via jedi
+pbr==6.0.0
+    # via stevedore
 pefile==2023.2.7
     # via pyinstaller
-pillow==10.3.0
+pillow==10.4.0
     # via adbutils
     # via auto-click
+    # via genbadge
     # via pyscreeze
-playwright==1.44.0
+platformdirs==4.2.2
+    # via jupyter-core
+    # via virtualenv
+playwright==1.45.0
     # via auto-click
+pluggy==1.5.0
+    # via pytest
+pre-commit==3.7.1
+prettytable==3.10.2
+    # via cliff
+prompt-toolkit==3.0.47
+    # via ipython
 protobuf==4.25.3
     # via googleapis-common-protos
     # via logfire
     # via opentelemetry-proto
+psutil==6.0.0
+    # via ipykernel
+pure-eval==0.2.3
+    # via stack-data
 py==1.11.0
     # via retry
 pyautogui==0.9.54
     # via auto-click
-pydantic==2.7.3
+pycodestyle==2.12.0
+    # via flake8
+pydantic==2.8.2
     # via auto-click
-pydantic-core==2.18.4
+pydantic-core==2.20.1
     # via pydantic
 pyee==11.1.0
     # via playwright
 pyelftools==0.31
     # via apkutils2
+pyflakes==3.2.0
+    # via flake8
 pygetwindow==0.0.9
     # via auto-click
     # via pyautogui
 pygments==2.18.0
+    # via flake8-html
+    # via ipython
     # via rich
-pyinstaller==6.7.0
+pyinstaller==6.9.0
     # via auto-click
-pyinstaller-hooks-contrib==2024.6
+pyinstaller-hooks-contrib==2024.7
     # via pyinstaller
 pymsgbox==1.0.9
     # via pyautogui
-pyperclip==1.8.2
+pyperclip==1.9.0
+    # via cmd2
     # via mouseinfo
+pyreadline3==3.4.1
+    # via cmd2
 pyrect==0.2.0
     # via pygetwindow
+pyrootutils==1.0.4
+    # via autorootcwd
 pyscreeze==0.1.30
     # via pyautogui
+pytest==8.3.2
+    # via pytest-asyncio
+    # via pytest-cov
+    # via pytest-xdist
+pytest-asyncio==0.23.8
+pytest-cov==5.0.0
+pytest-xdist==3.6.1
+python-dateutil==2.9.0.post0
+    # via jupyter-client
+python-dotenv==1.0.1
+    # via autorootcwd
+    # via pyrootutils
 pytweening==1.2.0
     # via pyautogui
+pywin32==306
+    # via jupyter-core
 pywin32-ctypes==0.2.2
     # via pyinstaller
 pyyaml==6.0.1
+    # via cliff
     # via omegaconf
+    # via optuna
+    # via pre-commit
+pyzmq==26.0.3
+    # via ipykernel
+    # via jupyter-client
 requests==2.32.3
     # via adbutils
+    # via genbadge
     # via opentelemetry-exporter-otlp-proto-http
 retry==0.9.2
     # via adbutils
 rich==13.7.1
     # via logfire
-setuptools==70.0.0
+scipy==1.14.0
+    # via optuna
+setuptools==71.0.3
+    # via genbadge
     # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
+six==1.16.0
+    # via asttokens
+    # via python-dateutil
+sqlalchemy==2.0.31
+    # via alembic
+    # via optuna
+stack-data==0.6.3
+    # via ipython
+stevedore==5.2.0
+    # via cliff
 tomli==2.0.1
+    # via coverage
     # via logfire
-typing-extensions==4.12.1
+    # via pytest
+tornado==6.4.1
+    # via ipykernel
+    # via jupyter-client
+tqdm==4.66.4
+    # via optuna
+traitlets==5.14.3
+    # via comm
+    # via ipykernel
+    # via ipython
+    # via ipywidgets
+    # via jupyter-client
+    # via jupyter-core
+    # via matplotlib-inline
+typing-extensions==4.12.2
+    # via alembic
+    # via ipython
     # via logfire
     # via opentelemetry-sdk
     # via pydantic
     # via pydantic-core
     # via pyee
-urllib3==2.2.1
+    # via sqlalchemy
+urllib3==2.2.2
     # via requests
+virtualenv==20.26.3
+    # via pre-commit
+wcwidth==0.2.13
+    # via cmd2
+    # via prettytable
+    # via prompt-toolkit
+widgetsnbextension==4.0.11
+    # via ipywidgets
 wrapt==1.16.0
     # via deprecated
     # via opentelemetry-instrumentation

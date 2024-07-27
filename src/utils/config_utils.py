@@ -1,7 +1,12 @@
-import yaml
+import sys
+
+from hydra import compose, initialize
+from omegaconf import OmegaConf
 
 
-def load_config(path: str) -> dict:
-    with open(path) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    return config
+def load_hydra_config() -> dict:
+    args = sys.argv[1:]
+    with initialize(config_path="../../configs", version_base="1.2"):
+        cfg = compose(config_name="configs", overrides=args, return_hydra_config=False)
+        config_dict = OmegaConf.to_container(cfg, resolve=False)
+    return config_dict
