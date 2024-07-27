@@ -12,6 +12,8 @@ base_check_list:
   - 返回大廳2
   - 等級提升
   - 重新連接確認
+  - 返回
+  - 開始5v5
 
 additional_check_list:
   - null
