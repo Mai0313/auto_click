@@ -1,6 +1,6 @@
 from adbutils import adb
 from pydantic import BaseModel
-from src.types.image_models import ConfigModel
+from src.types.config import ConfigModel
 
 
 class Scripts(BaseModel):

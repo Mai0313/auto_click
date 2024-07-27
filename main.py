@@ -74,6 +74,7 @@ class RemoteContoller(ConfigModel):
         while True:
             device_details = self.get_device()
             for config_dict in self.image_list:
+                # logfire.info(f"Checking for {config_dict.image_name}")
                 button_center_x, button_center_y = ImageComparison(
                     image_cfg=config_dict,
                     check_list=self.base_check_list,
@@ -86,6 +87,8 @@ class RemoteContoller(ConfigModel):
                         button_center_y=button_center_y,
                     )
                     time.sleep(config_dict.delay_after_click)
+                # else:
+                #     logfire.warn(f"Button {config_dict.image_name} not found")
             time.sleep(self.global_interval)
 
 
