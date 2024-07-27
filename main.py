@@ -1,19 +1,16 @@
 import time
-from typing import Union, Optional
+from typing import Union
 import getpass
 
-from PIL import Image
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, BaseModel
+from pydantic import computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
+from src.types.config import ConfigModel
 from playwright.sync_api import Page
-from src.types.simulator import SimulatorSettings
-from src.types.image_models import ConfigModel
-from src.utils.config_utils import load_config
-from src.types.output_models import ShiftPosition
+from src.types.output_models import DeviceOutput, ShiftPosition
 from src.utils.command_utils import CommandExecutor
 
 logfire.configure(
@@ -31,17 +28,15 @@ logfire.configure(
 )
 
 
-class RemoteContoller(BaseModel):
-    target: str = Field(
-        ..., description="This field can be either a window title or a URL or cdp url."
-    )
-    configs: ConfigModel = Field(...)
-    settings: SimulatorSettings = Field(...)
-    serial: Optional[str] = Field(default=None)
+class RemoteContoller(ConfigModel):
+    @computed_field
+    @property
+    def serial(self) -> str:
+        serial = f"127.0.0.1:{self.adb_port}"
+        return serial
 
-    def __init__(self, target: str, configs: ConfigModel, settings: SimulatorSettings):
-        super().__init__(target=target, configs=configs, settings=settings)
-        self.serial = f"127.0.0.1:{self.settings.adb_port}"
+    @model_validator(mode="after")
+    def connect2adb(self) -> None:
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
             commands = ["./binaries/adb.exe", "connect", self.serial]
@@ -50,9 +45,7 @@ class RemoteContoller(BaseModel):
         except Exception as e:
             logfire.error("Error in connecting to adb: {e}", e=e)
 
-    def get_device(
-        self,
-    ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
+    def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
         elif self.target.startswith("com"):
@@ -79,35 +72,30 @@ class RemoteContoller(BaseModel):
 
     def main(self) -> None:
         while True:
-            screenshot, device = self.get_device()
-            for config_dict in self.configs.image_list:
+            device_details = self.get_device()
+            for config_dict in self.image_list:
+                # logfire.info(f"Checking for {config_dict.image_name}")
                 button_center_x, button_center_y = ImageComparison(
                     image_cfg=config_dict,
-                    check_list=self.configs.base_check_list,
-                    screenshot=screenshot,
+                    check_list=self.base_check_list,
+                    screenshot=device_details.screenshot,
                 ).find()
-                if button_center_x and button_center_y and self.configs.auto_click is True:
+                if button_center_x and button_center_y and self.auto_click is True:
                     self.click_button(
-                        device=device,
+                        device=device_details.device,
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
                     time.sleep(config_dict.delay_after_click)
-            time.sleep(self.configs.global_interval)
+                # else:
+                #     logfire.warn(f"Button {config_dict.image_name} not found")
+            time.sleep(self.global_interval)
 
 
 if __name__ == "__main__":
-    from omegaconf import OmegaConf
+    from src.utils.config_utils import load_hydra_config
 
-    # target = "雀魂麻将"  # "http://localhost:9222"
-    # config = OmegaConf.load("./configs/mahjong.yaml")
-    # config_model = ConfigModel(**config)
-    # check_list = [*config_model.base_check_list, *config_model.additional_check_list]
-    # config_model.base_check_list = check_list
-
-    target = "com.longe.allstarhmt"
-    configs = OmegaConf.load("./configs/all_stars.yaml")
-    settings = load_config("./configs/simulator.yaml")
-
-    auto_web = RemoteContoller(target=target, configs=configs, settings=settings)
+    configs = load_hydra_config()
+    game_config = configs["games"]
+    auto_web = RemoteContoller(**game_config)
     auto_web.main()
