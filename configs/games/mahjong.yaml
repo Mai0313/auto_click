@@ -1,3 +1,4 @@
+target: 雀魂麻将  # "http://localhost:9222"
 auto_click: true
 loops: 100
 global_interval: 5

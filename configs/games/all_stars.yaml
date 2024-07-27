@@ -1,40 +1,24 @@
+target: com.longe.allstarhmt
 auto_click: true
+adb_port: 16416
 loops: 100
 global_interval: 5
 
 base_check_list:
-  # - 進入商店
-  # - 派對會員
-  # - 領取
   - 開始配對
   - 確認
   - 點擊空白區域繼續
   - 返回大廳
+  - 返回大廳2
   - 等級提升
   - 重新連接確認
+  - 返回
+  - 開始5v5
 
 additional_check_list:
   - null
 
 image_list:
-  - image_name: "進入商店"
-    image_path: "./data/allstars/shop.png"
-    delay_after_click: 0
-    screenshot_option: False
-    confidence: 0.8
-
-  - image_name: "派對會員"
-    image_path: "./data/allstars/party_member.png"
-    delay_after_click: 0
-    screenshot_option: False
-    confidence: 0.8
-
-  - image_name: "領取"
-    image_path: "./data/allstars/get_rewards.png"
-    delay_after_click: 0
-    screenshot_option: False
-    confidence: 0.8
-
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
     delay_after_click: 20
@@ -67,6 +51,18 @@ image_list:
 
   - image_name: "重新連接確認"
     image_path: "./data/allstars/conmfirm4reconnect.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "返回"
+    image_path: "./data/allstars/back.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "開始5v5"
+    image_path: "./data/allstars/start5v5.png"
     delay_after_click: 0
     screenshot_option: False
     confidence: 0.8

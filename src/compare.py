@@ -1,5 +1,6 @@
 from io import BytesIO
 import os
+import time
 from typing import Union
 import datetime
 
@@ -42,6 +43,7 @@ class ImageComparison(BaseModel):
         os.makedirs(log_dir, exist_ok=True)
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         log_filename = f"{log_dir}/{now}.png"
+        time.sleep(1)
         return log_filename
 
     @computed_field
@@ -64,8 +66,9 @@ class ImageComparison(BaseModel):
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         cv2.imwrite(self.log_filename, color_screenshot)
         logfire.warn(
-            "The screenshot has been taken under {log_filename}",
+            "The screenshot for {img_name} has been taken under {log_filename}",
             log_filename=self.log_filename,
+            img_name=self.image_cfg.image_name,
             _tags=["Screenshot"],
         )
 
