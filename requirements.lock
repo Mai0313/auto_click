@@ -20,7 +20,7 @@ apkutils2==1.0.0
     # via adbutils
 autorootcwd==1.0.0
     # via auto-click
-certifi==2024.6.2
+certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
@@ -35,7 +35,7 @@ deprecation==2.1.0
     # via adbutils
 executing==2.0.1
     # via logfire
-googleapis-common-protos==1.63.1
+googleapis-common-protos==1.63.2
     # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.0.3
     # via playwright
@@ -43,7 +43,7 @@ idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-logfire==0.42.0
+logfire==0.46.1
     # via auto-click
 markdown-it-py==3.0.0
     # via rich
@@ -82,11 +82,11 @@ packaging==24.1
     # via pyinstaller-hooks-contrib
 pefile==2023.2.7
     # via pyinstaller
-pillow==10.3.0
+pillow==10.4.0
     # via adbutils
     # via auto-click
     # via pyscreeze
-playwright==1.44.0
+playwright==1.45.0
     # via auto-click
 protobuf==4.25.3
     # via googleapis-common-protos
@@ -96,9 +96,9 @@ py==1.11.0
     # via retry
 pyautogui==0.9.54
     # via auto-click
-pydantic==2.7.4
+pydantic==2.8.2
     # via auto-click
-pydantic-core==2.18.4
+pydantic-core==2.20.1
     # via pydantic
 pyee==11.1.0
     # via playwright
@@ -109,7 +109,7 @@ pygetwindow==0.0.9
     # via pyautogui
 pygments==2.18.0
     # via rich
-pyinstaller==6.8.0
+pyinstaller==6.9.0
     # via auto-click
 pyinstaller-hooks-contrib==2024.7
     # via pyinstaller
@@ -139,7 +139,7 @@ retry==0.9.2
     # via adbutils
 rich==13.7.1
     # via logfire
-setuptools==70.1.0
+setuptools==71.0.3
     # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
