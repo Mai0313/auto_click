@@ -12,3 +12,15 @@ pydantic
 
 # Packaging
 pyinstaller
+
+# Develop Tools
+ipykernel
+ipywidgets
+pre-commit
+
+# Pytes Tools
+pytest
+pytest-cov
+pytest-xdist
+pytest-asyncio
+genbadge[all]
