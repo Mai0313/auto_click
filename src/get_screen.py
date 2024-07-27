@@ -4,9 +4,11 @@ from PIL import Image, ImageGrab
 from adbutils import adb
 from pydantic import BaseModel
 import pygetwindow as gw
+from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page, sync_playwright
 from src.types.output_models import ShiftPosition
+from src.types.image_models import OutputImage
 
 
 class GetScreen(BaseModel):
@@ -24,6 +26,8 @@ class GetScreen(BaseModel):
         screenshot = ImageGrab.grab(bbox=bbox)
         # For this method, there is always a shift position
         shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
+
+        screenshot.save("screenshot.png")
         return screenshot, shift_position
 
     @classmethod
@@ -31,9 +35,10 @@ class GetScreen(BaseModel):
         """For the android device."""
         adb.connect(serial)
         device = adb.device(serial=serial)
-        # current_app = device.app_current()
-        # if current_app.package != url:
-        #     device.app_start(url)
+        current_app = device.app_current()
+        if current_app.package != url:
+            # device.app_start(url)
+            raise Exception(f"Please make sure you have opened the app: {url}")
 
         screenshot = device.screenshot()
         return screenshot, device

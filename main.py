@@ -1,11 +1,11 @@
 import time
-from typing import Union, Optional
+from typing import Union
 import getpass
 
 from PIL import Image
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
@@ -30,15 +30,16 @@ logfire.configure(
 
 
 class RemoteContoller(BaseModel):
-    target: str = Field(
-        ..., description="This field can be either a window title or a URL or cdp url."
-    )
     configs: ConfigModel = Field(...)
-    serial: Optional[str] = Field(default=None)
 
-    def __init__(self, target: str, configs: ConfigModel):
-        super().__init__(target=target, configs=configs)
-        self.serial = f"127.0.0.1:{self.configs.adb_port}"
+    @computed_field
+    @property
+    def serial(self) -> str:
+        serial = f"127.0.0.1:{self.configs.adb_port}"
+        return serial
+
+    @model_validator(mode="after")
+    def connect2adb(self) -> None:
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
             commands = ["./binaries/adb.exe", "connect", self.serial]
@@ -50,13 +51,13 @@ class RemoteContoller(BaseModel):
     def get_device(
         self,
     ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
-        if self.target.startswith("http"):
-            return GetScreen.from_remote_window(self.target)
-        elif self.target.startswith("com"):
-            return GetScreen.from_adb_device(self.target, self.serial)
+        if self.configs.target.startswith("http"):
+            return GetScreen.from_remote_window(self.configs.target)
+        elif self.configs.target.startswith("com"):
+            return GetScreen.from_adb_device(self.configs.target, self.serial)
         else:
             # this will return screenshot, shift_position; not device.
-            return GetScreen.from_exist_window(self.target)
+            return GetScreen.from_exist_window(self.configs.target)
 
     def click_button(
         self,
@@ -94,21 +95,8 @@ class RemoteContoller(BaseModel):
 
 
 if __name__ == "__main__":
-    import sys
+    from src.utils.config_utils import load_hydra_config
 
-    from omegaconf import OmegaConf
-
-    # target = "雀魂麻将"  # "http://localhost:9222"
-    # config = OmegaConf.load("./configs/mahjong.yaml")
-    # config_model = ConfigModel(**config)
-    # check_list = [*config_model.base_check_list, *config_model.additional_check_list]
-    # config_model.base_check_list = check_list
-
-    args = sys.argv[1]
-    target = "com.longe.allstarhmt"
-    if args == "cn":
-        configs = OmegaConf.load("./configs/games/all_stars_cn.yaml")
-    else:
-        configs = OmegaConf.load("./configs/games/all_stars.yaml")
-    auto_web = RemoteContoller(target=target, configs=configs)
+    configs = load_hydra_config()
+    auto_web = RemoteContoller(configs=configs)
     auto_web.main()
