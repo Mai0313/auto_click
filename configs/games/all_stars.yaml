@@ -1,3 +1,4 @@
+target: com.longe.allstarhmt
 auto_click: true
 adb_port: 16416
 loops: 100
