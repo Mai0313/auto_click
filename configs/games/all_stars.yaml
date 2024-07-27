@@ -52,3 +52,15 @@ image_list:
     delay_after_click: 0
     screenshot_option: False
     confidence: 0.8
+
+  - image_name: "返回"
+    image_path: "./data/allstars/back.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "開始5v5"
+    image_path: "./data/allstars/start5v5.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
