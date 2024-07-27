@@ -1,19 +1,17 @@
 import time
 
-from PIL import Image, ImageGrab
+from PIL import ImageGrab
 from adbutils import adb
 from pydantic import BaseModel
 import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
-from adbutils._device import AdbDevice
-from playwright.sync_api import Page, sync_playwright
-from src.types.output_models import ShiftPosition
-from src.types.image_models import OutputImage
+from playwright.sync_api import sync_playwright
+from src.types.output_models import DeviceOutput, ShiftPosition
 
 
 class GetScreen(BaseModel):
     @classmethod
-    def from_exist_window(self, window_title: str) -> tuple[Image.Image, ShiftPosition]:
+    def from_exist_window(self, window_title: str) -> DeviceOutput:
         """For any window."""
         window = gw.getWindowsWithTitle(window_title)[0]  # type: Win32Window
         if window.isMinimized:
@@ -28,10 +26,10 @@ class GetScreen(BaseModel):
         shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
 
         screenshot.save("screenshot.png")
-        return screenshot, shift_position
+        return DeviceOutput(screenshot=screenshot, device=shift_position)
 
     @classmethod
-    def from_adb_device(cls, url: str, serial: str) -> tuple[bytes, AdbDevice]:
+    def from_adb_device(cls, url: str, serial: str) -> DeviceOutput:
         """For the android device."""
         adb.connect(serial)
         device = adb.device(serial=serial)
@@ -41,10 +39,10 @@ class GetScreen(BaseModel):
             raise Exception(f"Please make sure you have opened the app: {url}")
 
         screenshot = device.screenshot()
-        return screenshot, device
+        return DeviceOutput(screenshot=screenshot, device=device)
 
     @classmethod
-    def from_remote_window(cls, url: str) -> tuple[bytes, Page]:
+    def from_remote_window(cls, url: str) -> DeviceOutput:
         """For playingwright."""
         with sync_playwright() as p:
             # if "localhost" in url:
@@ -70,4 +68,4 @@ class GetScreen(BaseModel):
             page = context.new_page()
             page.goto(url)
             screenshot = page.screenshot()
-            return screenshot, page
+            return DeviceOutput(screenshot=screenshot, device=page)

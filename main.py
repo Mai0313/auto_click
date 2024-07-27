@@ -2,16 +2,15 @@ import time
 from typing import Union
 import getpass
 
-from PIL import Image
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, BaseModel, computed_field, model_validator
+from pydantic import computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
+from src.types.config import ConfigModel
 from playwright.sync_api import Page
-from src.types.image_models import ConfigModel
-from src.types.output_models import ShiftPosition
+from src.types.output_models import DeviceOutput, ShiftPosition
 from src.utils.command_utils import CommandExecutor
 
 logfire.configure(
@@ -29,13 +28,11 @@ logfire.configure(
 )
 
 
-class RemoteContoller(BaseModel):
-    configs: ConfigModel = Field(...)
-
+class RemoteContoller(ConfigModel):
     @computed_field
     @property
     def serial(self) -> str:
-        serial = f"127.0.0.1:{self.configs.adb_port}"
+        serial = f"127.0.0.1:{self.adb_port}"
         return serial
 
     @model_validator(mode="after")
@@ -48,16 +45,14 @@ class RemoteContoller(BaseModel):
         except Exception as e:
             logfire.error("Error in connecting to adb: {e}", e=e)
 
-    def get_device(
-        self,
-    ) -> Union[tuple[bytes, Page], tuple[bytes, AdbDevice], tuple[Image.Image, ShiftPosition]]:
-        if self.configs.target.startswith("http"):
-            return GetScreen.from_remote_window(self.configs.target)
-        elif self.configs.target.startswith("com"):
-            return GetScreen.from_adb_device(self.configs.target, self.serial)
+    def get_device(self) -> DeviceOutput:
+        if self.target.startswith("http"):
+            return GetScreen.from_remote_window(self.target)
+        elif self.target.startswith("com"):
+            return GetScreen.from_adb_device(self.target, self.serial)
         else:
             # this will return screenshot, shift_position; not device.
-            return GetScreen.from_exist_window(self.configs.target)
+            return GetScreen.from_exist_window(self.target)
 
     def click_button(
         self,
@@ -77,26 +72,27 @@ class RemoteContoller(BaseModel):
 
     def main(self) -> None:
         while True:
-            screenshot, device = self.get_device()
-            for config_dict in self.configs.image_list:
+            device_details = self.get_device()
+            for config_dict in self.image_list:
                 button_center_x, button_center_y = ImageComparison(
                     image_cfg=config_dict,
-                    check_list=self.configs.base_check_list,
-                    screenshot=screenshot,
+                    check_list=self.base_check_list,
+                    screenshot=device_details.screenshot,
                 ).find()
-                if button_center_x and button_center_y and self.configs.auto_click is True:
+                if button_center_x and button_center_y and self.auto_click is True:
                     self.click_button(
-                        device=device,
+                        device=device_details.device,
                         button_center_x=button_center_x,
                         button_center_y=button_center_y,
                     )
                     time.sleep(config_dict.delay_after_click)
-            time.sleep(self.configs.global_interval)
+            time.sleep(self.global_interval)
 
 
 if __name__ == "__main__":
     from src.utils.config_utils import load_hydra_config
 
     configs = load_hydra_config()
-    auto_web = RemoteContoller(configs=configs)
+    game_config = configs["games"]
+    auto_web = RemoteContoller(**game_config)
     auto_web.main()
