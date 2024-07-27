@@ -10,9 +10,7 @@ import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from playwright.sync_api import Page
-from src.types.simulator import SimulatorSettings
 from src.types.image_models import ConfigModel
-from src.utils.config_utils import load_config
 from src.types.output_models import ShiftPosition
 from src.utils.command_utils import CommandExecutor
 

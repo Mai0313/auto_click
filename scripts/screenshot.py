@@ -1,6 +1,5 @@
 from adbutils import adb
 from pydantic import BaseModel
-import autorootcwd
 from src.types.image_models import ConfigModel
 
 
