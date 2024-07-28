@@ -10,21 +10,14 @@
 -e file:.
 adbutils==2.7.2
     # via auto-click
-alembic==1.13.2
-    # via optuna
 altgraph==0.17.4
     # via pyinstaller
 annotated-types==0.7.0
     # via pydantic
 antlr4-python3-runtime==4.9.3
-    # via hydra-core
     # via omegaconf
 apkutils2==1.0.0
     # via adbutils
-attrs==23.2.0
-    # via cmd2
-autopage==0.5.2
-    # via cliff
 autorootcwd==1.0.0
     # via auto-click
 certifi==2024.7.4
@@ -33,18 +26,6 @@ charset-normalizer==3.3.2
     # via requests
 cigam==0.0.3
     # via apkutils2
-cliff==4.7.0
-    # via optuna
-cmaes==0.10.0
-    # via optuna
-cmd2==2.4.3
-    # via cliff
-colorama==0.4.6
-    # via colorlog
-    # via tqdm
-colorlog==6.8.2
-    # via hydra-colorlog
-    # via optuna
 decorator==5.1.1
     # via retry
 deprecated==1.2.14
@@ -58,39 +39,22 @@ googleapis-common-protos==1.63.2
     # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.0.3
     # via playwright
-    # via sqlalchemy
-hydra-colorlog==1.2.0
-    # via auto-click
-hydra-core==1.3.2
-    # via auto-click
-    # via hydra-colorlog
-    # via hydra-optuna-sweeper
-hydra-optuna-sweeper==1.2.0
-    # via auto-click
 idna==3.7
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
 logfire==0.46.1
     # via auto-click
-mako==1.3.5
-    # via alembic
 markdown-it-py==3.0.0
     # via rich
-markupsafe==2.1.5
-    # via mako
 mdurl==0.1.2
     # via markdown-it-py
 mouseinfo==0.1.3
     # via pyautogui
 numpy==2.0.0
-    # via cmaes
     # via opencv-python
-    # via optuna
-    # via scipy
 omegaconf==2.3.0
     # via auto-click
-    # via hydra-core
 opencv-python==4.10.0.84
     # via auto-click
 opentelemetry-api==1.25.0
@@ -112,16 +76,10 @@ opentelemetry-sdk==1.25.0
     # via opentelemetry-exporter-otlp-proto-http
 opentelemetry-semantic-conventions==0.46b0
     # via opentelemetry-sdk
-optuna==2.10.1
-    # via hydra-optuna-sweeper
 packaging==24.1
     # via deprecation
-    # via hydra-core
-    # via optuna
     # via pyinstaller
     # via pyinstaller-hooks-contrib
-pbr==6.0.0
-    # via stevedore
 pefile==2023.2.7
     # via pyinstaller
 pillow==10.4.0
@@ -130,8 +88,6 @@ pillow==10.4.0
     # via pyscreeze
 playwright==1.45.0
     # via auto-click
-prettytable==3.10.2
-    # via cliff
 protobuf==4.25.3
     # via googleapis-common-protos
     # via logfire
@@ -160,10 +116,7 @@ pyinstaller-hooks-contrib==2024.7
 pymsgbox==1.0.9
     # via pyautogui
 pyperclip==1.9.0
-    # via cmd2
     # via mouseinfo
-pyreadline3==3.4.1
-    # via cmd2
 pyrect==0.2.0
     # via pygetwindow
 pyrootutils==1.0.4
@@ -179,9 +132,7 @@ pytweening==1.2.0
 pywin32-ctypes==0.2.2
     # via pyinstaller
 pyyaml==6.0.1
-    # via cliff
     # via omegaconf
-    # via optuna
 requests==2.32.3
     # via adbutils
     # via opentelemetry-exporter-otlp-proto-http
@@ -191,34 +142,20 @@ rich==13.7.1
     # via logfire
 rootutils==1.0.7
     # via auto-click
-scipy==1.14.0
-    # via optuna
 setuptools==71.0.3
     # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
-sqlalchemy==2.0.31
-    # via alembic
-    # via optuna
-stevedore==5.2.0
-    # via cliff
 tomli==2.0.1
     # via logfire
-tqdm==4.66.4
-    # via optuna
 typing-extensions==4.12.2
-    # via alembic
     # via logfire
     # via opentelemetry-sdk
     # via pydantic
     # via pydantic-core
     # via pyee
-    # via sqlalchemy
 urllib3==2.2.2
     # via requests
-wcwidth==0.2.13
-    # via cmd2
-    # via prettytable
 wrapt==1.16.0
     # via deprecated
     # via opentelemetry-instrumentation

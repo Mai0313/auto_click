@@ -7,10 +7,10 @@ playwright
 pygetwindow
 opencv-python
 
-# Hydra
-hydra-core
-hydra-colorlog
-hydra-optuna-sweeper
+# # Hydra
+# hydra-core
+# hydra-colorlog
+# hydra-optuna-sweeper
 
 # Data Validation
 pydantic

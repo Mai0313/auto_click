@@ -1,14 +1,13 @@
-import sys
 import time
 from typing import Union
 import getpass
 
 import yaml
-from hydra import compose, initialize
+
+# from hydra import compose, initialize
 import logfire
 from adbutils import AdbDevice
 from pydantic import computed_field, model_validator
-from omegaconf import OmegaConf
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
@@ -101,12 +100,12 @@ class RemoteContoller(ConfigModel):
             time.sleep(self.global_interval)
 
 
-def load_hydra_config() -> dict:
-    args = sys.argv[1:]
-    with initialize(config_path="./configs", version_base="1.3"):
-        cfg = compose(config_name="configs", overrides=args, return_hydra_config=False)
-        config_dict = OmegaConf.to_container(cfg, resolve=False)
-    return config_dict
+# def load_hydra_config() -> dict:
+#     args = sys.argv[1:]
+#     with initialize(config_path="./configs", version_base="1.3"):
+#         cfg = compose(config_name="configs", overrides=args, return_hydra_config=False)
+#         config_dict = OmegaConf.to_container(cfg, resolve=False)
+#     return config_dict
 
 
 def load_yaml(config_path: str) -> dict:
