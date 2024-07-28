@@ -9,10 +9,10 @@ on:
       - master
     tags:
       - v*
-  # pull_request:
-  #   types: [opened, reopened, synchronize]
-  # pull_request_target:
-  #   types: [opened, reopened, synchronize]
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
 
 permissions: write-all
 
@@ -110,8 +110,13 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}
 
-      - name: List files
-        run: ls -al
+      - name: Check Files
+        run: |
+          ls -al
+          pwd
+          cd ..
+          ls -al
+          pwd
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
@@ -122,4 +127,6 @@ jobs:
         with:
           name: ${{ steps.drafter.outputs.name }}
           tag_name: ${{ steps.drafter.outputs.tag_name }}
-          files: ${{ github.event.repository.name }}.zip
+          files: |
+            auto_click.exe
+            ${{ github.event.repository.name }}.zip
