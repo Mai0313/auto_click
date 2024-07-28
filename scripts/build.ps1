@@ -1,6 +1,6 @@
-# Use this script to build the project
-$folderName = Split-Path -Leaf (Get-Location)
-pyinstaller -F main.py --onefile -n $folderName
+# # Use this script to build the project
+# $folderName = Split-Path -Leaf (Get-Location)
+# pyinstaller -F main.py --onefile -n $folderName
 
 # # Move and Rename
 # Move-Item -Path ./configs -Destination ./dist/
