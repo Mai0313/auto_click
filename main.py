@@ -72,23 +72,28 @@ class RemoteContoller(ConfigModel):
 
     def main(self) -> None:
         while True:
-            device_details = self.get_device()
-            for config_dict in self.image_list:
-                # logfire.info(f"Checking for {config_dict.image_name}")
-                button_center_x, button_center_y = ImageComparison(
-                    image_cfg=config_dict,
-                    check_list=self.base_check_list,
-                    screenshot=device_details.screenshot,
-                ).find()
-                if button_center_x and button_center_y and self.auto_click is True:
-                    self.click_button(
-                        device=device_details.device,
-                        button_center_x=button_center_x,
-                        button_center_y=button_center_y,
-                    )
-                    time.sleep(config_dict.delay_after_click)
-                # else:
-                #     logfire.warn(f"Button {config_dict.image_name} not found")
+            try:
+                device_details = self.get_device()
+                for config_dict in self.image_list:
+                    # logfire.info(f"Checking for {config_dict.image_name}")
+                    button_center_x, button_center_y = ImageComparison(
+                        image_cfg=config_dict,
+                        check_list=self.base_check_list,
+                        screenshot=device_details.screenshot,
+                    ).find()
+                    if button_center_x and button_center_y and self.auto_click is True:
+                        self.click_button(
+                            device=device_details.device,
+                            button_center_x=button_center_x,
+                            button_center_y=button_center_y,
+                        )
+                        time.sleep(config_dict.delay_after_click)
+                    # else:
+                    #     logfire.warn(f"Button {config_dict.image_name} not found")
+            except Exception as e:
+                logfire.error("Error in getting device: {e}", e=e)
+                logfire.info(f"Retrying in {self.global_interval} seconds")
+                self.connect2adb()
             time.sleep(self.global_interval)
 
 
