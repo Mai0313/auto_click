@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from playwright.sync_api import sync_playwright
+
 from src.types.output_models import DeviceOutput, ShiftPosition
 
 

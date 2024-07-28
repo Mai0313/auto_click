@@ -71,10 +71,7 @@ jobs:
       - name: Move and Rename
         shell: pwsh
         run: |
-          Move-Item -Path ./configs -Destination ./dist/
-          Move-Item -Path ./src -Destination ./dist/
-          Move-Item -Path ./data -Destination ./dist/
-          Move-Item -Path ./binaries -Destination ./dist/
+          ./scripts/build.ps1
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
@@ -86,15 +83,10 @@ jobs:
           compression-level: 6
           overwrite: true
 
-      # - name: Download Artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: ${{ github.event.repository.name }}
-
-      # - name: List files
-      #   shell: pwsh
-      #   run: |
-      #     Get-ChildItem -Path .
+      - name: List files
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path .
 
   upload_artifacts:
     name: Upload Release Assets
@@ -115,6 +107,7 @@ jobs:
           cd ..
           zip -r ${{ github.event.repository.name }}.zip ${{ github.event.repository.name }}
           ls -al
+          cp -R ${{ github.event.repository.name }}.zip ./${{ github.event.repository.name }}/
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2

@@ -2,6 +2,9 @@ import time
 from typing import Union
 import getpass
 
+import yaml
+
+# from hydra import compose, initialize
 import logfire
 from adbutils import AdbDevice
 from pydantic import computed_field, model_validator
@@ -97,10 +100,27 @@ class RemoteContoller(ConfigModel):
             time.sleep(self.global_interval)
 
 
-if __name__ == "__main__":
-    from src.utils.config_utils import load_hydra_config
+# def load_hydra_config() -> dict:
+#     args = sys.argv[1:]
+#     with initialize(config_path="./configs", version_base="1.3"):
+#         cfg = compose(config_name="configs", overrides=args, return_hydra_config=False)
+#         config_dict = OmegaConf.to_container(cfg, resolve=False)
+#     return config_dict
 
-    configs = load_hydra_config()
-    game_config = configs["games"]
-    auto_web = RemoteContoller(**game_config)
+
+def load_yaml(config_path: str) -> dict:
+    with open(config_path, encoding="utf-8") as file:
+        configs = yaml.load(file, Loader=yaml.FullLoader)
+    return configs
+
+
+if __name__ == "__main__":
+    config_path = "./configs/games/all_stars.yaml"
+    configs = load_yaml(config_path=config_path)
+    auto_web = RemoteContoller(**configs)
     auto_web.main()
+
+    # configs = load_hydra_config()
+    # game_config = configs["games"]
+    # auto_web = RemoteContoller(**game_config)
+    # auto_web.main()
