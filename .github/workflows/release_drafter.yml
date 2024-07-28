@@ -71,10 +71,7 @@ jobs:
       - name: Move and Rename
         shell: pwsh
         run: |
-          Move-Item -Path ./configs -Destination ./dist/
-          Move-Item -Path ./src -Destination ./dist/
-          Move-Item -Path ./data -Destination ./dist/
-          Move-Item -Path ./binaries -Destination ./dist/
+          ./scripts/build.ps1
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
