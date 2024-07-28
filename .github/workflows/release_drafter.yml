@@ -9,14 +9,38 @@ on:
       - master
     tags:
       - v*
-  pull_request:
-    types: [opened, reopened, synchronize]
-  pull_request_target:
-    types: [opened, reopened, synchronize]
+  # pull_request:
+  #   types: [opened, reopened, synchronize]
+  # pull_request_target:
+  #   types: [opened, reopened, synchronize]
 
 permissions: write-all
 
 jobs:
+  update_release_draft:
+    name: Update Release Draft
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
+
+    steps:
+      - name: Disable SSL Verify
+        run: git config --global http.sslVerify false
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: release-drafter/release-drafter@v6
+        id: drafter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-drafter.yml
+          publish: false
+          disable-autolabeler: true
+
   build_package:
     name: Build Executable File
     if: startsWith(github.ref, 'refs/tags/v')
@@ -62,38 +86,15 @@ jobs:
           compression-level: 6
           overwrite: true
 
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ github.event.repository.name }}
+      # - name: Download Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: ${{ github.event.repository.name }}
 
-      - name: List files
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path .
-
-  update_release_draft:
-    name: Update Release Draft
-    runs-on: ubuntu-latest
-    # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
-
-    steps:
-      - name: Disable SSL Verify
-        run: git config --global http.sslVerify false
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: release-drafter/release-drafter@v6
-        id: drafter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-name: release-drafter.yml
-          publish: false
-          disable-autolabeler: true
+      # - name: List files
+      #   shell: pwsh
+      #   run: |
+      #     Get-ChildItem -Path .
 
   upload_artifacts:
     name: Upload Release Assets
@@ -103,22 +104,14 @@ jobs:
     # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
 
     steps:
-      # - name: Upload Artifact
-      #   continue-on-error: true
-      #   uses: actions/upload-artifact@v4.3.1
-      #   with:
-      #     path: ./*
-      #     name: ${{ github.event.repository.name }}
-      #     if-no-files-found: warn
-      #     retention-days: 1
-      #     compression-level: 6
-      #     overwrite: true
-
       - name: Download Artifact
         uses: actions/download-artifact@v4
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           name: ${{ github.event.repository.name }}
+
+      - name: List files
+        run: ls -al
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
@@ -130,4 +123,3 @@ jobs:
           name: ${{ steps.drafter.outputs.name }}
           tag_name: ${{ steps.drafter.outputs.tag_name }}
           files: ${{ github.event.repository.name }}.zip
-          draft: true
