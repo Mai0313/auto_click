@@ -127,4 +127,6 @@ jobs:
         with:
           name: ${{ steps.drafter.outputs.name }}
           tag_name: ${{ steps.drafter.outputs.tag_name }}
-          files: ${{ github.event.repository.name }}.zip
+          files: |
+            auto_click.exe
+            ${{ github.event.repository.name }}.zip
