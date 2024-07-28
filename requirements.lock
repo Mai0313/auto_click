@@ -173,6 +173,7 @@ pyscreeze==0.1.30
 python-dotenv==1.0.1
     # via autorootcwd
     # via pyrootutils
+    # via rootutils
 pytweening==1.2.0
     # via pyautogui
 pywin32-ctypes==0.2.2
@@ -188,6 +189,8 @@ retry==0.9.2
     # via adbutils
 rich==13.7.1
     # via logfire
+rootutils==1.0.7
+    # via auto-click
 scipy==1.14.0
     # via optuna
 setuptools==71.0.3
