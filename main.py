@@ -3,6 +3,7 @@ import time
 from typing import Union
 import getpass
 
+import yaml
 from hydra import compose, initialize
 import logfire
 from adbutils import AdbDevice
@@ -108,8 +109,19 @@ def load_hydra_config() -> dict:
     return config_dict
 
 
+def load_yaml(config_path: str) -> dict:
+    with open(config_path, encoding="utf-8") as file:
+        configs = yaml.load(file, Loader=yaml.FullLoader)
+    return configs
+
+
 if __name__ == "__main__":
-    configs = load_hydra_config()
-    game_config = configs["games"]
-    auto_web = RemoteContoller(**game_config)
+    config_path = "./configs/games/all_stars.yaml"
+    configs = load_yaml(config_path=config_path)
+    auto_web = RemoteContoller(**configs)
     auto_web.main()
+
+    # configs = load_hydra_config()
+    # game_config = configs["games"]
+    # auto_web = RemoteContoller(**game_config)
+    # auto_web.main()
