@@ -13,7 +13,11 @@ base_check_list:
   - 等級提升
   - 重新連接確認
   - 返回
-  - 開始5v5
+  - 已完成王朝
+  - 切換遊戲
+  - 選擇3v3
+  - 選擇5v5
+  - 選擇
 
 additional_check_list:
   - null
@@ -61,8 +65,32 @@ image_list:
     screenshot_option: False
     confidence: 0.8
 
-  - image_name: "開始5v5"
-    image_path: "./data/allstars/start5v5.png"
+  - image_name: "已完成王朝"
+    image_path: "./data/allstars/game_limit.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "切換遊戲"
+    image_path: "./data/allstars/change_game_mode.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "選擇3v3"
+    image_path: "./data/allstars/select_3v3.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "選擇5v5"
+    image_path: "./data/allstars/select_5v5.png"
+    delay_after_click: 0
+    screenshot_option: False
+    confidence: 0.8
+
+  - image_name: "選擇"
+    image_path: "./data/allstars/select_it.png"
     delay_after_click: 0
     screenshot_option: False
     confidence: 0.8
