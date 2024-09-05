@@ -71,7 +71,10 @@ jobs:
       - name: Move and Rename
         shell: pwsh
         run: |
-          ./scripts/build.ps1
+          Copy-Item -Path ./configs -Destination ./dist/ -Recurse
+          Copy-Item -Path ./src -Destination ./dist/ -Recurse
+          Copy-Item -Path ./data -Destination ./dist/ -Recurse
+          Copy-Item -Path ./binaries -Destination ./dist/ -Recurse
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
@@ -82,11 +85,6 @@ jobs:
           retention-days: 90
           compression-level: 6
           overwrite: true
-
-      - name: List files
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path .
 
   upload_artifacts:
     name: Upload Release Assets
