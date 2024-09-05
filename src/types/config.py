@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import Field, BaseModel
 
 from src.types.image_models import ImageModel
@@ -14,5 +12,5 @@ class ConfigModel(BaseModel):
     loops: int = Field(...)
     global_interval: int = Field(...)
     base_check_list: list[str] = Field(...)
-    additional_check_list: list[Optional[str]] = Field(...)
+    additional_check_list: list[str | None] = Field(...)
     image_list: list[ImageModel] = Field(...)

@@ -1,5 +1,4 @@
 import time
-from typing import Union
 import getpass
 
 import yaml
@@ -18,7 +17,7 @@ from src.utils.command_utils import CommandExecutor
 
 logfire.configure(
     send_to_logfire=True,
-    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",  # noqa: S106
     project_name="auto-click",
     service_name=f"{getpass.getuser()}",
     trace_sample_rate=1.0,
@@ -51,17 +50,13 @@ class RemoteContoller(ConfigModel):
     def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
-        elif self.target.startswith("com"):
+        if self.target.startswith("com"):
             return GetScreen.from_adb_device(self.target, self.serial)
-        else:
-            # this will return screenshot, shift_position; not device.
-            return GetScreen.from_exist_window(self.target)
+        # this will return screenshot, shift_position; not device.
+        return GetScreen.from_exist_window(self.target)
 
     def click_button(
-        self,
-        device: Union[Page, AdbDevice, ShiftPosition],
-        button_center_x: int,
-        button_center_y: int,
+        self, device: Page | AdbDevice | ShiftPosition, button_center_x: int, button_center_y: int
     ) -> None:
         if isinstance(device, Page):
             device.mouse.click(x=button_center_x, y=button_center_y)
@@ -110,7 +105,7 @@ class RemoteContoller(ConfigModel):
 
 def load_yaml(config_path: str) -> dict:
     with open(config_path, encoding="utf-8") as file:
-        configs = yaml.load(file, Loader=yaml.FullLoader)
+        configs = yaml.safe_load(file)
     return configs
 
 
