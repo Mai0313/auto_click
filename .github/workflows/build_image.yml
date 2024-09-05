@@ -30,22 +30,12 @@ jobs:
       matrix:
         target:
           - name: Build and Push Image (Base)
-            target_step: repo_base
+            target_step: auto_click_base
             tag: ${{ vars.IMAGE }}-base
             build_args: --build-arg PYTHON_VERSION=3.10.14
 
-          - name: Build and Push Image (Develop Base)
-            target_step: repo_dev_base
-            tag: ${{ vars.IMAGE }}-dev-base
-            build_args: --build-arg PYTHON_VERSION=3.10.14
-
-          - name: Build and Push Images (Latest)
-            target_step: repo
-            tag: ${{ vars.IMAGE }}
-            build_args: --build-arg PYTHON_VERSION=3.10.14
-
-          - name: Build and Push Images (Release)
-            target_step: repo
+          - name: Build and Push Images (Latest / Release)
+            target_step: auto_click
             tag: ${{ vars.IMAGE }}
             build_args: --build-arg PYTHON_VERSION=3.10.14
 
