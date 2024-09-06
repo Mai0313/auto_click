@@ -12,8 +12,16 @@ from src.types.output_models import DeviceOutput, ShiftPosition
 
 class GetScreen(BaseModel):
     @classmethod
-    def from_exist_window(self, window_title: str) -> DeviceOutput:
-        """For any window."""
+    def from_exist_window(cls, window_title: str) -> DeviceOutput:
+        """Capture a screenshot from an existing window.
+
+        Args:
+            window_title (str): The title of the window to capture.
+
+        Returns:
+            DeviceOutput: An object containing the captured screenshot and the shift position.
+
+        """
         window = gw.getWindowsWithTitle(window_title)[0]  # type: Win32Window
         if window.isMinimized:
             window.restore()
@@ -31,7 +39,19 @@ class GetScreen(BaseModel):
 
     @classmethod
     def from_adb_device(cls, url: str, serial: str) -> DeviceOutput:
-        """For the android device."""
+        """Create a DeviceOutput object from an Android device using ADB.
+
+        Args:
+            url (str): The URL of the app to be opened on the device.
+            serial (str): The serial number of the Android device.
+
+        Returns:
+            DeviceOutput: An object containing the screenshot and device information.
+
+        Raises:
+            Exception: If the current app on the device is not the specified URL.
+
+        """
         adb.connect(serial)
         device = adb.device(serial=serial)
         current_app = device.app_current()
@@ -44,15 +64,16 @@ class GetScreen(BaseModel):
 
     @classmethod
     def from_remote_window(cls, url: str) -> DeviceOutput:
-        """For playingwright."""
+        """Create a screenshot of a remote window using Playwright.
+
+        Args:
+            url (str): The URL of the remote window.
+
+        Returns:
+            DeviceOutput: An object containing the screenshot and the page.
+
+        """
         with sync_playwright() as p:
-            # if "localhost" in url:
-            #     browser = p.chromium.connect_over_cdp(url)
-            #     contexts = browser.contexts
-            #     context = contexts[0]
-            #     page = context.pages[0]
-            #     screenshot = page.screenshot()
-            #     return screenshot, page
             browser = p.chromium.launch(headless=False)
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
