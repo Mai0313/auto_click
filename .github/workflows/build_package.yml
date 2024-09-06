@@ -1,14 +1,11 @@
 name: Build Package
 
 on:
-  pull_request:
+  push:
     branches:
       - master
-  # push:
-  #   branches:
-  #     - master
-  #   tags:
-  #     - v*
+    tags:
+      - v*
 
 jobs:
   build_package:
