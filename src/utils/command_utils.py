@@ -12,8 +12,8 @@ class CommandExecutor(BaseModel):
         stdout = connection_result.stdout
         stderr = connection_result.stderr
         if stderr:
-            logfire.error("{stderr}", stderr=stderr)
-        logfire.info("{stdout}", stdout=stdout)
+            logfire.error("Error on executing", stderr=stderr)
+        logfire.info("Success on executing", stdout=stdout)
         return stdout, stderr
 
     def popen(self) -> tuple[str, str]:
@@ -22,6 +22,6 @@ class CommandExecutor(BaseModel):
         )
         stdout, stderr = connection_result_popen.communicate()
         if stderr:
-            logfire.error("{stderr}", stderr=stderr)
-        logfire.info("{stdout}", stdout=stdout)
+            logfire.error("Error on executing", stderr=stderr)
+        logfire.info("Success on executing", stdout=stdout)
         return stdout, stderr
