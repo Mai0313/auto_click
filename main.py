@@ -43,7 +43,7 @@ class RemoteContoller(ConfigModel):
             command_executor = CommandExecutor(commands=commands)
             command_executor.run()
         except Exception as e:
-            logfire.error("Error in connecting to adb: {e}", e=e)
+            logfire.error("Error in connecting to adb", error=e)
 
     def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
@@ -72,7 +72,7 @@ class RemoteContoller(ConfigModel):
             try:
                 device_details = self.get_device()
                 for config_dict in self.image_list:
-                    # logfire.info(f"Checking for {config_dict.image_name}")
+                    # logfire.info("Checking Image", **config_dict.model_dump())
                     button_center_x, button_center_y = ImageComparison(
                         image_cfg=config_dict,
                         check_list=self.base_check_list,
@@ -85,8 +85,6 @@ class RemoteContoller(ConfigModel):
                             button_center_y=button_center_y,
                         )
                         time.sleep(config_dict.delay_after_click)
-                    # else:
-                    #     logfire.warn(f"Button {config_dict.image_name} not found")
             except Exception as e:
                 logfire.error("Error in getting device:", error=e)
                 logfire.info("Retrying...", retry_interval=self.global_interval)
