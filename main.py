@@ -6,7 +6,7 @@ import yaml
 # from hydra import compose, initialize
 import logfire
 from adbutils import AdbDevice
-from pydantic import computed_field, model_validator
+from pydantic import computed_field
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
@@ -23,7 +23,6 @@ logfire.configure(
     trace_sample_rate=1.0,
     show_summary=True,
     data_dir=".logfire",
-    collect_system_metrics=False,
     fast_shutdown=True,
     inspect_arguments=True,
     pydantic_plugin=logfire.PydanticPlugin(record="failure"),
@@ -37,7 +36,6 @@ class RemoteContoller(ConfigModel):
         serial = f"127.0.0.1:{self.adb_port}"
         return serial
 
-    @model_validator(mode="after")
     def connect2adb(self) -> None:
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
@@ -69,6 +67,7 @@ class RemoteContoller(ConfigModel):
             pyautogui.click()
 
     def main(self) -> None:
+        self.connect2adb()
         while True:
             try:
                 device_details = self.get_device()
@@ -89,8 +88,8 @@ class RemoteContoller(ConfigModel):
                     # else:
                     #     logfire.warn(f"Button {config_dict.image_name} not found")
             except Exception as e:
-                logfire.error("Error in getting device: {e}", e=e)
-                logfire.info(f"Retrying in {self.global_interval} seconds")
+                logfire.error("Error in getting device:", error=e)
+                logfire.info("Retrying...", retry_interval=self.global_interval)
                 self.connect2adb()
             time.sleep(self.global_interval)
 

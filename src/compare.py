@@ -1,4 +1,3 @@
-from io import BytesIO
 import os
 import time
 import datetime
@@ -6,7 +5,7 @@ import datetime
 import cv2
 import numpy as np
 import logfire
-from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
+from pydantic import Field, BaseModel, ConfigDict, computed_field
 import PIL.Image as Image
 
 from src.types.image_models import ImageModel
@@ -21,12 +20,12 @@ class ImageComparison(BaseModel):
     )
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
 
-    @model_validator(mode="after")
-    def get_screenshot_image(self) -> Image.Image | bytes:
-        if isinstance(self.screenshot, bytes):
-            image_stream = BytesIO(self.screenshot)
-            return Image.open(image_stream)
-        return self.screenshot
+    # @model_validator(mode="after")
+    # def get_screenshot_image(self) -> Image.Image | bytes:
+    #     if isinstance(self.screenshot, bytes):
+    #         image_stream = BytesIO(self.screenshot)
+    #         return Image.open(image_stream)
+    #     return self.screenshot
 
     @computed_field
     @property

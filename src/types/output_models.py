@@ -16,5 +16,9 @@ class DeviceOutput(BaseModel):
 
     def save(self, save_path: str) -> str:
         save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path
-        self.screenshot.save(save_path)
+        if isinstance(self.screenshot, bytes):
+            with open(save_path, "wb") as f:
+                f.write(self.screenshot)
+        elif isinstance(self.screenshot, Image.Image):
+            self.screenshot.save(save_path)
         return save_path
