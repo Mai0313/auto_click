@@ -1,5 +1,4 @@
 import time
-from typing import Union
 import getpass
 
 import yaml
@@ -7,7 +6,7 @@ import yaml
 # from hydra import compose, initialize
 import logfire
 from adbutils import AdbDevice
-from pydantic import computed_field, model_validator
+from pydantic import computed_field
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
@@ -18,13 +17,12 @@ from src.utils.command_utils import CommandExecutor
 
 logfire.configure(
     send_to_logfire=True,
-    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",
+    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",  # noqa: S106
     project_name="auto-click",
     service_name=f"{getpass.getuser()}",
     trace_sample_rate=1.0,
     show_summary=True,
     data_dir=".logfire",
-    collect_system_metrics=False,
     fast_shutdown=True,
     inspect_arguments=True,
     pydantic_plugin=logfire.PydanticPlugin(record="failure"),
@@ -38,7 +36,6 @@ class RemoteContoller(ConfigModel):
         serial = f"127.0.0.1:{self.adb_port}"
         return serial
 
-    @model_validator(mode="after")
     def connect2adb(self) -> None:
         try:
             # os.system(f".\\binaries\\adb.exe connect {self.serial}")
@@ -51,17 +48,13 @@ class RemoteContoller(ConfigModel):
     def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
             return GetScreen.from_remote_window(self.target)
-        elif self.target.startswith("com"):
+        if self.target.startswith("com"):
             return GetScreen.from_adb_device(self.target, self.serial)
-        else:
-            # this will return screenshot, shift_position; not device.
-            return GetScreen.from_exist_window(self.target)
+        # this will return screenshot, shift_position; not device.
+        return GetScreen.from_exist_window(self.target)
 
     def click_button(
-        self,
-        device: Union[Page, AdbDevice, ShiftPosition],
-        button_center_x: int,
-        button_center_y: int,
+        self, device: Page | AdbDevice | ShiftPosition, button_center_x: int, button_center_y: int
     ) -> None:
         if isinstance(device, Page):
             device.mouse.click(x=button_center_x, y=button_center_y)
@@ -74,6 +67,7 @@ class RemoteContoller(ConfigModel):
             pyautogui.click()
 
     def main(self) -> None:
+        self.connect2adb()
         while True:
             try:
                 device_details = self.get_device()
@@ -94,8 +88,8 @@ class RemoteContoller(ConfigModel):
                     # else:
                     #     logfire.warn(f"Button {config_dict.image_name} not found")
             except Exception as e:
-                logfire.error("Error in getting device: {e}", e=e)
-                logfire.info(f"Retrying in {self.global_interval} seconds")
+                logfire.error("Error in getting device:", error=e)
+                logfire.info("Retrying...", retry_interval=self.global_interval)
                 self.connect2adb()
             time.sleep(self.global_interval)
 
@@ -110,7 +104,7 @@ class RemoteContoller(ConfigModel):
 
 def load_yaml(config_path: str) -> dict:
     with open(config_path, encoding="utf-8") as file:
-        configs = yaml.load(file, Loader=yaml.FullLoader)
+        configs = yaml.safe_load(file)
     return configs
 
 
