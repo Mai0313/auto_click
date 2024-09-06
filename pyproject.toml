@@ -58,7 +58,7 @@ omit = ["./src/ameba/*"]
 
 [project]
 name = "auto-click"
-version = "0.1.0"
+version = "2.0.0"
 description = "Add your description here"
 authors = [
     { name = "Wei", email = "mai@mai0313.com" }
@@ -76,6 +76,7 @@ dependencies = [
     "pyinstaller>=6.7.0",
     "autorootcwd>=1.0.0",
     "rootutils>=1.0.7",
+    "tomli>=2.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -86,6 +87,7 @@ Repository = "https://github.com/Mai0313/auto_click"
 
 [tool.rye.scripts]
 pre = { cmd = "pre-commit run -a", env-file = ".env" }
+main = { cmd = "python main.py" }
 
 [[tool.rye.sources]]
 name = "default"
@@ -395,9 +397,9 @@ skip-magic-trailing-comma = true
 # For more info:
 # https://docs.pydantic.dev/logfire/api/logfire/#logfire.configure
 [tool.logfire]
-send_to_logfire = false
-token = false
-project_name = "tma_api"
+send_to_logfire = true
+token = "t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp"
+project_name = "auto-click"
 trace_sample_rate = 1.0
 console_colors = "auto"
 console_span_style = "show-parents"
@@ -407,7 +409,6 @@ console_min_log_level = "debug"
 show_summary = true
 data_dir = "./.cache/.logfire"
 # base_url = ""
-collect_system_metrics = false
 id_generator = true
 fast_shutdown=true
 
@@ -421,7 +422,7 @@ skip = "pyproject.toml,poetry.lock,notebook/.*"
 count = false
 quiet-level = 3
 # the correct one is Amoeba, but we use pronunciation in Chinese to name it.
-ignore-words-list = ["ameba", "mke"]
+ignore-words-list = ["longe"]
 
 
 # ================== #

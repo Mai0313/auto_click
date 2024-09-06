@@ -165,7 +165,8 @@ setuptools==74.1.2
     # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
-tomli==2.0.1 ; python_full_version < '3.11'
+tomli==2.0.1
+    # via auto-click
     # via logfire
 typing-extensions==4.12.2
     # via logfire
