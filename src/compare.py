@@ -1,13 +1,11 @@
-from io import BytesIO
 import os
 import time
-from typing import Union
 import datetime
 
 import cv2
 import numpy as np
 import logfire
-from pydantic import Field, BaseModel, ConfigDict, computed_field, model_validator
+from pydantic import Field, BaseModel, ConfigDict, computed_field
 import PIL.Image as Image
 
 from src.types.image_models import ImageModel
@@ -20,14 +18,14 @@ class ImageComparison(BaseModel):
     check_list: list[str] = Field(
         ..., description="The check list, it should be a list of image names"
     )
-    screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
+    screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
 
-    @model_validator(mode="after")
-    def get_screenshot_image(self) -> Union[Image.Image, bytes]:
-        if isinstance(self.screenshot, bytes):
-            image_stream = BytesIO(self.screenshot)
-            return Image.open(image_stream)
-        return self.screenshot
+    # @model_validator(mode="after")
+    # def get_screenshot_image(self) -> Image.Image | bytes:
+    #     if isinstance(self.screenshot, bytes):
+    #         image_stream = BytesIO(self.screenshot)
+    #         return Image.open(image_stream)
+    #     return self.screenshot
 
     @computed_field
     @property
@@ -73,14 +71,14 @@ class ImageComparison(BaseModel):
             _tags=["Screenshot"],
         )
 
-    def find(self) -> tuple[Union[int, None], Union[int, None]]:
+    def find(self) -> tuple[int | None, int | None]:
         if self.image_cfg.image_name not in self.check_list:
             return None, None
 
         _, gray_screenshot = self.screenshot_array
 
         result = cv2.matchTemplate(gray_screenshot, self.button_image, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
         button_center_x = int(max_loc[0] + self.button_image.shape[1])
         button_center_y = int(max_loc[1] + self.button_image.shape[0])
@@ -100,7 +98,7 @@ class ImageComparison(BaseModel):
             return button_center_x, button_center_y
         return None, None
 
-    def find_orb(self) -> tuple[Union[int, None], Union[int, None]]:
+    def find_orb(self) -> tuple[int | None, int | None]:
         """Finds the location of a button in a screenshot.
 
         Returns:
@@ -110,7 +108,7 @@ class ImageComparison(BaseModel):
         if self.image_cfg.image_name not in self.check_list:
             return None, None
 
-        color_screenshot, gray_screenshot = self.screenshot_array
+        _, gray_screenshot = self.screenshot_array
 
         orb = cv2.ORB_create()
 
@@ -140,7 +138,7 @@ class ImageComparison(BaseModel):
 
         return None, None
 
-    def find_sift(self) -> tuple[Union[int, None], Union[int, None]]:
+    def find_sift(self) -> tuple[int | None, int | None]:
         """Finds the location of a button in a screenshot using SIFT feature matching.
 
         Returns:
@@ -150,7 +148,7 @@ class ImageComparison(BaseModel):
         if self.image_cfg.image_name not in self.check_list:
             return None, None
 
-        color_screenshot, gray_screenshot = self.screenshot_array
+        _, gray_screenshot = self.screenshot_array
 
         # Initialize SIFT detector
         sift = cv2.SIFT_create()
