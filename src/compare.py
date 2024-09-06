@@ -50,12 +50,7 @@ class ImageComparison(BaseModel):
     def button_image(self) -> cv2.typing.MatLike:
         button_image = cv2.imread(self.image_cfg.image_path, 0)
         if button_image is None:
-            logfire.fatal(
-                "Unable to load button image from path: {image_path}",
-                image_path=self.image_cfg.image_path,
-                _tags=["Fatal Error"],
-            )
-            raise Exception(f"Unable to load button image from path: {self.image_cfg.image_path}")
+            logfire.warn("Unable to load button image", **self.image_cfg.model_dump())
         return button_image
 
     def draw_rectangle(
@@ -64,11 +59,10 @@ class ImageComparison(BaseModel):
         color_screenshot, _ = self.screenshot_array
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         cv2.imwrite(self.log_filename, color_screenshot)
-        logfire.warn(
-            "The screenshot for {img_name} has been taken under {log_filename}",
+        logfire.info(
+            "The screenshot has been saved",
             log_filename=self.log_filename,
-            img_name=self.image_cfg.image_name,
-            _tags=["Screenshot"],
+            **self.image_cfg.model_dump(),
         )
 
     def find(self) -> tuple[int | None, int | None]:
@@ -86,12 +80,11 @@ class ImageComparison(BaseModel):
 
         if max_val > self.image_cfg.confidence:
             logfire.info(
-                "{image_name} Found with confidence: {confidence} > {set_confidence} at position: {matched_image_position}",
-                image_name=self.image_cfg.image_name,
-                set_confidence=self.image_cfg.confidence,
-                confidence=max_val,
-                matched_image_position=matched_image_position,
-                _tags=[self.image_cfg.image_name],
+                "Found the target image",
+                confidence_decision=max_val,
+                button_center_x=button_center_x,
+                button_center_y=button_center_y,
+                **self.image_cfg.model_dump(),
             )
             if self.image_cfg.screenshot_option is True:
                 self.draw_rectangle(matched_image_position, max_loc)
