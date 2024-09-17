@@ -33,7 +33,7 @@ class RemoteContoller(ConfigModel):
     @computed_field
     @property
     def serial(self) -> str:
-        serial = f"127.0.0.1:{self.adb_port}"
+        serial = f"127.0.0.1:{self.adb_ports[0]}"
         return serial
 
     def connect2adb(self) -> None:

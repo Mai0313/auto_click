@@ -8,7 +8,7 @@ class ConfigModel(BaseModel):
         ..., description="This field can be either a window title or a URL or cdp url."
     )
     auto_click: bool = Field(...)
-    adb_port: int = Field(...)
+    adb_ports: list[int] = Field(...)
     loops: int = Field(...)
     global_interval: int = Field(...)
     base_check_list: list[str] = Field(...)
