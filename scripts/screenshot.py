@@ -7,7 +7,7 @@ class Scripts(BaseModel):
     configs: ConfigModel
 
     def screenshots(self) -> None:
-        serial = f"127.0.0.1:{self.configs.adb_port}"
+        serial = f"127.0.0.1:{self.configs.adb_ports[0]}"
         adb.connect(serial)
         d = adb.device(serial=serial)
         running_app = d.app_current()

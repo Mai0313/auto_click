@@ -1,6 +1,8 @@
 target: com.longe.allstarhmt
 auto_click: true
-adb_port: 16416
+adb_ports:
+  # - 16416  # MUMU模擬器
+  - 5555   # 雷電模擬器
 loops: 100
 global_interval: 5
 
