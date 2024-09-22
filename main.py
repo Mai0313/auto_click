@@ -25,6 +25,12 @@ logfire.configure(
     show_summary=True,
     data_dir=".logfire",
     fast_shutdown=True,
+    console={
+        "colors": "auto",
+        "span_style": "show-parents",
+        "verbose": True,
+        "min_log_level": "info",
+    },
     # inspect_arguments=True,
     # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
 )
