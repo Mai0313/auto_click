@@ -76,6 +76,7 @@ dependencies = [
     "autorootcwd>=1.0.0",
     "rootutils>=1.0.7",
     "tomli>=2.0.1",
+    "pyyaml>=6.0.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"

@@ -255,6 +255,7 @@ pywin32==306 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
     # via pyinstaller
 pyyaml==6.0.2
+    # via auto-click
     # via pre-commit
 pyzmq==26.2.0
     # via ipykernel
