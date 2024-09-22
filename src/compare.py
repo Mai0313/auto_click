@@ -37,7 +37,7 @@ class ImageComparison(BaseModel):
     def log_filename(self) -> str:
         log_dir = "./data/logs"
         os.makedirs(log_dir, exist_ok=True)
-        now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        now = datetime.datetime.now().strftime("%Y%m%d_%H.%M.%S")
         log_filename = f"{log_dir}/{now}.png"
         time.sleep(1)
         return log_filename
@@ -50,12 +50,43 @@ class ImageComparison(BaseModel):
             logfire.warn("Unable to load button image", **self.image_cfg.model_dump())
         return button_image
 
+    # def draw_rectangle(
+    #     self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point
+    # ) -> None:
+    #     color_screenshot, _ = self.screenshot_array
+    #     cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+    #     cv2.imwrite(self.log_filename, color_screenshot)
+    #     logfire.info(
+    #         "The screenshot has been saved",
+    #         log_filename=self.log_filename,
+    #         **self.image_cfg.model_dump(),
+    #     )
+
     def draw_rectangle(
         self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point
     ) -> None:
         color_screenshot, _ = self.screenshot_array
+
+        # 建立一個全黑的遮罩
+        mask = np.zeros_like(color_screenshot)
+
+        # 在遮罩上畫出白色矩形，表示保留紅色框內的部分
+        cv2.rectangle(mask, max_loc, matched_image_position, (255, 255, 255), -1)
+
+        # 創建一個完全黑色的圖片
+        black_img = np.zeros_like(color_screenshot)
+
+        # 將紅色框內的部分保留，其餘部分塗黑
+        color_screenshot = cv2.bitwise_and(color_screenshot, mask) + cv2.bitwise_and(
+            black_img, cv2.bitwise_not(mask)
+        )
+
+        # 在結果圖像上畫出紅色框
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+
+        # 儲存結果圖像
         cv2.imwrite(self.log_filename, color_screenshot)
+
         logfire.info(
             "The screenshot has been saved",
             log_filename=self.log_filename,
