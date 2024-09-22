@@ -34,12 +34,6 @@ image_list:
     screenshot_option: True
     confidence: 0.8
 
-  - image_name: "重新連接確認"
-    image_path: "./data/allstars/conmfirm4reconnect.png"
-    delay_after_click: 0
-    screenshot_option: True
-    confidence: 0.8
-
   - image_name: "返回"
     image_path: "./data/allstars/back.png"
     delay_after_click: 0
@@ -48,30 +42,6 @@ image_list:
 
   - image_name: "已完成王朝"
     image_path: "./data/allstars/game_limit.png"
-    delay_after_click: 0
-    screenshot_option: True
-    confidence: 0.8
-
-  - image_name: "切換遊戲"
-    image_path: "./data/allstars/change_game_mode.png"
-    delay_after_click: 0
-    screenshot_option: True
-    confidence: 0.8
-
-  - image_name: "選擇3v3"
-    image_path: "./data/allstars/select_3v3.png"
-    delay_after_click: 0
-    screenshot_option: True
-    confidence: 0.8
-
-  - image_name: "選擇5v5"
-    image_path: "./data/allstars/select_5v5.png"
-    delay_after_click: 0
-    screenshot_option: True
-    confidence: 0.8
-
-  - image_name: "選擇"
-    image_path: "./data/allstars/select_it.png"
     delay_after_click: 0
     screenshot_option: True
     confidence: 0.8
