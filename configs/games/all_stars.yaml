@@ -75,3 +75,15 @@ image_list:
     delay_after_click: 0
     screenshot_option: True
     confidence: 0.8
+
+  - image_name: "勝利"
+    image_path: "./data/allstars/win.png"
+    delay_after_click: 0
+    screenshot_option: True
+    confidence: 0.8
+
+  - image_name: "失敗"
+    image_path: "./data/allstars/lose.png"
+    delay_after_click: 0
+    screenshot_option: True
+    confidence: 0.8
