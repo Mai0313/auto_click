@@ -87,6 +87,7 @@ Repository = "https://github.com/Mai0313/auto_click"
 
 [tool.rye.scripts]
 pre = { cmd = "pre-commit run -a", env-file = ".env" }
+build = { cmd = "pyinstaller -F main.py --onefile -n auto-click" }
 main = { cmd = "python main.py" }
 
 [[tool.rye.sources]]
