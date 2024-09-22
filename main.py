@@ -1,19 +1,20 @@
 import time
 import getpass
+import secrets
 
 import yaml
 
 # from hydra import compose, initialize
 import logfire
-from adbutils import AdbDevice
+from adbutils import AdbDevice, adb
 from pydantic import computed_field
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from src.types.config import ConfigModel
 from playwright.sync_api import Page
+from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import DeviceOutput, ShiftPosition
-from src.utils.command_utils import CommandExecutor
 
 logfire.configure(
     send_to_logfire=True,
@@ -33,17 +34,24 @@ class RemoteContoller(ConfigModel):
     @computed_field
     @property
     def serial(self) -> str:
-        serial = f"127.0.0.1:{self.adb_ports[0]}"
-        return serial
+        apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
+        return apps.serial
+
+    # def connect2adb(self) -> None:
+    #     try:
+    #         # os.system(f".\\binaries\\adb.exe connect {self.serial}")
+    #         commands = ["./binaries/adb.exe", "connect", self.serial]
+    #         command_executor = CommandExecutor(commands=commands)
+    #         command_executor.run()
+    #     except Exception as e:
+    #         logfire.error("Error in connecting to adb", error=e)
 
     def connect2adb(self) -> None:
-        try:
-            # os.system(f".\\binaries\\adb.exe connect {self.serial}")
-            commands = ["./binaries/adb.exe", "connect", self.serial]
-            command_executor = CommandExecutor(commands=commands)
-            command_executor.run()
-        except Exception as e:
-            logfire.error("Error in connecting to adb", error=e)
+        adb.connect(addr=self.serial)
+        device = adb.device(serial=self.serial)
+        logfire.info("Connected to adb", serial=device.serial)
+        running_app = device.app_current()
+        logfire.info("Running App", **running_app.__dict__)
 
     def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
@@ -74,11 +82,14 @@ class RemoteContoller(ConfigModel):
                 for config_dict in self.image_list:
                     # logfire.info("Checking Image", **config_dict.model_dump())
                     button_center_x, button_center_y = ImageComparison(
-                        image_cfg=config_dict,
-                        check_list=self.base_check_list,
-                        screenshot=device_details.screenshot,
+                        image_cfg=config_dict, screenshot=device_details.screenshot
                     ).find()
-                    if button_center_x and button_center_y and self.auto_click is True:
+                    if (
+                        button_center_x
+                        and button_center_y
+                        and self.auto_click is True
+                        and config_dict.click_this is True
+                    ):
                         self.click_button(
                             device=device_details.device,
                             button_center_x=button_center_x,
@@ -87,17 +98,12 @@ class RemoteContoller(ConfigModel):
                         time.sleep(config_dict.delay_after_click)
             except Exception as e:
                 logfire.error("Error in getting device:", error=e)
-                logfire.info("Retrying...", retry_interval=self.global_interval)
+                _random_interval = secrets.randbelow(self.random_interval)
+                logfire.info("Retrying...", retry_interval=_random_interval)
+                time.sleep(_random_interval)
                 self.connect2adb()
-            time.sleep(self.global_interval)
-
-
-# def load_hydra_config() -> dict:
-#     args = sys.argv[1:]
-#     with initialize(config_path="./configs", version_base="1.3"):
-#         cfg = compose(config_name="configs", overrides=args, return_hydra_config=False)
-#         config_dict = OmegaConf.to_container(cfg, resolve=False)
-#     return config_dict
+            _random_interval = secrets.randbelow(self.random_interval)
+            time.sleep(_random_interval)
 
 
 def load_yaml(config_path: str) -> dict:

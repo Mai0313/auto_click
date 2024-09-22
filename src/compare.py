@@ -1,7 +1,7 @@
 import os
 import time
-import datetime
 
+# import datetime
 import cv2
 import numpy as np
 import logfire
@@ -15,9 +15,6 @@ class ImageComparison(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
-    check_list: list[str] = Field(
-        ..., description="The check list, it should be a list of image names"
-    )
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
 
     # @model_validator(mode="after")
@@ -38,10 +35,11 @@ class ImageComparison(BaseModel):
     @computed_field
     @property
     def log_filename(self) -> str:
-        log_dir = "./data/logs"
+        # now = datetime.datetime.now().strftime("%Y%m%d")
+        log_dir = "./logs"
         os.makedirs(log_dir, exist_ok=True)
-        now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_filename = f"{log_dir}/{now}.png"
+        image_name = self.image_cfg.image_path.split("/")[-1].split(".")[0]
+        log_filename = f"{log_dir}/{image_name}.png"
         time.sleep(1)
         return log_filename
 
@@ -53,12 +51,43 @@ class ImageComparison(BaseModel):
             logfire.warn("Unable to load button image", **self.image_cfg.model_dump())
         return button_image
 
+    # def draw_rectangle(
+    #     self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point
+    # ) -> None:
+    #     color_screenshot, _ = self.screenshot_array
+    #     cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+    #     cv2.imwrite(self.log_filename, color_screenshot)
+    #     logfire.info(
+    #         "The screenshot has been saved",
+    #         log_filename=self.log_filename,
+    #         **self.image_cfg.model_dump(),
+    #     )
+
     def draw_rectangle(
         self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point
     ) -> None:
         color_screenshot, _ = self.screenshot_array
+
+        # 建立一個全黑的遮罩
+        mask = np.zeros_like(color_screenshot)
+
+        # 在遮罩上畫出白色矩形，表示保留紅色框內的部分
+        cv2.rectangle(mask, max_loc, matched_image_position, (255, 255, 255), -1)
+
+        # 創建一個完全黑色的圖片
+        black_img = np.zeros_like(color_screenshot)
+
+        # 將紅色框內的部分保留，其餘部分塗黑
+        color_screenshot = cv2.bitwise_and(color_screenshot, mask) + cv2.bitwise_and(
+            black_img, cv2.bitwise_not(mask)
+        )
+
+        # 在結果圖像上畫出紅色框
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+
+        # 儲存結果圖像
         cv2.imwrite(self.log_filename, color_screenshot)
+
         logfire.info(
             "The screenshot has been saved",
             log_filename=self.log_filename,
@@ -66,9 +95,6 @@ class ImageComparison(BaseModel):
         )
 
     def find(self) -> tuple[int | None, int | None]:
-        if self.image_cfg.image_name not in self.check_list:
-            return None, None
-
         _, gray_screenshot = self.screenshot_array
 
         result = cv2.matchTemplate(gray_screenshot, self.button_image, cv2.TM_CCOEFF_NORMED)
@@ -89,92 +115,4 @@ class ImageComparison(BaseModel):
             if self.image_cfg.screenshot_option is True:
                 self.draw_rectangle(matched_image_position, max_loc)
             return button_center_x, button_center_y
-        return None, None
-
-    def find_orb(self) -> tuple[int | None, int | None]:
-        """Finds the location of a button in a screenshot.
-
-        Returns:
-            A tuple containing the x and y coordinates of the button's center.
-            If the button is not found, returns (None, None).
-        """
-        if self.image_cfg.image_name not in self.check_list:
-            return None, None
-
-        _, gray_screenshot = self.screenshot_array
-
-        orb = cv2.ORB_create()
-
-        keypoints_button, descriptors_button = orb.detectAndCompute(self.button_image, None)
-        keypoints_screenshot, descriptors_screenshot = orb.detectAndCompute(gray_screenshot, None)
-
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-        matches = bf.match(descriptors_button, descriptors_screenshot)
-
-        matches = sorted(matches, key=lambda x: x.distance)
-
-        if len(matches) > 0:
-            best_match = matches[0]
-            button_center_x = int(keypoints_screenshot[best_match.trainIdx].pt[0])
-            button_center_y = int(keypoints_screenshot[best_match.trainIdx].pt[1])
-
-            if self.image_cfg.screenshot_option is True:
-                self.draw_rectangle(
-                    (button_center_x, button_center_y),
-                    (
-                        int(keypoints_button[best_match.queryIdx].pt[0]),
-                        int(keypoints_button[best_match.queryIdx].pt[1]),
-                    ),
-                )
-
-            return button_center_x, button_center_y
-
-        return None, None
-
-    def find_sift(self) -> tuple[int | None, int | None]:
-        """Finds the location of a button in a screenshot using SIFT feature matching.
-
-        Returns:
-            A tuple containing the x and y coordinates of the center of the matched button.
-            If no match is found, returns (None, None).
-        """
-        if self.image_cfg.image_name not in self.check_list:
-            return None, None
-
-        _, gray_screenshot = self.screenshot_array
-
-        # Initialize SIFT detector
-        sift = cv2.SIFT_create()
-
-        # Detect keypoints and descriptors
-        keypoints_button, descriptors_button = sift.detectAndCompute(self.button_image, None)
-        keypoints_screenshot, descriptors_screenshot = sift.detectAndCompute(gray_screenshot, None)
-
-        # Use BFMatcher for matching
-        bf = cv2.BFMatcher()
-        matches = bf.knnMatch(descriptors_button, descriptors_screenshot, k=2)
-
-        # Apply Lowe's ratio test to filter matching points
-        good_matches = []
-        for m, n in matches:
-            if m.distance < 0.75 * n.distance:
-                good_matches.append(m)
-
-        if len(good_matches) > 0:
-            # Get the position of the best match keypoint
-            best_match = good_matches[0]
-            button_center_x = int(keypoints_screenshot[best_match.trainIdx].pt[0])
-            button_center_y = int(keypoints_screenshot[best_match.trainIdx].pt[1])
-
-            if self.image_cfg.screenshot_option is True:
-                self.draw_rectangle(
-                    (button_center_x, button_center_y),
-                    (
-                        int(keypoints_button[best_match.queryIdx].pt[0]),
-                        int(keypoints_button[best_match.queryIdx].pt[1]),
-                    ),
-                )
-
-            return button_center_x, button_center_y
-
         return None, None

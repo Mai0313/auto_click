@@ -1,25 +1,27 @@
+import logfire
 from adbutils import adb
 from pydantic import BaseModel
-from src.types.config import ConfigModel
+
+logfire.configure(send_to_logfire=False)
 
 
 class Scripts(BaseModel):
-    configs: ConfigModel
+    port: int
 
-    def screenshots(self) -> None:
-        serial = f"127.0.0.1:{self.configs.adb_ports[0]}"
-        adb.connect(serial)
-        d = adb.device(serial=serial)
-        running_app = d.app_current()
-        if running_app.package != "com.longe.allstarhmt":
-            d.app_start("com.longe.allstarhmt")
-        current_screent = d.screenshot()
-        current_screent.save("./data/allstars_test/debug.png")
+    def screenshots(self, output_path: str) -> None:
+        serial = f"127.0.0.1:{self.port}"
+        adb.connect(addr=serial)
+        device = adb.device(serial=serial)
+        logfire.info("Connected to adb", serial=device.serial)
+        running_app = device.app_current()
+        logfire.info("Running App", **running_app.__dict__)
+        current_screent = device.screenshot()
+        current_screent.save(output_path)
 
 
 if __name__ == "__main__":
-    from omegaconf import OmegaConf
+    port = 5557
+    output_path = "./data/allstars_test/debug.png"
 
-    configs = OmegaConf.load("./configs/all_stars_cn.yaml")
-    scripts = Scripts(configs=configs)
-    scripts.screenshots()
+    scripts = Scripts(port=port)
+    scripts.screenshots(output_path=output_path)

@@ -1,89 +1,83 @@
 target: 雀魂麻将  # "http://localhost:9222"
 auto_click: true
-loops: 100
-global_interval: 5
 
-base_check_list:
-  - 遊戲結束確認
-  - 遊戲結束確認2
-  - 開始段位
-  - 胡了
-  - 對局結束
-  - 結算畫面
-  - 簽到
-  - 關閉
-  - 叉叉
-  - 進入遊戲
-  - 好的
-
-additional_check_list:
-  - 玉之間
-  - 四人南
+random_interval: 5
 
 image_list:
   - image_name: "開始段位"
     image_path: "./data/mahjong/ranking.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "胡了"
     image_path: "./data/mahjong/hule.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "對局結束"
     image_path: "./data/mahjong/match_end.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "結算畫面"
     image_path: "./data/mahjong/score.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.9
 
   - image_name: "遊戲結束確認"
     image_path: "./data/mahjong/confirm.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "遊戲結束確認2"
     image_path: "./data/mahjong/confirm2.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "簽到"
     image_path: "./data/mahjong/assign_v2.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "關閉"
     image_path: "./data/mahjong/turn_off.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "叉叉"
     image_path: "./data/mahjong/xx.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "進入遊戲"
     image_path: "./data/mahjong/login.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "好的"
     image_path: "./data/mahjong/haode.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
@@ -91,36 +85,42 @@ image_list:
   - image_name: "一般場"
     image_path: "./data/mahjong/normal.png"
     delay_after_click: 5
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "銅之間"
     image_path: "./data/mahjong/tong.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "銀之間"
     image_path: "./data/mahjong/silver.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "金之間"
     image_path: "./data/mahjong/gold.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "玉之間"
     image_path: "./data/mahjong/yu.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "王座之間"
     image_path: "./data/mahjong/king.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
@@ -128,23 +128,27 @@ image_list:
   - image_name: "四人東"
     image_path: "./data/mahjong/east_4p.png"
     delay_after_click: 30
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "四人南"
     image_path: "./data/mahjong/south_4p.png"
     delay_after_click: 30
+    click_this: True
     screenshot_option: False
     confidence: 0.9
 
   - image_name: "三人東"
     image_path: "./data/mahjong/east_3p.png"
     delay_after_click: 30
+    click_this: True
     screenshot_option: False
     confidence: 0.95
 
   - image_name: "三人南"
     image_path: "./data/mahjong/south_3p.png"
     delay_after_click: 30
+    click_this: True
     screenshot_option: False
     confidence: 0.9
