@@ -35,10 +35,11 @@ class ImageComparison(BaseModel):
     @computed_field
     @property
     def log_filename(self) -> str:
-        log_dir = "./data/logs"
+        now = datetime.datetime.now().strftime("%Y%m%d")
+        log_dir = f"./data/logs/{now}"
         os.makedirs(log_dir, exist_ok=True)
-        now = datetime.datetime.now().strftime("%Y%m%d_%H.%M.%S")
-        log_filename = f"{log_dir}/{now}.png"
+        image_name = self.image_cfg.image_path.split("/")[-1].split(".")[0]
+        log_filename = f"{log_dir}/{image_name}.png"
         time.sleep(1)
         return log_filename
 
