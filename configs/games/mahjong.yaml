@@ -1,11 +1,7 @@
 target: 雀魂麻将  # "http://localhost:9222"
 auto_click: true
-loops: 100
-global_interval: 5
 
-additional_check_list:
-  - 玉之間
-  - 四人南
+global_interval: 5
 
 image_list:
   - image_name: "開始段位"

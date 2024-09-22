@@ -1,13 +1,7 @@
 target: com.longe.allstarhmt
 auto_click: true
-adb_ports:
-  - 16416  # MUMU模擬器
-  # - 5555   # 雷電模擬器
-loops: 100
-global_interval: 5
 
-additional_check_list:
-  - null
+global_interval: 5
 
 image_list:
   - image_name: "開始配對"
