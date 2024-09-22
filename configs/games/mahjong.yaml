@@ -1,7 +1,7 @@
 target: 雀魂麻将  # "http://localhost:9222"
 auto_click: true
 
-global_interval: 5
+random_interval: 5
 
 image_list:
   - image_name: "開始段位"

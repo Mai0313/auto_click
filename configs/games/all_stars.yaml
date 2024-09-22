@@ -1,7 +1,7 @@
 target: com.longe.allstarhmt
 auto_click: true
 
-global_interval: 5
+random_interval: 5
 
 image_list:
   - image_name: "開始配對"

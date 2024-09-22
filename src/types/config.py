@@ -8,5 +8,5 @@ class ConfigModel(BaseModel):
         ..., description="This field can be either a window title or a URL or cdp url."
     )
     auto_click: bool = Field(...)
-    global_interval: int = Field(...)
+    random_interval: int = Field(...)
     image_list: list[ImageModel] = Field(...)
