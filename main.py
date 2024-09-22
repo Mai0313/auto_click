@@ -25,8 +25,8 @@ logfire.configure(
     show_summary=True,
     data_dir=".logfire",
     fast_shutdown=True,
-    inspect_arguments=True,
-    pydantic_plugin=logfire.PydanticPlugin(record="failure"),
+    # inspect_arguments=True,
+    # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
 )
 
 
@@ -51,7 +51,7 @@ class RemoteContoller(ConfigModel):
         device = adb.device(serial=self.serial)
         logfire.info("Connected to adb", serial=device.serial)
         running_app = device.app_current()
-        logfire.info("Running App", **running_app.__dict__)
+        logfire.info("Running App", app=running_app.package)
 
     def get_device(self) -> DeviceOutput:
         if self.target.startswith("http"):
