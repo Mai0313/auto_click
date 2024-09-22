@@ -14,7 +14,7 @@ class Scripts(BaseModel):
         device = adb.device(serial=serial)
         logfire.info("Connected to adb", serial=device.serial)
         running_app = device.app_current()
-        logfire.info("Running App", **running_app.__dict__)
+        logfire.info("Running App", app=running_app.package)
         current_screent = device.screenshot()
         current_screent.save(output_path)
 
