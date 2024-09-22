@@ -1,5 +1,6 @@
 import time
 import getpass
+import secrets
 
 import yaml
 
@@ -92,8 +93,13 @@ class RemoteContoller(ConfigModel):
                         time.sleep(config_dict.delay_after_click)
             except Exception as e:
                 logfire.error("Error in getting device:", error=e)
-                logfire.info("Retrying...", retry_interval=self.random_interval)
+                _random_interval = secrets.randbelow(self.random_interval)
+                logfire.info("Retrying...", retry_interval=_random_interval)
+                time.sleep(_random_interval)
                 self.connect2adb()
+            _random_interval = secrets.randbelow(self.random_interval)
+            time.sleep(_random_interval)
+
 
 def load_yaml(config_path: str) -> dict:
     with open(config_path, encoding="utf-8") as file:
