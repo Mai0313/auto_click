@@ -84,7 +84,12 @@ class RemoteContoller(ConfigModel):
                     button_center_x, button_center_y = ImageComparison(
                         image_cfg=config_dict, screenshot=device_details.screenshot
                     ).find()
-                    if button_center_x and button_center_y and self.auto_click is True:
+                    if (
+                        button_center_x
+                        and button_center_y
+                        and self.auto_click is True
+                        and config_dict.click_this is True
+                    ):
                         self.click_button(
                             device=device_details.device,
                             button_center_x=button_center_x,
