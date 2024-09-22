@@ -1,55 +1,47 @@
 target: com.longe.allstarhmt
 auto_click: true
-adb_ports:
-  # - 16416  # MUMU模擬器
-  - 5555   # 雷電模擬器
-loops: 100
-global_interval: 5
 
-base_check_list:
-  - 開始配對
-  - 確認
-  - 點擊空白區域繼續
-  - 返回大廳
-  - 等級提升
-  - 重新連接確認
-
-additional_check_list:
-  - null
+random_interval: 5
 
 image_list:
   - image_name: "開始配對"
     image_path: "./data/allstars_cn/start.png"
     delay_after_click: 20
+    click_this: True
     screenshot_option: True
     confidence: 0.8
 
   - image_name: "點擊空白區域繼續"
     image_path: "./data/allstars_cn/click2continue.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.8
 
   - image_name: "返回大廳"
     image_path: "./data/allstars_cn/back2lobby.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.8
 
   - image_name: "確認"
     image_path: "./data/allstars_cn/confirm.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.8
 
   - image_name: "等級提升"
     image_path: "./data/allstars_cn/levelup.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.8
 
   - image_name: "重新連接確認"
     image_path: "./data/allstars_cn/conmfirm4reconnect.png"
     delay_after_click: 0
+    click_this: True
     screenshot_option: True
     confidence: 0.8

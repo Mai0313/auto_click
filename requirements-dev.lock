@@ -17,8 +17,6 @@ altgraph==0.17.4
     # via pyinstaller
 annotated-types==0.7.0
     # via pydantic
-antlr4-python3-runtime==4.9.3
-    # via omegaconf
 apkutils2==1.0.0
     # via adbutils
 appnope==0.1.4 ; platform_system == 'Darwin'
@@ -129,8 +127,6 @@ nodeenv==1.9.1
     # via pre-commit
 numpy==2.1.1
     # via opencv-python
-omegaconf==2.3.0
-    # via auto-click
 opencv-python==4.10.0.84
     # via auto-click
 opentelemetry-api==1.27.0
@@ -240,7 +236,7 @@ pytest==8.3.2
     # via pytest-asyncio
     # via pytest-cov
     # via pytest-xdist
-pytest-asyncio==0.24.0
+pytest-asyncio==0.23.8
 pytest-cov==5.0.0
 pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
@@ -259,7 +255,6 @@ pywin32==306 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
     # via pyinstaller
 pyyaml==6.0.2
-    # via omegaconf
     # via pre-commit
 pyzmq==26.2.0
     # via ipykernel
