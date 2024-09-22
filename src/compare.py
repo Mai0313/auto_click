@@ -1,7 +1,7 @@
 import os
 import time
-import datetime
 
+# import datetime
 import cv2
 import numpy as np
 import logfire
@@ -35,8 +35,8 @@ class ImageComparison(BaseModel):
     @computed_field
     @property
     def log_filename(self) -> str:
-        now = datetime.datetime.now().strftime("%Y%m%d")
-        log_dir = f"./data/logs/{now}"
+        # now = datetime.datetime.now().strftime("%Y%m%d")
+        log_dir = "./logs"
         os.makedirs(log_dir, exist_ok=True)
         image_name = self.image_cfg.image_path.split("/")[-1].split(".")[0]
         log_filename = f"{log_dir}/{image_name}.png"
