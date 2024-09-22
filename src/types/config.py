@@ -11,6 +11,5 @@ class ConfigModel(BaseModel):
     adb_ports: list[int] = Field(...)
     loops: int = Field(...)
     global_interval: int = Field(...)
-    base_check_list: list[str] = Field(...)
     additional_check_list: list[str | None] = Field(...)
     image_list: list[ImageModel] = Field(...)

@@ -74,9 +74,7 @@ class RemoteContoller(ConfigModel):
                 for config_dict in self.image_list:
                     # logfire.info("Checking Image", **config_dict.model_dump())
                     button_center_x, button_center_y = ImageComparison(
-                        image_cfg=config_dict,
-                        check_list=self.base_check_list,
-                        screenshot=device_details.screenshot,
+                        image_cfg=config_dict, screenshot=device_details.screenshot
                     ).find()
                     if button_center_x and button_center_y and self.auto_click is True:
                         self.click_button(

@@ -3,19 +3,6 @@ auto_click: true
 loops: 100
 global_interval: 5
 
-base_check_list:
-  - 遊戲結束確認
-  - 遊戲結束確認2
-  - 開始段位
-  - 胡了
-  - 對局結束
-  - 結算畫面
-  - 簽到
-  - 關閉
-  - 叉叉
-  - 進入遊戲
-  - 好的
-
 additional_check_list:
   - 玉之間
   - 四人南
