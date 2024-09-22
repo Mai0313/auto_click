@@ -1,25 +1,10 @@
 target: com.longe.allstarhmt
 auto_click: true
 adb_ports:
-  # - 16416  # MUMU模擬器
-  - 5555   # 雷電模擬器
+  - 16416  # MUMU模擬器
+  # - 5555   # 雷電模擬器
 loops: 100
 global_interval: 5
-
-base_check_list:
-  - 開始配對
-  - 確認
-  - 點擊空白區域繼續
-  - 返回大廳
-  - 返回大廳2
-  - 等級提升
-  - 重新連接確認
-  - 返回
-  - 已完成王朝
-  - 切換遊戲
-  - 選擇3v3
-  - 選擇5v5
-  - 選擇
 
 additional_check_list:
   - null
