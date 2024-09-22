@@ -15,15 +15,9 @@ class ADBDeviceManager(BaseModel):
     @property
     def avaliable_devices(self) -> list[int]:
         mumu_player = [16384, 16416]
-        ld_player = [5555, 5557]
-        avaliable_devices = [*mumu_player, *ld_player]
+        # ld_player = [5555, 5557]
+        avaliable_devices = [*mumu_player]
         return avaliable_devices
-
-    @computed_field
-    @property
-    def ignore_devices(self) -> list[int]:
-        ignore_devices = [5554, 5556]
-        return ignore_devices
 
     @computed_field
     @property
