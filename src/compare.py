@@ -9,7 +9,8 @@ import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
-from .types import ImageModel, ShiftPosition
+from src.types.image_models import ImageModel
+from src.types.output_models import ShiftPosition
 
 
 class ImageComparison(BaseModel):

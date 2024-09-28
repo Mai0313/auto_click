@@ -8,7 +8,7 @@ import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from playwright.sync_api import sync_playwright
 
-from .types.output_models import Screenshot, ShiftPosition
+from src.types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
