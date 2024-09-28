@@ -1,3 +1,5 @@
+from typing import Union
+
 from PIL import Image
 from pydantic import BaseModel, ConfigDict
 from adbutils._device import AdbDevice
@@ -11,8 +13,8 @@ class ShiftPosition(BaseModel):
 
 class Screenshot(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    screenshot: bytes | Image.Image
-    device: AdbDevice | Page | ShiftPosition
+    screenshot: Union[bytes, Image.Image]
+    device: Union[AdbDevice, Page, ShiftPosition]
 
     def save(self, save_path: str) -> str:
         save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path

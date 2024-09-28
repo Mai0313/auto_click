@@ -1,4 +1,5 @@
 import time
+from typing import Union
 import getpass
 import secrets
 
@@ -50,7 +51,7 @@ class RemoteContoller(ConfigModel):
 
     def click_button(
         self,
-        device: Page | AdbDevice | ShiftPosition,
+        device: Union[Page, AdbDevice, ShiftPosition],
         calibrated_x: int,
         calibrated_y: int,
         click_this: bool,
@@ -86,14 +87,13 @@ class RemoteContoller(ConfigModel):
                         calibrated_x, calibrated_y = device_details.calibrate(
                             button_center_x=button_center_x, button_center_y=button_center_y
                         )
-                        if calibrated_x and calibrated_y:
-                            self.click_button(
-                                device=device_details.device,
-                                calibrated_x=calibrated_x,
-                                calibrated_y=calibrated_y,
-                                click_this=config_dict.click_this,
-                            )
-                            time.sleep(config_dict.delay_after_click)
+                        self.click_button(
+                            device=device_details.device,
+                            calibrated_x=calibrated_x,
+                            calibrated_y=calibrated_y,
+                            click_this=config_dict.click_this,
+                        )
+                        time.sleep(config_dict.delay_after_click)
             except Exception as e:
                 logfire.error("Error in getting device:", error=e, _exc_info=True)
                 _random_interval = secrets.randbelow(self.random_interval)
