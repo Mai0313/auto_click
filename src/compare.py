@@ -1,6 +1,6 @@
 import os
+from typing import Union
 
-# import datetime
 import cv2
 import numpy as np
 import logfire
@@ -16,8 +16,8 @@ class ImageComparison(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
-    screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
-    device: Page | AdbDevice | ShiftPosition = Field(..., description="The device")
+    screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
+    device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
 
     @computed_field
     @property
@@ -73,7 +73,8 @@ class ImageComparison(BaseModel):
             **self.image_cfg.model_dump(),
         )
 
-    def find(self) -> tuple[int | None, int | None]:
+    def find(self) -> tuple[int, int]:
+        button_center_x, button_center_y = 0, 0
         _, gray_screenshot = self.__screenshot_array
 
         result = cv2.matchTemplate(gray_screenshot, self.__button_image, cv2.TM_CCOEFF_NORMED)
@@ -95,5 +96,4 @@ class ImageComparison(BaseModel):
                 self.__draw_rectangle(
                     matched_image_position=matched_image_position, max_loc=max_loc, draw_black=True
                 )
-            return button_center_x, button_center_y
-        return None, None
+        return button_center_x, button_center_y
