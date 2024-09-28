@@ -1,6 +1,5 @@
 import time
 from typing import Union
-import getpass
 import secrets
 
 import yaml
