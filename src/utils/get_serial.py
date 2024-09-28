@@ -13,17 +13,17 @@ class ADBDeviceManager(BaseModel):
 
     @computed_field
     @property
-    def avaliable_devices(self) -> list[int]:
+    def available_devices(self) -> list[int]:
         mumu_player = [16384, 16416]
         # ld_player = [5555, 5557]
-        avaliable_devices = [*mumu_player]
-        return avaliable_devices
+        available_devices = [*mumu_player]
+        return available_devices
 
     @computed_field
     @property
     def serials(self) -> list[str]:
-        for avaliable_device in self.avaliable_devices:
-            adb.connect(addr=f"{self.host}:{avaliable_device}", timeout=3.0)
+        for available_device in self.available_devices:
+            adb.connect(addr=f"{self.host}:{available_device}", timeout=3.0)
         devices = adb.device_list()
         serials = []
         for device in devices:
@@ -44,12 +44,11 @@ class ADBDeviceManager(BaseModel):
         return running_apps
 
     def get_correct_serial(self) -> AppInfo:
-        apps = [
-            running_app for running_app in self.running_apps if running_app.package == self.target
-        ]
+        apps = [r_app for r_app in self.running_apps if r_app.package == self.target]
         if len(apps) > 1 or len(apps) == 0:
             raise Exception("Multiple or no devices found")
-        return apps[0]
+        app = next(iter(apps))
+        return app
 
 
 if __name__ == "__main__":

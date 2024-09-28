@@ -1,25 +1,26 @@
 import time
 
 from PIL import ImageGrab
+import logfire
 from adbutils import adb
 from pydantic import BaseModel
 import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from playwright.sync_api import sync_playwright
 
-from src.types.output_models import DeviceOutput, ShiftPosition
+from .types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
     @classmethod
-    def from_exist_window(cls, window_title: str) -> DeviceOutput:
+    def from_exist_window(cls, window_title: str) -> Screenshot:
         """Capture a screenshot from an existing window.
 
         Args:
             window_title (str): The title of the window to capture.
 
         Returns:
-            DeviceOutput: An object containing the captured screenshot and the shift position.
+            Screenshot: An object containing the captured screenshot and the shift position.
 
         """
         window = gw.getWindowsWithTitle(window_title)[0]  # type: Win32Window
@@ -33,44 +34,52 @@ class GetScreen(BaseModel):
         screenshot = ImageGrab.grab(bbox=bbox)
         # For this method, there is always a shift position
         shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
-
-        screenshot.save("screenshot.png")
-        return DeviceOutput(screenshot=screenshot, device=shift_position)
+        logfire.info("Screenshot taken", window_title=window_title)
+        return Screenshot(screenshot=screenshot, device=shift_position)
 
     @classmethod
-    def from_adb_device(cls, url: str, serial: str) -> DeviceOutput:
-        """Create a DeviceOutput object from an Android device using ADB.
+    def from_adb_device(cls, url: str, serial: str) -> Screenshot:
+        """Create a Screenshot object from an Android device using ADB.
 
         Args:
             url (str): The URL of the app to be opened on the device.
             serial (str): The serial number of the Android device.
 
         Returns:
-            DeviceOutput: An object containing the screenshot and device information.
+            Screenshot: An object containing the screenshot and device information.
 
         Raises:
             Exception: If the current app on the device is not the specified URL.
 
         """
+        # os.system(f".\\binaries\\adb.exe connect {serial}")
+        # commands = ["./binaries/adb.exe", "connect", serial]
+        # command_executor = CommandExecutor(commands=commands)
+        # command_executor.run()
         adb.connect(serial)
         device = adb.device(serial=serial)
-        current_app = device.app_current()
-        if current_app.package != url:
-            # device.app_start(url)
-            raise Exception(f"Please make sure you have opened the app: {url}")
-
+        running_app = device.app_current()
+        if running_app.package != url:
+            logfire.error(
+                "The current app is not the specified URL",
+                serial=device.serial,
+                app=running_app.package,
+                _exc_info=True,
+            )
+            raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
-        return DeviceOutput(screenshot=screenshot, device=device)
+        logfire.info("Screenshot taken", serial=device.serial, game=running_app.package)
+        return Screenshot(screenshot=screenshot, device=device)
 
     @classmethod
-    def from_remote_window(cls, url: str) -> DeviceOutput:
+    def from_remote_window(cls, url: str) -> Screenshot:
         """Create a screenshot of a remote window using Playwright.
 
         Args:
             url (str): The URL of the remote window.
 
         Returns:
-            DeviceOutput: An object containing the screenshot and the page.
+            Screenshot: An object containing the screenshot and the page.
 
         """
         with sync_playwright() as p:
@@ -90,4 +99,5 @@ class GetScreen(BaseModel):
             page = context.new_page()
             page.goto(url)
             screenshot = page.screenshot()
-            return DeviceOutput(screenshot=screenshot, device=page)
+            logfire.info("Screenshot taken", url=url)
+            return Screenshot(screenshot=screenshot, device=page)
