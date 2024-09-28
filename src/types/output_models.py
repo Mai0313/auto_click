@@ -22,3 +22,15 @@ class Screenshot(BaseModel):
         elif isinstance(self.screenshot, Image.Image):
             self.screenshot.save(save_path)
         return save_path
+
+    def calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
+        # if the device is from a window process, we need to add shift_x, shift_y to the button_center_x, button_center_y
+        # since we do not know the exact position of the window.
+        if isinstance(self.device, Page):
+            pass  # place holder for future implementation
+        if isinstance(self.device, AdbDevice):
+            pass  # place holder for future implementation
+        if isinstance(self.device, ShiftPosition):
+            button_center_x = button_center_x + self.device.shift_x
+            button_center_y = button_center_y + self.device.shift_y
+        return button_center_x, button_center_y
