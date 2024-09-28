@@ -107,7 +107,7 @@ jupyter-core==5.7.2
     # via jupyter-client
 jupyterlab-widgets==3.0.13
     # via ipywidgets
-logfire==0.55.0
+logfire==0.52.0
     # via auto-click
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
