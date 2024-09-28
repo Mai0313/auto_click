@@ -1,6 +1,6 @@
 from pydantic import Field, BaseModel
 
-from .image_models import ImageModel
+from src.types.image_models import ImageModel
 
 
 class ConfigModel(BaseModel):

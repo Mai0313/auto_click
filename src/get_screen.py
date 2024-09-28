@@ -8,7 +8,7 @@ import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from playwright.sync_api import sync_playwright
 
-from .types.output_models import Screenshot, ShiftPosition
+from src.types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
@@ -34,7 +34,7 @@ class GetScreen(BaseModel):
         screenshot = ImageGrab.grab(bbox=bbox)
         # For this method, there is always a shift position
         shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
-        logfire.info("Screenshot taken", window_title=window_title)
+        logfire.debug("Screenshot taken", window_title=window_title)
         return Screenshot(screenshot=screenshot, device=shift_position)
 
     @classmethod
@@ -68,7 +68,7 @@ class GetScreen(BaseModel):
             )
             raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
-        logfire.info("Screenshot taken", serial=device.serial, game=running_app.package)
+        logfire.debug("Screenshot taken", serial=device.serial, game=running_app.package)
         return Screenshot(screenshot=screenshot, device=device)
 
     @classmethod
@@ -99,5 +99,5 @@ class GetScreen(BaseModel):
             page = context.new_page()
             page.goto(url)
             screenshot = page.screenshot()
-            logfire.info("Screenshot taken", url=url)
+            logfire.debug("Screenshot taken", url=url)
             return Screenshot(screenshot=screenshot, device=page)
