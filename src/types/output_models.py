@@ -9,7 +9,7 @@ class ShiftPosition(BaseModel):
     shift_y: int
 
 
-class DeviceOutput(BaseModel):
+class Screenshot(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot: bytes | Image.Image
     device: AdbDevice | Page | ShiftPosition

@@ -3,10 +3,8 @@ import getpass
 import secrets
 
 import yaml
-
-# from hydra import compose, initialize
 import logfire
-from adbutils import AdbDevice, adb
+from adbutils import AdbDevice
 from pydantic import computed_field
 import pyautogui
 from src.compare import ImageComparison
@@ -14,11 +12,11 @@ from src.get_screen import GetScreen
 from src.types.config import ConfigModel
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
-from src.types.output_models import DeviceOutput, ShiftPosition
+from src.types.output_models import Screenshot, ShiftPosition
 
 logfire.configure(
-    send_to_logfire=True,
-    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",  # noqa: S106
+    send_to_logfire=False,
+    token=None,
     project_name="auto-click",
     service_name=f"{getpass.getuser()}",
     trace_sample_rate=1.0,
@@ -31,8 +29,6 @@ logfire.configure(
         "verbose": True,
         "min_log_level": "info",
     },
-    # inspect_arguments=True,
-    # pydantic_plugin=logfire.PydanticPlugin(record="failure"),
 )
 
 
@@ -40,32 +36,17 @@ class RemoteContoller(ConfigModel):
     @computed_field
     @property
     def serial(self) -> str:
+        """We want to run ADBDeviceManager only once, so we use computed_field."""
         apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
         return apps.serial
 
-    # def connect2adb(self) -> None:
-    #     try:
-    #         # os.system(f".\\binaries\\adb.exe connect {self.serial}")
-    #         commands = ["./binaries/adb.exe", "connect", self.serial]
-    #         command_executor = CommandExecutor(commands=commands)
-    #         command_executor.run()
-    #     except Exception as e:
-    #         logfire.error("Error in connecting to adb", error=e)
-
-    def connect2adb(self) -> None:
-        adb.connect(addr=self.serial)
-        device = adb.device(serial=self.serial)
-        logfire.info("Connected to adb", serial=device.serial)
-        running_app = device.app_current()
-        logfire.info("Running App", app=running_app.package)
-
-    def get_device(self) -> DeviceOutput:
+    def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
-            return GetScreen.from_remote_window(self.target)
+            return GetScreen.from_remote_window(url=self.target)
         if self.target.startswith("com"):
-            return GetScreen.from_adb_device(self.target, self.serial)
+            return GetScreen.from_adb_device(url=self.target, serial=self.serial)
         # this will return screenshot, shift_position; not device.
-        return GetScreen.from_exist_window(self.target)
+        return GetScreen.from_exist_window(window_title=self.target)
 
     def click_button(
         self, device: Page | AdbDevice | ShiftPosition, button_center_x: int, button_center_y: int
@@ -81,10 +62,9 @@ class RemoteContoller(ConfigModel):
             pyautogui.click()
 
     def main(self) -> None:
-        self.connect2adb()
         while True:
             try:
-                device_details = self.get_device()
+                device_details = self.get_screenshot()
                 for config_dict in self.image_list:
                     # logfire.info("Checking Image", **config_dict.model_dump())
                     button_center_x, button_center_y = ImageComparison(
@@ -107,7 +87,6 @@ class RemoteContoller(ConfigModel):
                 _random_interval = secrets.randbelow(self.random_interval)
                 logfire.info("Retrying...", retry_interval=_random_interval)
                 time.sleep(_random_interval)
-                self.connect2adb()
             _random_interval = secrets.randbelow(self.random_interval)
             time.sleep(_random_interval)
 
