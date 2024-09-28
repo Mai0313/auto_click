@@ -15,20 +15,7 @@ from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
 
-logfire.configure(
-    send_to_logfire=False,
-    token=None,
-    project_name="auto-click",
-    service_name=f"{getpass.getuser()}",
-    show_summary=True,
-    data_dir=".logfire",
-    console={
-        "colors": "auto",
-        "span_style": "show-parents",
-        "verbose": True,
-        "min_log_level": "info",
-    },
-)
+logfire.configure(send_to_logfire=False)
 
 
 class RemoteContoller(ConfigModel):
