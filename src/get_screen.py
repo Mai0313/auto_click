@@ -64,6 +64,7 @@ class GetScreen(BaseModel):
                 "The current app is not the specified URL",
                 serial=device.serial,
                 app=running_app.package,
+                _exc_info=True,
             )
             raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
