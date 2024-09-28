@@ -65,7 +65,7 @@ authors = [
 ]
 dependencies = [
     "pillow>=10.3.0",
-    "logfire>=0.40.0",
+    "logfire==0.52.0",
     "adbutils>=2.8.0",
     "pyautogui>=0.9.54",
     "playwright>=1.44.0",
