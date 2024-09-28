@@ -66,7 +66,6 @@ class RemoteContoller(ConfigModel):
             try:
                 device_details = self.get_screenshot()
                 for config_dict in self.image_list:
-                    # logfire.info("Checking Image", **config_dict.model_dump())
                     button_center_x, button_center_y = ImageComparison(
                         image_cfg=config_dict, screenshot=device_details.screenshot
                     ).find()
