@@ -6,8 +6,10 @@ import numpy as np
 import logfire
 from pydantic import Field, BaseModel, ConfigDict, computed_field
 import PIL.Image as Image
+from adbutils._device import AdbDevice
+from playwright.sync_api import Page
 
-from .types.image_models import ImageModel
+from .types import ImageModel, ShiftPosition
 
 
 class ImageComparison(BaseModel):
@@ -15,6 +17,7 @@ class ImageComparison(BaseModel):
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
+    device: Page | AdbDevice | ShiftPosition = Field(..., description="The device")
 
     @computed_field
     @property
