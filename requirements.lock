@@ -47,7 +47,7 @@ importlib-metadata==8.4.0
     # via opentelemetry-api
     # via pyinstaller
     # via pyinstaller-hooks-contrib
-logfire==0.55.0
+logfire==0.52.0
     # via auto-click
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
