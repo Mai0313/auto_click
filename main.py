@@ -20,10 +20,8 @@ logfire.configure(
     token=None,
     project_name="auto-click",
     service_name=f"{getpass.getuser()}",
-    trace_sample_rate=1.0,
     show_summary=True,
     data_dir=".logfire",
-    fast_shutdown=True,
     console={
         "colors": "auto",
         "span_style": "show-parents",
