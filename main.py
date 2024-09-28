@@ -82,7 +82,7 @@ class RemoteContoller(ConfigModel):
                         )
                         time.sleep(config_dict.delay_after_click)
             except Exception as e:
-                logfire.error("Error in getting device:", error=e)
+                logfire.error("Error in getting device:", error=e, _exc_info=True)
                 _random_interval = secrets.randbelow(self.random_interval)
                 logfire.info("Retrying...", retry_interval=_random_interval)
                 time.sleep(_random_interval)
