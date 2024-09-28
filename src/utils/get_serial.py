@@ -1,4 +1,3 @@
-import logfire
 from adbutils import adb
 from pydantic import Field, BaseModel, computed_field
 
@@ -31,7 +30,6 @@ class ADBDeviceManager(BaseModel):
             if device.serial.startswith("emulator"):
                 continue
             serials.append(device.serial)
-        logfire.info("Available devices", serials=serials)
         return serials
 
     @computed_field
@@ -43,7 +41,6 @@ class ADBDeviceManager(BaseModel):
             running_app = device.app_current()
             running_details = AppInfo(**{"serial": serial, "package": running_app.package})
             running_apps.append(running_details)
-        logfire.info("Running apps", running_apps=running_apps)
         return running_apps
 
     def get_correct_serial(self) -> AppInfo:
@@ -51,7 +48,6 @@ class ADBDeviceManager(BaseModel):
         if len(apps) > 1 or len(apps) == 0:
             raise Exception("Multiple or no devices found")
         app = next(iter(apps))
-        logfire.info("Correct device found", serial=app.serial, package=app.package)
         return app
 
 
