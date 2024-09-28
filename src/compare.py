@@ -7,7 +7,7 @@ import logfire
 from pydantic import Field, BaseModel, ConfigDict, computed_field
 import PIL.Image as Image
 
-from src.types.image_models import ImageModel
+from .types.image_models import ImageModel
 
 
 class ImageComparison(BaseModel):
