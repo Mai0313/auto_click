@@ -3,7 +3,6 @@ from typing import Union
 
 import cv2
 import numpy as np
-import logfire
 from pydantic import Field, BaseModel, ConfigDict, computed_field
 import PIL.Image as Image
 from adbutils._device import AdbDevice
@@ -38,14 +37,6 @@ class ImageComparison(BaseModel):
         log_filename = f"{log_dir}/{image_name}.png"
         return log_filename
 
-    @computed_field
-    @property
-    def __button_image(self) -> cv2.typing.MatLike:
-        __button_image = cv2.imread(self.image_cfg.image_path, 0)
-        if __button_image is None:
-            logfire.warn("Unable to load button image", **self.image_cfg.model_dump())
-        return __button_image
-
     def __draw_rectangle(
         self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point, draw_black: bool
     ) -> None:
@@ -68,33 +59,25 @@ class ImageComparison(BaseModel):
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         # Save the resulting image
         cv2.imwrite(self.__log_filename, color_screenshot)
-        logfire.info(
-            "The screenshot has been saved",
-            log_filename=self.__log_filename,  # Remove leading underscores
-            **self.image_cfg.model_dump(),
-        )
+        # add log here.
 
-    def find(self) -> tuple[int, int]:
+    def find(self) -> Union[tuple[int, int], tuple[None, None]]:
         button_center_x, button_center_y = 0, 0
         _, gray_screenshot = self.__screenshot_array
+        button_image = cv2.imread(self.image_cfg.image_path, 0)
 
-        result = cv2.matchTemplate(gray_screenshot, self.__button_image, cv2.TM_CCOEFF_NORMED)
+        result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
-        button_center_x = int(max_loc[0] + self.__button_image.shape[1])
-        button_center_y = int(max_loc[1] + self.__button_image.shape[0])
+        button_center_x = int(max_loc[0] + button_image.shape[1])
+        button_center_y = int(max_loc[1] + button_image.shape[0])
         matched_image_position = (button_center_x, button_center_y)
 
         if max_val > self.image_cfg.confidence:
-            logfire.info(
-                "Found the target image",
-                confidence_decision=max_val,
-                button_center_x=button_center_x,
-                button_center_y=button_center_y,
-                **self.image_cfg.model_dump(),
-            )
+            # add log here.
             if self.image_cfg.screenshot_option is True:
                 self.__draw_rectangle(
                     matched_image_position=matched_image_position, max_loc=max_loc, draw_black=True
                 )
-        return button_center_x, button_center_y
+            return button_center_x, button_center_y
+        return None, None
