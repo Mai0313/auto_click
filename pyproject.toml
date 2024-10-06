@@ -77,6 +77,7 @@ dependencies = [
     "tomli>=2.0.1",
     "pyyaml>=6.0.2",
     "mlflow>=2.16.2",
+    "logfire>=1.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
