@@ -5,6 +5,7 @@ import datetime
 
 import yaml
 import mlflow
+import logfire
 from adbutils import AdbDevice
 from pydantic import computed_field, model_validator
 import pyautogui
@@ -15,6 +16,8 @@ from src.utils.logger import Logger
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
+
+logfire.configure(send_to_logfire=False, console={"min_log_level": "trace", "verbose": True})
 
 
 class RemoteContoller(ConfigModel):
@@ -79,6 +82,14 @@ class RemoteContoller(ConfigModel):
                                 calibrated_y=calibrated_y,
                                 click_this=config_dict.click_this,
                             )
+                            logfire.info(
+                                "Button found",
+                                button_name=config_dict.image_name,
+                                x=calibrated_x,
+                                y=calibrated_y,
+                                auto_click=self.auto_click,
+                                click_this=config_dict.click_this,
+                            )
                             mlflow.log_metrics(
                                 metrics={
                                     "button_center_x": found.button_center_x,
@@ -102,9 +113,8 @@ class RemoteContoller(ConfigModel):
                             time.sleep(config_dict.delay_after_click)
                 except Exception as e:
                     _random_interval = secrets.randbelow(self.random_interval)
-                    mlflow.log_text(
-                        f"Error: {e}, Retrying in {_random_interval} seconds",
-                        artifact_file="error.txt",
+                    logfire.error(
+                        f"Error: {e}, Retrying in {_random_interval} seconds", _exc_info=True
                     )
                     time.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
