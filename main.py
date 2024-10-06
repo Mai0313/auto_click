@@ -1,17 +1,23 @@
 import time
 from typing import Union
 import secrets
+import datetime
 
 import yaml
+import mlflow
+import logfire
 from adbutils import AdbDevice
-from pydantic import computed_field
+from pydantic import computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from src.types.config import ConfigModel
+from src.utils.logger import Logger
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
+
+logfire.configure(send_to_logfire=False, console={"min_log_level": "trace", "verbose": True})
 
 
 class RemoteContoller(ConfigModel):
@@ -21,6 +27,12 @@ class RemoteContoller(ConfigModel):
         """We want to run ADBDeviceManager only once, so we use computed_field."""
         apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
         return apps.serial
+
+    @model_validator(mode="after")
+    def init_mlflow(self) -> "RemoteContoller":
+        mlflow.set_tracking_uri("./mlruns")
+        mlflow.set_experiment(experiment_name=self.target)
+        return self
 
     def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
@@ -45,36 +57,66 @@ class RemoteContoller(ConfigModel):
             if isinstance(device, ShiftPosition):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
-        else:
-            # add log here.
-            pass
 
     def main(self) -> None:
         while True:
-            try:
-                device_details = self.get_screenshot()
-                for config_dict in self.image_list:
-                    button_center_x, button_center_y = ImageComparison(
-                        image_cfg=config_dict,
-                        screenshot=device_details.screenshot,
-                        device=device_details.device,
-                    ).find()
-                    if button_center_x and button_center_y:
-                        calibrated_x, calibrated_y = device_details.calibrate(
-                            button_center_x=button_center_x, button_center_y=button_center_y
-                        )
-                        self.click_button(
+            run_name = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with mlflow.start_run(run_name=run_name):
+                try:
+                    device_details = self.get_screenshot()
+                    for config_dict in self.image_list:
+                        image_conpare = ImageComparison(
+                            image_cfg=config_dict,
+                            screenshot=device_details.screenshot,
                             device=device_details.device,
-                            calibrated_x=calibrated_x,
-                            calibrated_y=calibrated_y,
-                            click_this=config_dict.click_this,
                         )
-                        time.sleep(config_dict.delay_after_click)
-            except Exception:
-                # add log here.
-                _random_interval = secrets.randbelow(self.random_interval)
-                # add log here.
-                time.sleep(_random_interval)
+                        found = image_conpare.find()
+                        if found.button_center_x and found.button_center_y:
+                            calibrated_x, calibrated_y = device_details.calibrate(
+                                button_center_x=found.button_center_x,
+                                button_center_y=found.button_center_y,
+                            )
+                            self.click_button(
+                                device=device_details.device,
+                                calibrated_x=calibrated_x,
+                                calibrated_y=calibrated_y,
+                                click_this=config_dict.click_this,
+                            )
+                            logfire.info(
+                                "Button found",
+                                button_name=config_dict.image_name,
+                                x=calibrated_x,
+                                y=calibrated_y,
+                                auto_click=self.auto_click,
+                                click_this=config_dict.click_this,
+                            )
+                            mlflow.log_metrics(
+                                metrics={
+                                    "button_center_x": found.button_center_x,
+                                    "button_center_y": found.button_center_y,
+                                    "calibrated_x": calibrated_x,
+                                    "calibrated_y": calibrated_y,
+                                }
+                            )
+                            logger = Logger(original_image_path=config_dict.image_path)
+                            logger.save_mlflow(
+                                screenshot=found.color_screenshot, image_type="color"
+                            )
+                            logger.save_mlflow(
+                                screenshot=found.blackout_screenshot, image_type="blackout"
+                            )
+                            if config_dict.screenshot_option is True:
+                                logger.save(screenshot=found.color_screenshot, image_type="color")
+                                logger.save(
+                                    screenshot=found.blackout_screenshot, image_type="blackout"
+                                )
+                            time.sleep(config_dict.delay_after_click)
+                except Exception as e:
+                    _random_interval = secrets.randbelow(self.random_interval)
+                    logfire.error(
+                        f"Error: {e}, Retrying in {_random_interval} seconds", _exc_info=True
+                    )
+                    time.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             time.sleep(_random_interval)
 
