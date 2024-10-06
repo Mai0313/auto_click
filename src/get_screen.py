@@ -1,7 +1,6 @@
 import time
 
 from PIL import ImageGrab
-import logfire
 from adbutils import adb
 from pydantic import BaseModel
 import pygetwindow as gw
@@ -34,7 +33,6 @@ class GetScreen(BaseModel):
         screenshot = ImageGrab.grab(bbox=bbox)
         # For this method, there is always a shift position
         shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
-        logfire.debug("Screenshot taken", window_title=window_title)
         return Screenshot(screenshot=screenshot, device=shift_position)
 
     @classmethod
@@ -60,15 +58,9 @@ class GetScreen(BaseModel):
         device = adb.device(serial=serial)
         running_app = device.app_current()
         if running_app.package != url:
-            logfire.error(
-                "The current app is not the specified URL",
-                serial=device.serial,
-                app=running_app.package,
-                _exc_info=True,
-            )
+            # add log here.
             raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
-        logfire.debug("Screenshot taken", serial=device.serial, game=running_app.package)
         return Screenshot(screenshot=screenshot, device=device)
 
     @classmethod
@@ -99,5 +91,4 @@ class GetScreen(BaseModel):
             page = context.new_page()
             page.goto(url)
             screenshot = page.screenshot()
-            logfire.debug("Screenshot taken", url=url)
             return Screenshot(screenshot=screenshot, device=page)

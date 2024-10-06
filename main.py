@@ -3,7 +3,6 @@ from typing import Union
 import secrets
 
 import yaml
-import logfire
 from adbutils import AdbDevice
 from pydantic import computed_field
 import pyautogui
@@ -13,15 +12,6 @@ from src.types.config import ConfigModel
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
-
-logfire.configure(
-    send_to_logfire=True,
-    token="t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp",  # noqa: S106
-    project_name="auto-click",
-    show_summary=True,
-    data_dir=".logfire",
-    inspect_arguments=None,
-)
 
 
 class RemoteContoller(ConfigModel):
@@ -56,13 +46,8 @@ class RemoteContoller(ConfigModel):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
         else:
-            logfire.info(
-                "Button found but click feature is disabled",
-                x=calibrated_x,
-                y=calibrated_y,
-                auto_click=self.auto_click,
-                click_this=click_this,
-            )
+            # add log here.
+            pass
 
     def main(self) -> None:
         while True:
@@ -85,10 +70,10 @@ class RemoteContoller(ConfigModel):
                             click_this=config_dict.click_this,
                         )
                         time.sleep(config_dict.delay_after_click)
-            except Exception as e:
-                logfire.error("Error in getting device:", error=e, _exc_info=True)
+            except Exception:
+                # add log here.
                 _random_interval = secrets.randbelow(self.random_interval)
-                logfire.info("Retrying...", retry_interval=_random_interval)
+                # add log here.
                 time.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             time.sleep(_random_interval)
