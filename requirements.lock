@@ -60,6 +60,7 @@ decorator==5.1.1
     # via retry
 deprecated==1.2.14
     # via opentelemetry-api
+    # via opentelemetry-semantic-conventions
 deprecation==2.1.0
     # via adbutils
 docker==7.1.0
@@ -95,13 +96,14 @@ gunicorn==23.0.0 ; platform_system != 'Windows'
     # via mlflow
 idna==3.10
     # via requests
-importlib-metadata==8.5.0
+importlib-metadata==8.4.0
     # via flask
     # via markdown
     # via mkdocs
     # via mkdocs-get-deps
     # via mkdocstrings
     # via mlflow-skinny
+    # via opentelemetry-api
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 importlib-resources==6.4.5 ; python_full_version < '3.10'
@@ -175,12 +177,13 @@ numpy==2.0.2
     # via scipy
 opencv-python==4.10.0.84
     # via auto-click
-opentelemetry-api==1.16.0
+opentelemetry-api==1.27.0
     # via mlflow-skinny
     # via opentelemetry-sdk
-opentelemetry-sdk==1.16.0
+    # via opentelemetry-semantic-conventions
+opentelemetry-sdk==1.27.0
     # via mlflow-skinny
-opentelemetry-semantic-conventions==0.37b0
+opentelemetry-semantic-conventions==0.48b0
     # via opentelemetry-sdk
 packaging==24.1
     # via deprecation
@@ -208,7 +211,7 @@ platformdirs==4.3.6
     # via mkdocstrings
 playwright==1.47.0
     # via auto-click
-protobuf==5.28.2
+protobuf==4.25.5
     # via mlflow-skinny
 py==1.11.0
     # via retry
@@ -311,8 +314,6 @@ scipy==1.13.1
     # via mlflow
     # via scikit-learn
 setuptools==75.1.0
-    # via opentelemetry-api
-    # via opentelemetry-sdk
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 six==1.16.0

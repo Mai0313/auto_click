@@ -163,3 +163,4 @@ data/logs/
 /.github/reports/
 
 /logs/
+/mlruns/

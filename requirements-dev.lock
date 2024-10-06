@@ -81,6 +81,7 @@ defusedxml==0.7.1
     # via genbadge
 deprecated==1.2.14
     # via opentelemetry-api
+    # via opentelemetry-semantic-conventions
 deprecation==2.1.0
     # via adbutils
 distlib==0.3.8
@@ -134,7 +135,7 @@ identify==2.6.1
     # via pre-commit
 idna==3.10
     # via requests
-importlib-metadata==8.5.0
+importlib-metadata==8.4.0
     # via flask
     # via jupyter-client
     # via markdown
@@ -142,6 +143,7 @@ importlib-metadata==8.5.0
     # via mkdocs-get-deps
     # via mkdocstrings
     # via mlflow-skinny
+    # via opentelemetry-api
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 importlib-resources==6.4.5 ; python_full_version < '3.10'
@@ -241,12 +243,13 @@ numpy==2.0.2
     # via scipy
 opencv-python==4.10.0.84
     # via auto-click
-opentelemetry-api==1.16.0
+opentelemetry-api==1.27.0
     # via mlflow-skinny
     # via opentelemetry-sdk
-opentelemetry-sdk==1.16.0
+    # via opentelemetry-semantic-conventions
+opentelemetry-sdk==1.27.0
     # via mlflow-skinny
-opentelemetry-semantic-conventions==0.37b0
+opentelemetry-semantic-conventions==0.48b0
     # via opentelemetry-sdk
 packaging==24.1
     # via deprecation
@@ -288,7 +291,7 @@ pluggy==1.5.0
 pre-commit==4.0.0
 prompt-toolkit==3.0.48
     # via ipython
-protobuf==5.28.2
+protobuf==4.25.5
     # via mlflow-skinny
 psutil==6.0.0
     # via ipykernel
@@ -420,8 +423,6 @@ scipy==1.13.1
     # via scikit-learn
 setuptools==75.1.0
     # via genbadge
-    # via opentelemetry-api
-    # via opentelemetry-sdk
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 six==1.16.0
