@@ -29,57 +29,23 @@ cigam==0.0.3
     # via apkutils2
 decorator==5.1.1
     # via retry
-deprecated==1.2.14
-    # via opentelemetry-api
-    # via opentelemetry-exporter-otlp-proto-http
-    # via opentelemetry-semantic-conventions
 deprecation==2.1.0
     # via adbutils
-executing==2.1.0
-    # via logfire
-googleapis-common-protos==1.65.0
-    # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.0.3
     # via playwright
 idna==3.10
     # via requests
-importlib-metadata==8.4.0
-    # via opentelemetry-api
+importlib-metadata==8.4.0 ; python_full_version < '3.10'
     # via pyinstaller
     # via pyinstaller-hooks-contrib
-logfire==0.52.0
-    # via auto-click
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
-markdown-it-py==3.0.0
-    # via rich
-mdurl==0.1.2
-    # via markdown-it-py
 mouseinfo==0.1.3
     # via pyautogui
 numpy==2.0.2
     # via opencv-python
 opencv-python==4.10.0.84
     # via auto-click
-opentelemetry-api==1.27.0
-    # via opentelemetry-exporter-otlp-proto-http
-    # via opentelemetry-instrumentation
-    # via opentelemetry-sdk
-    # via opentelemetry-semantic-conventions
-opentelemetry-exporter-otlp-proto-common==1.27.0
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-exporter-otlp-proto-http==1.27.0
-    # via logfire
-opentelemetry-instrumentation==0.48b0
-    # via logfire
-opentelemetry-proto==1.27.0
-    # via opentelemetry-exporter-otlp-proto-common
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-sdk==1.27.0
-    # via logfire
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-semantic-conventions==0.48b0
-    # via opentelemetry-sdk
 packaging==24.1
     # via deprecation
     # via pyinstaller
@@ -92,10 +58,6 @@ pillow==10.4.0
     # via pyscreeze
 playwright==1.47.0
     # via auto-click
-protobuf==4.25.5
-    # via googleapis-common-protos
-    # via logfire
-    # via opentelemetry-proto
 py==1.11.0
     # via retry
 pyautogui==0.9.54
@@ -111,8 +73,6 @@ pyelftools==0.31
 pygetwindow==0.0.9
     # via auto-click
     # via pyautogui
-pygments==2.18.0
-    # via rich
 pyinstaller==6.10.0
     # via auto-click
 pyinstaller-hooks-contrib==2024.8
@@ -150,34 +110,24 @@ pyyaml==6.0.2
     # via auto-click
 requests==2.32.3
     # via adbutils
-    # via opentelemetry-exporter-otlp-proto-http
 retry==0.9.2
     # via adbutils
-rich==13.8.1
-    # via logfire
 rootutils==1.0.7
     # via auto-click
 rubicon-objc==0.4.9 ; platform_system == 'Darwin'
     # via mouseinfo
 setuptools==75.1.0
-    # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 tomli==2.0.1
     # via auto-click
-    # via logfire
 typing-extensions==4.12.2
-    # via logfire
-    # via opentelemetry-sdk
     # via pydantic
     # via pydantic-core
     # via pyee
 urllib3==2.2.3
     # via requests
-wrapt==1.16.0
-    # via deprecated
-    # via opentelemetry-instrumentation
 xmltodict==0.13.0
     # via apkutils2
-zipp==3.20.2
+zipp==3.20.2 ; python_full_version < '3.10'
     # via importlib-metadata

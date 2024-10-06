@@ -65,7 +65,6 @@ authors = [
 ]
 dependencies = [
     "pillow>=10.3.0",
-    "logfire==0.52.0",
     "adbutils>=2.8.0",
     "pyautogui>=0.9.54",
     "playwright>=1.44.0",
@@ -390,28 +389,6 @@ line-ending = "auto"
 preview = true
 quote-style = "double"
 skip-magic-trailing-comma = true
-
-# ================== #
-#      Logfire       #
-# ================== #
-
-# For more info:
-# https://docs.pydantic.dev/logfire/api/logfire/#logfire.configure
-[tool.logfire]
-send_to_logfire = true
-token = "t5yWZMmjyRH5ZVqvJRwwHHfm5L3SgbRjtkk7chW3rjSp"
-project_name = "auto-click"
-trace_sample_rate = 1.0
-console_colors = "auto"
-console_span_style = "show-parents"
-console_include_timestamps = true
-console_verbose = true
-console_min_log_level = "debug"
-show_summary = true
-data_dir = "./.cache/.logfire"
-# base_url = ""
-id_generator = true
-fast_shutdown=true
 
 
 # ================== #
