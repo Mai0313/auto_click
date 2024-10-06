@@ -24,8 +24,8 @@ RUN python -m pip install --upgrade pip
 
 FROM builder as auto_click_base
 WORKDIR /base_env
-COPY ./requirements.txt ./requirements.txt
-RUN pip install -r ./requirements.txt && pip cache purge
+COPY ./requirements.lock ./requirements.lock
+RUN pip install -r ./requirements.lock && pip cache purge
 
 ########################################################################################
 
