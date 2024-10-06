@@ -1,10 +1,8 @@
 import time
 from typing import Union
-from pathlib import Path
 import secrets
 import datetime
 
-import cv2
 import yaml
 import mlflow
 from adbutils import AdbDevice
@@ -13,6 +11,7 @@ import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from src.types.config import ConfigModel
+from src.utils.logger import Logger
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
@@ -88,29 +87,17 @@ class RemoteContoller(ConfigModel):
                                     "calibrated_y": calibrated_y,
                                 }
                             )
-                            _image_path = Path(config_dict.image_path)
-                            mlflow.log_image(
-                                image=found.color_screenshot,
-                                key="color",
-                                artifact_file=f"{_image_path.name}",
+                            logger = Logger(original_image_path=config_dict.image_path)
+                            logger.save_mlflow(
+                                screenshot=found.color_screenshot, image_type="color"
                             )
-                            mlflow.log_image(
-                                image=found.blackout_screenshot,
-                                key="blackout",
-                                artifact_file=f"{_image_path.name}",
+                            logger.save_mlflow(
+                                screenshot=found.blackout_screenshot, image_type="blackout"
                             )
                             if config_dict.screenshot_option is True:
-                                color_log_dir = Path("./logs/color")
-                                blackout_log_dir = Path("./logs/blackout")
-                                color_log_dir.mkdir(exist_ok=True)
-                                blackout_log_dir.mkdir(exist_ok=True)
-                                cv2.imwrite(
-                                    f"{color_log_dir.as_posix()}/{_image_path.name}",
-                                    found.color_screenshot,
-                                )
-                                cv2.imwrite(
-                                    f"{blackout_log_dir.as_posix()}/{_image_path.name}",
-                                    found.blackout_screenshot,
+                                logger.save(screenshot=found.color_screenshot, image_type="color")
+                                logger.save(
+                                    screenshot=found.blackout_screenshot, image_type="blackout"
                                 )
                             time.sleep(config_dict.delay_after_click)
                 except Exception as e:
