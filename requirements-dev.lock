@@ -3,7 +3,7 @@
 #
 # last locked with the following flags:
 #   pre: false
-#   features: []
+#   features: ["docs"]
 #   all-features: false
 #   with-sources: false
 #   generate-hashes: false
@@ -12,9 +12,13 @@
 -e file:.
 adbutils==2.8.0
     # via auto-click
+alembic==1.13.3
+    # via mlflow
 altgraph==0.17.4
     # via macholib
     # via pyinstaller
+aniso8601==9.0.1
+    # via graphene
 annotated-types==0.7.0
     # via pydantic
 apkutils2==1.0.0
@@ -25,6 +29,13 @@ asttokens==2.4.1
     # via stack-data
 autorootcwd==1.0.1
     # via auto-click
+babel==2.16.0
+    # via mkdocs-material
+blinker==1.8.2
+    # via flask
+cachetools==5.5.0
+    # via google-auth
+    # via mlflow-skinny
 certifi==2024.8.30
     # via requests
 cffi==1.17.1 ; implementation_name == 'pypy'
@@ -36,16 +47,31 @@ charset-normalizer==3.3.2
 cigam==0.0.3
     # via apkutils2
 click==8.1.7
+    # via flask
     # via genbadge
-colorama==0.4.6 ; sys_platform == 'win32' or platform_system == 'Windows'
+    # via mkdocs
+    # via mkdocstrings
+    # via mlflow-skinny
+cloudpickle==3.0.0
+    # via mlflow-skinny
+colorama==0.4.6
     # via click
+    # via griffe
     # via ipython
+    # via mkdocs
+    # via mkdocs-material
     # via pytest
 comm==0.2.2
     # via ipykernel
     # via ipywidgets
+contourpy==1.3.0
+    # via matplotlib
 coverage==7.6.1
     # via pytest-cov
+cycler==0.12.1
+    # via matplotlib
+databricks-sdk==0.33.0
+    # via mlflow-skinny
 debugpy==1.8.6
     # via ipykernel
 decorator==5.1.1
@@ -53,10 +79,14 @@ decorator==5.1.1
     # via retry
 defusedxml==0.7.1
     # via genbadge
+deprecated==1.2.14
+    # via opentelemetry-api
 deprecation==2.1.0
     # via adbutils
 distlib==0.3.8
     # via virtualenv
+docker==7.1.0
+    # via mlflow
 exceptiongroup==1.2.2 ; python_full_version < '3.11'
     # via ipython
     # via pytest
@@ -70,17 +100,52 @@ flake8==7.1.1
     # via flake8-html
 flake8-html==0.4.3
     # via genbadge
+flask==3.0.3
+    # via mlflow
+fonttools==4.54.1
+    # via matplotlib
 genbadge==1.1.1
+ghp-import==2.1.0
+    # via mkdocs
+gitdb==4.0.11
+    # via gitpython
+gitpython==3.1.43
+    # via mlflow-skinny
+google-auth==2.35.0
+    # via databricks-sdk
+graphene==3.3
+    # via mlflow
+graphql-core==3.2.4
+    # via graphene
+    # via graphql-relay
+graphql-relay==3.2.0
+    # via graphene
 greenlet==3.0.3
     # via playwright
+    # via sqlalchemy
+griffe==1.3.2
+    # via griffe-typingdoc
+    # via mkdocstrings-python
+griffe-typingdoc==0.2.7
+    # via auto-click
+gunicorn==23.0.0 ; platform_system != 'Windows'
+    # via mlflow
 identify==2.6.1
     # via pre-commit
 idna==3.10
     # via requests
-importlib-metadata==8.4.0 ; python_full_version < '3.10'
+importlib-metadata==8.5.0
+    # via flask
     # via jupyter-client
+    # via markdown
+    # via mkdocs
+    # via mkdocs-get-deps
+    # via mkdocstrings
+    # via mlflow-skinny
     # via pyinstaller
     # via pyinstaller-hooks-contrib
+importlib-resources==6.4.5 ; python_full_version < '3.10'
+    # via matplotlib
 iniconfig==2.0.0
     # via pytest
 ipykernel==6.29.5
@@ -88,10 +153,19 @@ ipython==8.18.1
     # via ipykernel
     # via ipywidgets
 ipywidgets==8.1.5
+itsdangerous==2.2.0
+    # via flask
 jedi==0.19.1
     # via ipython
 jinja2==3.1.4
     # via flake8-html
+    # via flask
+    # via mkdocs
+    # via mkdocs-material
+    # via mkdocstrings
+    # via mlflow
+joblib==1.4.2
+    # via scikit-learn
 jupyter-client==8.6.3
     # via ipykernel
 jupyter-core==5.7.2
@@ -99,15 +173,57 @@ jupyter-core==5.7.2
     # via jupyter-client
 jupyterlab-widgets==3.0.13
     # via ipywidgets
+kiwisolver==1.4.7
+    # via matplotlib
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
+mako==1.3.5
+    # via alembic
+markdown==3.7
+    # via mkdocs
+    # via mkdocs-autorefs
+    # via mkdocs-material
+    # via mkdocstrings
+    # via mlflow
+    # via pymdown-extensions
 markupsafe==2.1.5
     # via jinja2
+    # via mako
+    # via mkdocs
+    # via mkdocs-autorefs
+    # via mkdocstrings
+    # via werkzeug
+matplotlib==3.9.2
+    # via mlflow
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
 mccabe==0.7.0
     # via flake8
+mergedeep==1.3.4
+    # via mkdocs
+    # via mkdocs-get-deps
+mkdocs==1.6.1
+    # via mkdocs-autorefs
+    # via mkdocs-material
+    # via mkdocstrings
+mkdocs-autorefs==1.2.0
+    # via mkdocstrings
+    # via mkdocstrings-python
+mkdocs-get-deps==0.2.0
+    # via mkdocs
+mkdocs-material==9.5.39
+    # via auto-click
+mkdocs-material-extensions==1.3.1
+    # via mkdocs-material
+mkdocstrings==0.26.1
+    # via mkdocstrings-python
+mkdocstrings-python==1.11.1
+    # via auto-click
+mlflow==2.16.2
+    # via auto-click
+mlflow-skinny==2.16.2
+    # via mlflow
 mouseinfo==0.1.3
     # via pyautogui
 nest-asyncio==1.6.0
@@ -115,17 +231,41 @@ nest-asyncio==1.6.0
 nodeenv==1.9.1
     # via pre-commit
 numpy==2.0.2
+    # via contourpy
+    # via matplotlib
+    # via mlflow
     # via opencv-python
+    # via pandas
+    # via pyarrow
+    # via scikit-learn
+    # via scipy
 opencv-python==4.10.0.84
     # via auto-click
+opentelemetry-api==1.16.0
+    # via mlflow-skinny
+    # via opentelemetry-sdk
+opentelemetry-sdk==1.16.0
+    # via mlflow-skinny
+opentelemetry-semantic-conventions==0.37b0
+    # via opentelemetry-sdk
 packaging==24.1
     # via deprecation
+    # via gunicorn
     # via ipykernel
+    # via matplotlib
+    # via mkdocs
+    # via mlflow-skinny
     # via pyinstaller
     # via pyinstaller-hooks-contrib
     # via pytest
+paginate==0.5.7
+    # via mkdocs-material
+pandas==2.2.3
+    # via mlflow
 parso==0.8.4
     # via jedi
+pathspec==0.12.1
+    # via mkdocs
 pefile==2024.8.26 ; sys_platform == 'win32'
     # via pyinstaller
 pexpect==4.9.0 ; sys_platform != 'win32'
@@ -134,17 +274,22 @@ pillow==10.4.0
     # via adbutils
     # via auto-click
     # via genbadge
+    # via matplotlib
     # via pyscreeze
 platformdirs==4.3.6
     # via jupyter-core
+    # via mkdocs-get-deps
+    # via mkdocstrings
     # via virtualenv
 playwright==1.47.0
     # via auto-click
 pluggy==1.5.0
     # via pytest
-pre-commit==3.8.0
+pre-commit==4.0.0
 prompt-toolkit==3.0.48
     # via ipython
+protobuf==5.28.2
+    # via mlflow-skinny
 psutil==6.0.0
     # via ipykernel
 ptyprocess==0.7.0 ; sys_platform != 'win32'
@@ -153,6 +298,13 @@ pure-eval==0.2.3
     # via stack-data
 py==1.11.0
     # via retry
+pyarrow==17.0.0
+    # via mlflow
+pyasn1==0.6.1
+    # via pyasn1-modules
+    # via rsa
+pyasn1-modules==0.4.1
+    # via google-auth
 pyautogui==0.9.54
     # via auto-click
 pycodestyle==2.12.1
@@ -175,10 +327,14 @@ pygetwindow==0.0.9
 pygments==2.18.0
     # via flake8-html
     # via ipython
+    # via mkdocs-material
 pyinstaller==6.10.0
     # via auto-click
 pyinstaller-hooks-contrib==2024.8
     # via pyinstaller
+pymdown-extensions==10.11.2
+    # via mkdocs-material
+    # via mkdocstrings
 pymsgbox==1.0.9
     # via pyautogui
 pyobjc-core==10.3.1 ; platform_system == 'Darwin'
@@ -189,6 +345,8 @@ pyobjc-framework-cocoa==10.3.1 ; platform_system == 'Darwin'
     # via pyobjc-framework-quartz
 pyobjc-framework-quartz==10.3.1 ; platform_system == 'Darwin'
     # via pyautogui
+pyparsing==3.1.4
+    # via matplotlib
 pyperclip==1.9.0
     # via mouseinfo
 pyrect==0.2.0
@@ -205,7 +363,10 @@ pytest-asyncio==0.23.8
 pytest-cov==5.0.0
 pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
+    # via ghp-import
     # via jupyter-client
+    # via matplotlib
+    # via pandas
 python-dotenv==1.0.1
     # via autorootcwd
     # via pyrootutils
@@ -215,35 +376,69 @@ python3-xlib==0.15 ; platform_system == 'Linux'
     # via pyautogui
 pytweening==1.2.0
     # via pyautogui
-pywin32==306 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
+pytz==2024.2
+    # via pandas
+pywin32==307 ; sys_platform == 'win32'
+    # via docker
     # via jupyter-core
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
     # via pyinstaller
 pyyaml==6.0.2
     # via auto-click
+    # via mkdocs
+    # via mkdocs-get-deps
+    # via mlflow-skinny
     # via pre-commit
+    # via pymdown-extensions
+    # via pyyaml-env-tag
+pyyaml-env-tag==0.1
+    # via mkdocs
 pyzmq==26.2.0
     # via ipykernel
     # via jupyter-client
+regex==2024.9.11
+    # via mkdocs-material
 requests==2.32.3
     # via adbutils
+    # via databricks-sdk
+    # via docker
     # via genbadge
+    # via mkdocs-material
+    # via mlflow-skinny
 retry==0.9.2
     # via adbutils
 rootutils==1.0.7
     # via auto-click
+rsa==4.9
+    # via google-auth
 rubicon-objc==0.4.9 ; platform_system == 'Darwin'
     # via mouseinfo
+scikit-learn==1.5.2
+    # via mlflow
+scipy==1.13.1
+    # via mlflow
+    # via scikit-learn
 setuptools==75.1.0
     # via genbadge
+    # via opentelemetry-api
+    # via opentelemetry-sdk
     # via pyinstaller
     # via pyinstaller-hooks-contrib
 six==1.16.0
     # via asttokens
     # via python-dateutil
+smmap==5.0.1
+    # via gitdb
+sqlalchemy==2.0.35
+    # via alembic
+    # via mlflow
+sqlparse==0.5.1
+    # via mlflow-skinny
 stack-data==0.6.3
     # via ipython
-tomli==2.0.1
+threadpoolctl==3.5.0
+    # via scikit-learn
+tomli==2.0.2
     # via auto-click
     # via coverage
     # via pytest
@@ -259,19 +454,36 @@ traitlets==5.14.3
     # via jupyter-core
     # via matplotlib-inline
 typing-extensions==4.12.2
+    # via alembic
+    # via griffe-typingdoc
     # via ipython
+    # via mkdocstrings
+    # via opentelemetry-sdk
     # via pydantic
     # via pydantic-core
     # via pyee
+    # via sqlalchemy
+tzdata==2024.2
+    # via pandas
 urllib3==2.2.3
+    # via docker
     # via requests
 virtualenv==20.26.6
     # via pre-commit
+waitress==3.0.0 ; platform_system == 'Windows'
+    # via mlflow
+watchdog==5.0.3
+    # via mkdocs
 wcwidth==0.2.13
     # via prompt-toolkit
+werkzeug==3.0.4
+    # via flask
 widgetsnbextension==4.0.13
     # via ipywidgets
+wrapt==1.16.0
+    # via deprecated
 xmltodict==0.13.0
     # via apkutils2
-zipp==3.20.2 ; python_full_version < '3.10'
+zipp==3.20.2
     # via importlib-metadata
+    # via importlib-resources

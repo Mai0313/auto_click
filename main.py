@@ -46,7 +46,7 @@ class RemoteContoller(ConfigModel):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
         else:
-            # add log here.
+            # TODO: add log here.
             pass
 
     def main(self) -> None:
@@ -71,9 +71,9 @@ class RemoteContoller(ConfigModel):
                         )
                         time.sleep(config_dict.delay_after_click)
             except Exception:
-                # add log here.
+                # TODO: add log here.
                 _random_interval = secrets.randbelow(self.random_interval)
-                # add log here.
+                # TODO: add log here.
                 time.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             time.sleep(_random_interval)

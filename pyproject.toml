@@ -76,6 +76,7 @@ dependencies = [
     "rootutils>=1.0.7",
     "tomli>=2.0.1",
     "pyyaml>=6.0.2",
+    "mlflow>=2.16.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -84,8 +85,18 @@ requires-python = ">= 3.9"
 Homepage = "https://github.com/Mai0313/auto_click"
 Repository = "https://github.com/Mai0313/auto_click"
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.5.39",
+    "mkdocstrings-python>=1.11.1",
+    "griffe-typingdoc>=0.2.7",
+]
+
 [tool.rye.scripts]
-pre = { cmd = "pre-commit run -a", env-file = ".env" }
+"deploy:install" = "rye sync --features docs"
+"deploy:docs" = "mkdocs gh-deploy"
+docs = { cmd = "mkdocs serve" }
+deploy = { chain = ["deploy:install", "deploy:docs"]}
 build = { cmd = "pyinstaller -F main.py --onefile -n auto-click" }
 main = { cmd = "python main.py" }
 
