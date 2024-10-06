@@ -1,4 +1,3 @@
-import os
 from typing import Union
 
 import cv2
@@ -9,10 +8,25 @@ from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
 from src.types.image_models import ImageModel
-from src.types.output_models import ShiftPosition
+from src.types.output_models import FoundPosition, ShiftPosition
 
 
 class ImageComparison(BaseModel):
+    """Represents an image comparison object.
+
+    This class provides methods to compare an image with a screenshot and find the position of a button image within the screenshot.
+
+    Attributes:
+        image_cfg (ImageModel): The image configuration.
+        screenshot (Union[Image.Image, bytes]): The screenshot image.
+        device (Union[Page, AdbDevice, ShiftPosition]): The device.
+
+    Methods:
+        __screenshot_array: Converts the screenshot to color and grayscale arrays.
+        __draw_rectangle: Draws a rectangle on the image and saves the resulting image.
+        find: Finds the position of a button image within a screenshot.
+    """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
@@ -22,24 +36,33 @@ class ImageComparison(BaseModel):
     @computed_field
     @property
     def __screenshot_array(self) -> tuple[np.ndarray, np.ndarray]:
+        """Converts the screenshot to color and grayscale arrays.
+
+        Returns:
+            color_screenshot (np.ndarray): The screenshot in color format.
+            gray_screenshot (np.ndarray): The screenshot in grayscale format.
+        """
         color_screenshot = np.array(self.screenshot)
         color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
         gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2GRAY)
         return color_screenshot, gray_screenshot
 
-    @computed_field
-    @property
-    def __log_filename(self) -> str:
-        # now = datetime.datetime.now().strftime("%Y%m%d")
-        log_dir = "./logs"
-        os.makedirs(log_dir, exist_ok=True)
-        image_name = self.image_cfg.image_path.split("/")[-1].split(".")[0]
-        log_filename = f"{log_dir}/{image_name}.png"
-        return log_filename
-
     def __draw_rectangle(
         self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point, draw_black: bool
-    ) -> None:
+    ) -> cv2.typing.MatLike:
+        """Draws a rectangle on the image and saves the resulting image.
+
+        Args:
+            matched_image_position (tuple[int, int]): The position of the matched image.
+            max_loc (cv2.typing.Point): The maximum location of the matched image.
+            draw_black (bool): Flag indicating whether to draw a black rectangle.
+
+        Returns:
+            color_screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
+
+        Todo:
+            Add logging functionality
+        """
         color_screenshot, _ = self.__screenshot_array
 
         if draw_black:
@@ -57,11 +80,19 @@ class ImageComparison(BaseModel):
 
         # Draw the red rectangle on the image
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
-        # Save the resulting image
-        cv2.imwrite(self.__log_filename, color_screenshot)
-        # add log here.
+        return color_screenshot
 
-    def find(self) -> Union[tuple[int, int], tuple[None, None]]:
+    def find(self) -> FoundPosition:
+        """Finds the position of a button image within a screenshot.
+
+        Returns:
+            button_center_x (int): The x-coordinate of the button center.
+            button_center_y (int): The y-coordinate of the button center.
+            color_screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
+
+        Todo:
+            Add logging functionality
+        """
         button_center_x, button_center_y = 0, 0
         _, gray_screenshot = self.__screenshot_array
         button_image = cv2.imread(self.image_cfg.image_path, 0)
@@ -73,11 +104,23 @@ class ImageComparison(BaseModel):
         button_center_y = int(max_loc[1] + button_image.shape[0])
         matched_image_position = (button_center_x, button_center_y)
 
+        color_screenshot = self.__draw_rectangle(
+            matched_image_position=matched_image_position, max_loc=max_loc, draw_black=False
+        )
+        blackout_screenshot = self.__draw_rectangle(
+            matched_image_position=matched_image_position, max_loc=max_loc, draw_black=True
+        )
+
         if max_val > self.image_cfg.confidence:
-            # add log here.
-            if self.image_cfg.screenshot_option is True:
-                self.__draw_rectangle(
-                    matched_image_position=matched_image_position, max_loc=max_loc, draw_black=True
-                )
-            return button_center_x, button_center_y
-        return None, None
+            return FoundPosition(
+                button_center_x=button_center_x,
+                button_center_y=button_center_y,
+                color_screenshot=color_screenshot,
+                blackout_screenshot=blackout_screenshot,
+            )
+        return FoundPosition(
+            button_center_x=None,
+            button_center_y=None,
+            color_screenshot=color_screenshot,
+            blackout_screenshot=blackout_screenshot,
+        )

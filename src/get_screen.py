@@ -11,6 +11,17 @@ from src.types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
+    """A class for capturing screenshots from different sources.
+
+    Attributes:
+        screenshot (Screenshot): The screenshot object.
+
+    Methods:
+        from_exist_window: Capture a screenshot from an existing window.
+        from_adb_device: Create a screenshot from an Android device using ADB.
+        from_remote_window: Create a screenshot of a remote window using Playwright.
+    """
+
     @classmethod
     def from_exist_window(cls, window_title: str) -> Screenshot:
         """Capture a screenshot from an existing window.
@@ -58,7 +69,7 @@ class GetScreen(BaseModel):
         device = adb.device(serial=serial)
         running_app = device.app_current()
         if running_app.package != url:
-            # add log here.
+            # TODO: add log here.
             raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
         return Screenshot(screenshot=screenshot, device=device)
