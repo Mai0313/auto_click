@@ -1,10 +1,14 @@
 import time
 from typing import Union
+from pathlib import Path
 import secrets
+import datetime
 
+import cv2
 import yaml
+import mlflow
 from adbutils import AdbDevice
-from pydantic import computed_field
+from pydantic import computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
@@ -21,6 +25,12 @@ class RemoteContoller(ConfigModel):
         """We want to run ADBDeviceManager only once, so we use computed_field."""
         apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
         return apps.serial
+
+    @model_validator(mode="after")
+    def init_mlflow(self) -> "RemoteContoller":
+        mlflow.set_tracking_uri("./mlruns")
+        mlflow.set_experiment(experiment_name=self.target)
+        return self
 
     def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
@@ -45,36 +55,71 @@ class RemoteContoller(ConfigModel):
             if isinstance(device, ShiftPosition):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
-        else:
-            # TODO: add log here.
-            pass
 
     def main(self) -> None:
         while True:
-            try:
-                device_details = self.get_screenshot()
-                for config_dict in self.image_list:
-                    button_center_x, button_center_y = ImageComparison(
-                        image_cfg=config_dict,
-                        screenshot=device_details.screenshot,
-                        device=device_details.device,
-                    ).find()
-                    if button_center_x and button_center_y:
-                        calibrated_x, calibrated_y = device_details.calibrate(
-                            button_center_x=button_center_x, button_center_y=button_center_y
-                        )
-                        self.click_button(
+            run_name = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with mlflow.start_run(run_name=run_name):
+                try:
+                    device_details = self.get_screenshot()
+                    for config_dict in self.image_list:
+                        image_conpare = ImageComparison(
+                            image_cfg=config_dict,
+                            screenshot=device_details.screenshot,
                             device=device_details.device,
-                            calibrated_x=calibrated_x,
-                            calibrated_y=calibrated_y,
-                            click_this=config_dict.click_this,
                         )
-                        time.sleep(config_dict.delay_after_click)
-            except Exception:
-                # TODO: add log here.
-                _random_interval = secrets.randbelow(self.random_interval)
-                # TODO: add log here.
-                time.sleep(_random_interval)
+                        found = image_conpare.find()
+                        if found.button_center_x and found.button_center_y:
+                            calibrated_x, calibrated_y = device_details.calibrate(
+                                button_center_x=found.button_center_x,
+                                button_center_y=found.button_center_y,
+                            )
+                            self.click_button(
+                                device=device_details.device,
+                                calibrated_x=calibrated_x,
+                                calibrated_y=calibrated_y,
+                                click_this=config_dict.click_this,
+                            )
+                            mlflow.log_metrics(
+                                metrics={
+                                    "button_center_x": found.button_center_x,
+                                    "button_center_y": found.button_center_y,
+                                    "calibrated_x": calibrated_x,
+                                    "calibrated_y": calibrated_y,
+                                }
+                            )
+                            _image_path = Path(config_dict.image_path)
+                            mlflow.log_image(
+                                image=found.color_screenshot,
+                                key="color",
+                                artifact_file=f"{_image_path.name}",
+                            )
+                            mlflow.log_image(
+                                image=found.blackout_screenshot,
+                                key="blackout",
+                                artifact_file=f"{_image_path.name}",
+                            )
+                            if config_dict.screenshot_option is True:
+                                color_log_dir = Path("./logs/color")
+                                blackout_log_dir = Path("./logs/blackout")
+                                color_log_dir.mkdir(exist_ok=True)
+                                blackout_log_dir.mkdir(exist_ok=True)
+                                cv2.imwrite(
+                                    f"{color_log_dir.as_posix()}/{_image_path.name}",
+                                    found.color_screenshot,
+                                )
+                                cv2.imwrite(
+                                    f"{blackout_log_dir.as_posix()}/{_image_path.name}",
+                                    found.blackout_screenshot,
+                                )
+                            time.sleep(config_dict.delay_after_click)
+                except Exception as e:
+                    _random_interval = secrets.randbelow(self.random_interval)
+                    mlflow.log_text(
+                        f"Error: {e}, Retrying in {_random_interval} seconds",
+                        artifact_file="error.txt",
+                    )
+                    time.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             time.sleep(_random_interval)
 

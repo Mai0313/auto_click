@@ -1,7 +1,8 @@
-from typing import Union
+from typing import Union, Optional
 
 from PIL import Image
-from pydantic import BaseModel, ConfigDict
+import cv2
+from pydantic import Field, BaseModel, ConfigDict
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
@@ -16,6 +17,28 @@ class ShiftPosition(BaseModel):
 
     shift_x: int
     shift_y: int
+
+
+class FoundPosition(BaseModel):
+    """Represents the position of a found button on the screen.
+
+    Attributes:
+        button_center_x (Optional[int]): The x-coordinate of the button center.
+        button_center_y (Optional[int]): The y-coordinate of the button center.
+        color_screenshot (cv2.typing.MatLike): The screenshot of the button in color.
+        blackout_screenshot (cv2.typing.MatLike): The screenshot of the button with blackout effect.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    button_center_x: Optional[int] = Field(
+        default=None, description="The x-coordinate of the button center."
+    )
+    button_center_y: Optional[int] = Field(
+        default=None, description="The y-coordinate of the button center."
+    )
+    color_screenshot: cv2.typing.MatLike
+    blackout_screenshot: cv2.typing.MatLike
 
 
 class Screenshot(BaseModel):
@@ -65,9 +88,13 @@ class Screenshot(BaseModel):
         # if the device is from a window process, we need to add shift_x, shift_y to the button_center_x, button_center_y
         # since we do not know the exact position of the window.
         if isinstance(self.device, Page):
-            pass  # place holder for future implementation
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
         if isinstance(self.device, AdbDevice):
-            pass  # place holder for future implementation
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
         if isinstance(self.device, ShiftPosition):
             button_center_x = button_center_x + self.device.shift_x
             button_center_y = button_center_y + self.device.shift_y
