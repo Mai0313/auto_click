@@ -38,17 +38,27 @@ jobs:
         run: |
           pyinstaller -F main.py --onefile -n ${{ github.event.repository.name }}
 
+      # - name: Move and Rename
+      #   shell: pwsh
+      #   run: |
+      #     Copy-Item -Path ./configs -Destination ./dist/ -Recurse
+      #     Copy-Item -Path ./data -Destination ./dist/ -Recurse
+
       - name: Move and Rename
         shell: pwsh
         run: |
-          Copy-Item -Path ./configs -Destination ./dist/ -Recurse
-          Copy-Item -Path ./data -Destination ./dist/ -Recurse
+          Copy-Item -Path ./* -Destination ./dist/ -Recurse -Exclude dist, .git, .cache
+
+      - name: Get the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: metadata
+        uses: battila7/get-version-action@v2
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
         with:
           path: ./dist/*
-          name: ${{ github.event.repository.name }}
+          name: ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}
           if-no-files-found: ignore
           retention-days: 90
           compression-level: 6
@@ -81,7 +91,7 @@ jobs:
       - name: Check Files
         run: |
           cd ..
-          zip -r ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}.zip ${{ github.event.repository.name }}
+          zip -r ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}.zip ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}
           ls -al
           cp -R ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}.zip ./${{ github.event.repository.name }}/
 
