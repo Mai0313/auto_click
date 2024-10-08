@@ -17,7 +17,7 @@ from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
 
-logfire.configure(send_to_logfire=False, console={"min_log_level": "trace", "verbose": True})
+logfire.configure(send_to_logfire=False)
 
 
 class RemoteContoller(ConfigModel):
@@ -98,16 +98,18 @@ class RemoteContoller(ConfigModel):
                                     "calibrated_y": calibrated_y,
                                 }
                             )
-                            logger = Logger(original_image_path=config_dict.image_path)
-                            logger.save_mlflow(
+                            custom_logger = Logger(original_image_path=config_dict.image_path)
+                            custom_logger.save_mlflow(
                                 screenshot=found.color_screenshot, image_type="color"
                             )
-                            logger.save_mlflow(
+                            custom_logger.save_mlflow(
                                 screenshot=found.blackout_screenshot, image_type="blackout"
                             )
                             if config_dict.screenshot_option is True:
-                                logger.save(screenshot=found.color_screenshot, image_type="color")
-                                logger.save(
+                                custom_logger.save(
+                                    screenshot=found.color_screenshot, image_type="color"
+                                )
+                                custom_logger.save(
                                     screenshot=found.blackout_screenshot, image_type="blackout"
                                 )
                             time.sleep(config_dict.delay_after_click)
