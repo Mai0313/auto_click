@@ -12,7 +12,7 @@ import pyautogui
 from src.compare import ImageComparison
 from src.get_screen import GetScreen
 from src.types.config import ConfigModel
-from src.utils.logger import Logger
+from src.utils.logger import CustomLogger
 from playwright.sync_api import Page
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
@@ -27,6 +27,11 @@ class RemoteContoller(ConfigModel):
         """We want to run ADBDeviceManager only once, so we use computed_field."""
         apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
         return apps.serial
+
+    @computed_field
+    @property
+    def current_time(self) -> str:
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     @model_validator(mode="after")
     def init_mlflow(self) -> "RemoteContoller":
@@ -57,11 +62,17 @@ class RemoteContoller(ConfigModel):
             if isinstance(device, ShiftPosition):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
+        logfire.info(
+            "Button Found",
+            x=calibrated_x,
+            y=calibrated_y,
+            auto_click=self.auto_click,
+            click_this=click_this,
+        )
 
     def main(self) -> None:
         while True:
-            run_name = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with mlflow.start_run(run_name=run_name):
+            with mlflow.start_run(run_name=self.current_time):
                 try:
                     device_details = self.get_screenshot()
                     for config_dict in self.image_list:
@@ -70,6 +81,7 @@ class RemoteContoller(ConfigModel):
                             screenshot=device_details.screenshot,
                             device=device_details.device,
                         )
+                        custom_logger = CustomLogger(original_image_path=config_dict.image_path)
                         found = image_conpare.find()
                         if found.button_center_x and found.button_center_y:
                             calibrated_x, calibrated_y = device_details.calibrate(
@@ -98,20 +110,12 @@ class RemoteContoller(ConfigModel):
                                     "calibrated_y": calibrated_y,
                                 }
                             )
-                            custom_logger = Logger(original_image_path=config_dict.image_path)
-                            custom_logger.save_mlflow(
-                                screenshot=found.color_screenshot, image_type="color"
-                            )
-                            custom_logger.save_mlflow(
-                                screenshot=found.blackout_screenshot, image_type="blackout"
-                            )
                             if config_dict.screenshot_option is True:
-                                custom_logger.save(
-                                    screenshot=found.color_screenshot, image_type="color"
-                                )
-                                custom_logger.save(
-                                    screenshot=found.blackout_screenshot, image_type="blackout"
-                                )
+                                image_pair = {
+                                    "color": found.color_screenshot,
+                                    "blackout": found.blackout_screenshot,
+                                }
+                                custom_logger.save_all_images(pair_dict=image_pair)
                             time.sleep(config_dict.delay_after_click)
                 except Exception as e:
                     _random_interval = secrets.randbelow(self.random_interval)
