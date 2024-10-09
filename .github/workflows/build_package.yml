@@ -69,13 +69,6 @@ jobs:
           rye version $VERSION
           rye build --clean
 
-      # - name: Publish Package
-      #   continue-on-error: true
-      #   env:
-      #     PYPI_URL: https://test.pypi.org/legacy/
-      #   run: |
-      #     rye publish --repository ${{ github.repository_owner }}/ameba --repository-url ${{ env.PYPI_URL }} --token ${{ secrets.GT_TOKEN }} --cert /etc/ssl/certs/mediatek-MTKECA02-CA.crt -y --skip-existing
-
       # - name: Publish package distributions to PyPI
       #   uses: pypa/gh-action-pypi-publish@release/v1
       #   continue-on-error: true
