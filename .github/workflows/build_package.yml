@@ -2,8 +2,6 @@ name: Build Package
 
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
 
@@ -40,25 +38,56 @@ jobs:
           submodules: 'recursive'
 
       - name: Setup Rye
-        run: |
-          make rye-install
-          ~/.rye/shims/rye pin 3.10
-          ~/.rye/shims/rye sync
-          ~/.rye/shims/rye --version
+        uses: mai0313/setup-rye@master
+        with:
+          version: 'latest' # Optional, default is latest
+          toolchain_version: '3.10' # Optional, default is 3.10
+          python_version: '3.10' # Optional, default is 3.10
+          use-uv: 'true' # Optional, default is true
+          pypi_source: 'https://pypi.org/simple' # Optional
+          http_proxy: ${{ secrets.HTTP_PROXY }} # Optional
+          https_proxy: ${{ secrets.HTTPS_PROXY }} # Optional
 
       - name: Get the version
-        if: startsWith(github.ref, 'refs/tags/v')
         id: metadata
         uses: battila7/get-version-action@v2
 
-      - name: Updaste Version
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Update Version
+        shell: bash
         run: |
-          ~/.rye/shims/rye version ${{ steps.metadata.outputs.version }}
+          if [[ ! "$GITHUB_REF" =~ ^refs/tags/v ]]; then
+            VERSION=$(date +%Y.%m.%d)
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "Version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build Package
         run: |
-          ~/.rye/shims/rye build --clean
+          sed -i 's/virtual = true/virtual = false/' pyproject.toml
+          rye version $VERSION
+          rye build --clean
+
+      # - name: Publish Package
+      #   continue-on-error: true
+      #   env:
+      #     PYPI_URL: https://test.pypi.org/legacy/
+      #   run: |
+      #     rye publish --repository ${{ github.repository_owner }}/ameba --repository-url ${{ env.PYPI_URL }} --token ${{ secrets.GT_TOKEN }} --cert /etc/ssl/certs/mediatek-MTKECA02-CA.crt -y --skip-existing
+
+      # - name: Publish package distributions to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   continue-on-error: true
+      #   with:
+      #     user: ${{ secrets.PYPI_USERNAME }}
+      #     password: ${{ secrets.PYPI_PASSWORD }}
+      #     repository-url: https://test.pypi.org/legacy/
+      #     packages-dir: ./dist
+      #     verify-metadata: true
+      #     skip-existing: true
+      #     verbose: true
+      #     print-hash: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.3
@@ -66,7 +95,7 @@ jobs:
           path: ./dist/*
           name: ${{ github.event.repository.name }}-packages
           if-no-files-found: ignore
-          retention-days: 90
+          retention-days: 1
           compression-level: 6
           overwrite: true
 
