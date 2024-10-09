@@ -41,7 +41,7 @@ jobs:
 
       - name: Packaging to Executable file
         run: |
-          pyinstaller -F main.py --onefile -n ${{ github.event.repository.name }}
+          pyinstaller -F main.py --onefile -n ${{ github.event.repository.name }} --hidden-import pydantic --hidden-import logfire --hidden-import mlflow
 
       - name: Move and Rename
         shell: pwsh
