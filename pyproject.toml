@@ -96,7 +96,7 @@ docs = [
 "deploy:docs" = "mkdocs gh-deploy --force"
 docs = { cmd = "mkdocs serve" }
 deploy = { chain = ["deploy:install", "deploy:docs"]}
-build = { cmd = "pyinstaller -F main.py --onefile -n auto-click" }
+build = { cmd = "pyinstaller -F main.py --onefile -n auto_click --hidden-import pydantic --hidden-import logfire --hidden-import mlflow" }
 main = { cmd = "python main.py" }
 
 [[tool.rye.sources]]
