@@ -14,6 +14,7 @@ from src.screenshot import GetScreen
 from src.types.config import ConfigModel
 from src.utils.logger import CustomLogger
 from playwright.sync_api import Page
+from playwright.async_api import Page as APage
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, ShiftPosition
 
@@ -55,6 +56,8 @@ class RemoteContoller(ConfigModel):
         if self.auto_click and click_this:
             if isinstance(device, Page):
                 device.mouse.click(x=calibrated_x, y=calibrated_y)
+            if isinstance(device, APage):
+                await device.mouse.click(x=calibrated_x, y=calibrated_y)
             if isinstance(device, AdbDevice):
                 device.click(x=calibrated_x, y=calibrated_y)
             if isinstance(device, ShiftPosition):
@@ -109,11 +112,13 @@ class RemoteContoller(ConfigModel):
                                 }
                             )
                             if config_dict.screenshot_option is True:
-                                image_pair = {
-                                    "color": found.color_screenshot,
-                                    "blackout": found.blackout_screenshot,
-                                }
-                                custom_logger.save_images(images=image_pair, save_to="both")
+                                await custom_logger.a_save_images(
+                                    images={
+                                        "color": found.color_screenshot,
+                                        "blackout": found.blackout_screenshot,
+                                    },
+                                    save_to="mlflow",
+                                )
                             await asyncio.sleep(config_dict.delay_after_click)
                 except Exception as e:
                     _random_interval = secrets.randbelow(self.random_interval)

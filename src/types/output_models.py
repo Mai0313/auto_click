@@ -7,6 +7,7 @@ import numpy as np
 from pydantic import Field, BaseModel, ConfigDict
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
+from playwright.async_api import Page as APage
 
 
 class ShiftPosition(BaseModel):
@@ -49,7 +50,7 @@ class Screenshot(BaseModel):
     Attributes:
         model_config (ConfigDict): The configuration dictionary for the model.
         screenshot (Union[bytes, Image.Image]): The screenshot image data.
-        device (Union[AdbDevice, Page, ShiftPosition]): The device from which the screenshot was captured.
+        device (Union[AdbDevice, Page, APage, ShiftPosition]): The device from which the screenshot was captured.
 
     Methods:
         save: Save the screenshot to a specified path.
@@ -58,7 +59,7 @@ class Screenshot(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot: Union[bytes, Image.Image]
-    device: Union[AdbDevice, Page, ShiftPosition]
+    device: Union[AdbDevice, Page, APage, ShiftPosition]
 
     def save(self, save_path: str) -> str:
         """Saves the screenshot to the specified path.
@@ -119,6 +120,10 @@ class Screenshot(BaseModel):
         # if the device is from a window process, we need to add shift_x, shift_y to the button_center_x, button_center_y
         # since we do not know the exact position of the window.
         if isinstance(self.device, Page):
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
+        if isinstance(self.device, APage):
             # button_center_x = button_center_x // 2
             # button_center_y = button_center_y // 2
             pass
