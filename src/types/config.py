@@ -4,18 +4,28 @@ from src.types.image_models import ImageModel
 
 
 class ConfigModel(BaseModel):
-    """Represents the configuration model for auto click functionality.
-
-    Attributes:
-        target (str): The target of the auto click, which can be either a window title, a URL, or a CDP URL.
-        auto_click (bool): Indicates whether auto click is enabled or not.
-        random_interval (int): The random interval between auto clicks.
-        image_list (list[ImageModel]): The list of image models to be used for auto click matching.
-    """
-
     target: str = Field(
-        ..., description="This field can be either a window title or a URL or cdp url."
+        ...,
+        description="This field can be either a window title or a URL or cdp url.",
+        frozen=True,
+        deprecated=False,
     )
-    auto_click: bool = Field(...)
-    random_interval: int = Field(...)
-    image_list: list[ImageModel] = Field(...)
+    auto_click: bool = Field(
+        ...,
+        description="Indicates whether auto click is enabled or not.",
+        frozen=True,
+        deprecated=False,
+    )
+    serial: str = Field(default="", description="The serial number of the device.")
+    random_interval: int = Field(
+        ...,
+        description="The interval between each click in seconds.",
+        frozen=True,
+        deprecated=False,
+    )
+    image_list: list[ImageModel] = Field(
+        ...,
+        description="The list of images to compare, it should contain path and name.",
+        frozen=True,
+        deprecated=False,
+    )

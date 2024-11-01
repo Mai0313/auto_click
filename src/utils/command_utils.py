@@ -1,6 +1,6 @@
 import subprocess  # noqa: S404
 
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
 
 class CommandExecutor(BaseModel):
@@ -14,7 +14,9 @@ class CommandExecutor(BaseModel):
         popen: Executes the command using subprocess.Popen and returns the stdout and stderr outputs
     """
 
-    commands: list[str]
+    commands: list[str] = Field(
+        ..., description="The list of commands to be executed.", frozen=True, deprecated=False
+    )
 
     def run(self) -> tuple[str, str]:
         """Executes the command and captures the output.
