@@ -9,7 +9,7 @@ image_list:
     delay_after_click: 0
     click_this: False
     screenshot_option: True
-    confidence: 0.5
+    confidence: 0.8
 
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
