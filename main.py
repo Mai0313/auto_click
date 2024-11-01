@@ -83,41 +83,24 @@ class RemoteController(ConfigModel):
                             device=device_details.device,
                         )
                         custom_logger = CustomLogger(original_image_path=config_dict.image_path)
-                        found = await image_compare.find()
-                        if found.button_center_x and found.button_center_y:
-                            calibrated_x, calibrated_y = await device_details.a_calibrate(
-                                button_center_x=found.button_center_x,
-                                button_center_y=found.button_center_y,
-                            )
-                            await self.click_button(
-                                device=device_details.device,
-                                calibrated_x=calibrated_x,
-                                calibrated_y=calibrated_y,
-                                click_this=config_dict.click_this,
-                            )
-                            logfire.info(
-                                "Button found",
-                                button_name=config_dict.image_name,
-                                x=calibrated_x,
-                                y=calibrated_y,
-                                auto_click=self.auto_click,
-                                click_this=config_dict.click_this,
-                            )
-                            mlflow.log_metrics(
-                                metrics={
-                                    "button_center_x": found.button_center_x,
-                                    "button_center_y": found.button_center_y,
-                                    "calibrated_x": calibrated_x,
-                                    "calibrated_y": calibrated_y,
-                                }
-                            )
+                        found = await image_compare.find_and_select(
+                            vertical_align="top", horizontal_align="right"
+                        )
+                        # found = await image_compare.find()
+                        if found.calibrated_x and found.calibrated_y:
+                            # await self.click_button(
+                            #     device=device_details.device,
+                            #     calibrated_x=found.calibrated_x,
+                            #     calibrated_y=found.calibrated_y,
+                            #     click_this=config_dict.click_this,
+                            # )
                             if config_dict.screenshot_option:
                                 await custom_logger.a_save_images(
                                     images={
                                         "color": found.color_screenshot,
                                         "blackout": found.blackout_screenshot,
                                     },
-                                    save_to="mlflow",
+                                    save_to="local",
                                 )
                             await asyncio.sleep(config_dict.delay_after_click)
                 except Exception as e:
