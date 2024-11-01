@@ -7,10 +7,11 @@ import yaml
 import mlflow
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, model_validator
+from pydantic import model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.screenshot import GetScreen
+from src.types.game import GameResult
 from src.types.config import ConfigModel
 from src.utils.logger import CustomLogger
 from playwright.sync_api import Page
@@ -20,15 +21,19 @@ from src.types.output_models import Screenshot, ShiftPosition
 
 logfire.configure(send_to_logfire=False)
 
-current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
-class RemoteController(ConfigModel):
-    serial: str = Field(default="")
-
+class RemoteController(ConfigModel, GameResult):
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
-        apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
+        if self.serial:
+            adb_manager = ADBDeviceManager(
+                host="127.0.0.1", ports=[self.serial], target=self.target
+            )
+        else:
+            adb_manager = ADBDeviceManager(host="127.0.0.1", target=self.target)
+        apps = adb_manager.get_correct_serial()
         self.serial = apps.serial
         return self
 
@@ -94,6 +99,14 @@ class RemoteController(ConfigModel):
                                 calibrated_y=found.calibrated_y,
                                 click_this=config_dict.click_this,
                             )
+
+                            if found.found_button_name_en == "win":
+                                self.win += 1
+                                await self.a_export(today=current_time)
+                            elif found.found_button_name_en == "lose":
+                                self.lose += 1
+                                await self.a_export(today=current_time)
+
                             if config_dict.screenshot_option:
                                 await custom_logger.a_save_images(
                                     images={
