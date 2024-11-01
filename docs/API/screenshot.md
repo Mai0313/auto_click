@@ -1,1 +1,1 @@
-::: src.get_screen
+::: src.screenshot

@@ -1,9 +1,17 @@
-from typing import Literal
+from enum import Enum
+from typing import Union, Literal
+import asyncio
 from pathlib import Path
 
 import cv2
+import numpy as np
 import mlflow
 from pydantic import BaseModel, computed_field
+
+
+class ImageType(str, Enum):
+    COLOR = "color"
+    BLACKOUT = "blackout"
 
 
 class CustomLogger(BaseModel):
@@ -14,41 +22,49 @@ class CustomLogger(BaseModel):
     def image_name(self) -> str:
         return Path(self.original_image_path).name
 
-    def save_single_image(
-        self, screenshot: cv2.typing.MatLike, image_type: Literal["color", "blackout"]
+    def save_images(
+        self,
+        images: Union[np.ndarray, dict[ImageType, np.ndarray]],
+        save_to: Literal["local", "mlflow", "both"] = "both",
     ) -> None:
-        self._save_image(screenshot, image_type)
+        if isinstance(images, np.ndarray):
+            images = {ImageType.COLOR: images}
 
-    def save_multiple_images(self, pair_dict: dict[str, cv2.typing.MatLike]) -> None:
-        for image_type, screenshot in pair_dict.items():
-            self._save_image(screenshot, image_type)
+        for image_type, screenshot in images.items():
+            if save_to in ("local", "both"):
+                self._save_image_local(screenshot, image_type)
+            if save_to in ("mlflow", "both"):
+                self._save_image_mlflow(screenshot, image_type)
 
-    def _save_image(self, screenshot: cv2.typing.MatLike, image_type: str) -> None:
+    async def a_save_images(
+        self,
+        images: Union[np.ndarray, dict[ImageType, np.ndarray]],
+        save_to: Literal["local", "mlflow", "both"] = "both",
+    ) -> None:
+        if isinstance(images, np.ndarray):
+            images = {ImageType.COLOR: images}
+
+        tasks = []
+        for image_type, screenshot in images.items():
+            if save_to in ("local", "both"):
+                tasks.append(self._a_save_image_local(screenshot, image_type))
+            if save_to in ("mlflow", "both"):
+                tasks.append(self._a_save_image_mlflow(screenshot, image_type))
+        await asyncio.gather(*tasks)
+
+    def _save_image_local(self, screenshot: np.ndarray, image_type: ImageType) -> None:
         log_dir = Path(f"./logs/{image_type}")
         log_dir.mkdir(exist_ok=True, parents=True)
         screenshot_path = log_dir / self.image_name
         if not screenshot_path.exists():
             cv2.imwrite(str(screenshot_path.absolute()), screenshot)
 
-    def save_single_image_mlflow(
-        self, screenshot: cv2.typing.MatLike, image_type: Literal["color", "blackout"]
-    ) -> None:
-        self._log_image_mlflow(screenshot, image_type)
+    async def _a_save_image_local(self, screenshot: np.ndarray, image_type: ImageType) -> None:
+        await asyncio.to_thread(self._save_image_local, screenshot, image_type)
 
-    def save_multiple_images_mlflow(self, pair_dict: dict[str, cv2.typing.MatLike]) -> None:
-        for image_type, screenshot in pair_dict.items():
-            self._log_image_mlflow(screenshot, image_type)
-
-    def _log_image_mlflow(self, screenshot: cv2.typing.MatLike, image_type: str) -> None:
+    def _save_image_mlflow(self, screenshot: np.ndarray, image_type: ImageType) -> None:
         screenshot_rgb = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
         mlflow.log_image(image=screenshot_rgb, artifact_file=f"{image_type}/{self.image_name}")
 
-    def save_all_image(
-        self, screenshot: cv2.typing.MatLike, image_type: Literal["color", "blackout"]
-    ) -> None:
-        self.save_single_image(screenshot=screenshot, image_type=image_type)
-        self.save_single_image_mlflow(screenshot=screenshot, image_type=image_type)
-
-    def save_all_images(self, pair_dict: dict[str, cv2.typing.MatLike]) -> None:
-        self.save_multiple_images(pair_dict=pair_dict)
-        self.save_multiple_images_mlflow(pair_dict=pair_dict)
+    async def _a_save_image_mlflow(self, screenshot: np.ndarray, image_type: ImageType) -> None:
+        await asyncio.to_thread(self._save_image_mlflow, screenshot, image_type)
