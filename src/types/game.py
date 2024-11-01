@@ -12,28 +12,13 @@ class GameResult(BaseModel):
 
     @computed_field
     @property
-    def total(self) -> int:
-        return self.win + self.lose
-
-    @computed_field
-    @property
-    def win_rate(self) -> float:
-        return self.win / self.total
-
-    @computed_field
-    @property
-    def lose_rate(self) -> float:
-        return self.lose / self.total
-
-    @computed_field
-    @property
     def win_lost_dict(self) -> dict[str, Any]:
         return {
             "win": self.win,
             "lose": self.lose,
-            "total": self.total,
-            "win_rate": self.win_rate,
-            "lose_rate": self.lose_rate,
+            "total": self.win + self.lose,
+            "win_rate": self.win / (self.win + self.lose),
+            "lose_rate": self.lose / (self.win + self.lose),
         }
 
     def export(self, today: str) -> dict[str, Any]:

@@ -21,7 +21,7 @@ from src.types.output_models import Screenshot, ShiftPosition
 
 logfire.configure(send_to_logfire=False)
 
-current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
 class RemoteController(ConfigModel, GameResult):
@@ -91,13 +91,6 @@ class RemoteController(ConfigModel, GameResult):
                         found = await image_compare.find_and_select(
                             vertical_align="top", horizontal_align="right"
                         )
-                        if found.found_button_name_en == "win":
-                            self.win += 1
-                        elif found.found_button_name_en == "lose":
-                            self.lose += 1
-
-                        await self.a_export(today=current_time)
-
                         # found = await image_compare.find()
                         if found.calibrated_x and found.calibrated_y:
                             await self.click_button(
@@ -106,6 +99,14 @@ class RemoteController(ConfigModel, GameResult):
                                 calibrated_y=found.calibrated_y,
                                 click_this=config_dict.click_this,
                             )
+
+                            if found.found_button_name_en == "win":
+                                self.win += 1
+                                await self.a_export(today=current_time)
+                            elif found.found_button_name_en == "lose":
+                                self.lose += 1
+                                await self.a_export(today=current_time)
+
                             if config_dict.screenshot_option:
                                 await custom_logger.a_save_images(
                                     images={
