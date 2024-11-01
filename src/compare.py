@@ -47,7 +47,7 @@ class ImageComparison(BaseModel):
         """
         color_screenshot = np.array(self.screenshot)
         color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
-        gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2GRAY)
+        gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_BGR2GRAY)
         return color_screenshot, gray_screenshot
 
     async def __draw_rectangle(
@@ -56,7 +56,7 @@ class ImageComparison(BaseModel):
         matched_image_position: tuple[int, int],
         max_loc: cv2.typing.Point,
         draw_black: bool,
-    ) -> cv2.typing.MatLike:
+    ) -> np.ndarray:
         """Draws a rectangle on the image and saves the resulting image.
 
         Args:
@@ -67,9 +67,6 @@ class ImageComparison(BaseModel):
 
         Returns:
             color_screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
-
-        Todo:
-            Add logging functionality
         """
         if draw_black:
             # Create a mask with a white rectangle to keep the area inside the red box
