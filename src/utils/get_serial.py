@@ -8,37 +8,12 @@ class AppInfo(BaseModel):
 
 
 class ADBDeviceManager(BaseModel):
-    """Class for managing ADB devices and retrieving device information.
-
-    Attributes:
-        host (str): The host IP address.
-        target (str): The target app package name.
-
-    Methods:
-        available_devices: Returns a list of available devices.
-        serials: Retrieves a list of serial numbers for connected devices.
-        running_apps: Retrieves the running apps on the connected devices.
-        get_correct_serial: Returns the correct serial number for the target app.
-
-    Raises:
-        Exception: If multiple or no matching apps are found.
-    """
-
     host: str = Field(default="127.0.0.1")
+    ports: list[str] = Field(
+        default=["16384", "16416"],
+        description="The list of ports to connect to; defaults to ['16384', '16416'], 16384 and 16416 are for MuMu Player, 5555 and 5557 are for LD Player.",
+    )
     target: str = Field(default="com.longe.allstarhmt", description="The game you wanna afk.")
-
-    @computed_field
-    @property
-    def available_devices(self) -> list[int]:
-        """Returns a list of available devices.
-
-        Returns:
-            list[int]: A list of available devices.
-        """
-        mumu_player = [16384, 16416]
-        # ld_player = [5555, 5557]
-        available_devices = [*mumu_player]
-        return available_devices
 
     @computed_field
     @property
@@ -48,7 +23,7 @@ class ADBDeviceManager(BaseModel):
         Returns:
             A list of serial numbers for connected devices.
         """
-        for port in self.available_devices:
+        for port in self.ports:
             adb.connect(addr=f"{self.host}:{port}", timeout=3.0)
         devices = adb.device_list()
         serials = [device.serial for device in devices if not device.serial.startswith("emulator")]
