@@ -83,7 +83,10 @@ class RemoteController(ConfigModel):
                             device=device_details.device,
                         )
                         custom_logger = CustomLogger(original_image_path=config_dict.image_path)
-                        found = await image_compare.find()
+                        found = await image_compare.find_and_select(
+                            vertical_align="top", horizontal_align="right"
+                        )
+                        # found = await image_compare.find()
                         if found.calibrated_x and found.calibrated_y:
                             # await self.click_button(
                             #     device=device_details.device,
