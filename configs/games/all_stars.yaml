@@ -4,6 +4,13 @@ auto_click: true
 random_interval: 5
 
 image_list:
+  - image_name: "切換模式"
+    image_path: "./data/allstars/switch_mode.png"
+    delay_after_click: 0
+    click_this: False
+    screenshot_option: True
+    confidence: 0.5
+
   - image_name: "開始配對"
     image_path: "./data/allstars/start.png"
     delay_after_click: 20

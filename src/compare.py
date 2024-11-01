@@ -1,12 +1,16 @@
 from typing import Union
 import asyncio
+from pathlib import Path
 
 import cv2
 import numpy as np
+import mlflow
+import logfire
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
+from playwright.async_api import Page as APage
 
 from src.types.image_models import ImageModel
 from src.types.output_models import FoundPosition, ShiftPosition
@@ -97,46 +101,121 @@ class ImageComparison(BaseModel):
         """
         button_center_x, button_center_y = 0, 0
         color_screenshot, gray_screenshot = await self.__get_screenshot_array()
-        button_image = cv2.imread(self.image_cfg.image_path, 0)
+        image_path = Path(self.image_cfg.image_path)
+        image_name_en = image_path.stem
+        image_name_cn = self.image_cfg.image_name
+        button_image = cv2.imread(image_path.as_posix(), 0)
 
         result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
-        button_center_x = int(max_loc[0] + button_image.shape[1])
-        button_center_y = int(max_loc[1] + button_image.shape[0])
-        matched_image_position = (button_center_x, button_center_y)
-
-        tasks = [
-            asyncio.create_task(
-                self.__draw_rectangle(
-                    color_screenshot=color_screenshot,
-                    matched_image_position=matched_image_position,
-                    max_loc=max_loc,
-                    draw_black=False,
-                )
-            ),
-            asyncio.create_task(
-                self.__draw_rectangle(
-                    color_screenshot=color_screenshot,
-                    matched_image_position=matched_image_position,
-                    max_loc=max_loc,
-                    draw_black=True,
-                )
-            ),
-        ]
-
-        blackout_screenshot, color_screenshot = await asyncio.gather(*tasks)
-
         if max_val > self.image_cfg.confidence:
+            button_center_x = int(max_loc[0] + button_image.shape[1])
+            button_center_y = int(max_loc[1] + button_image.shape[0])
+
+            calibrated_x, calibrated_y = await self.a_calibrate(
+                button_center_x=button_center_x, button_center_y=button_center_y
+            )
+            matched_image_position = (calibrated_x, calibrated_y)
+
+            tasks = [
+                asyncio.create_task(
+                    self.__draw_rectangle(
+                        color_screenshot=color_screenshot,
+                        matched_image_position=matched_image_position,
+                        max_loc=max_loc,
+                        draw_black=False,
+                    )
+                ),
+                asyncio.create_task(
+                    self.__draw_rectangle(
+                        color_screenshot=color_screenshot,
+                        matched_image_position=matched_image_position,
+                        max_loc=max_loc,
+                        draw_black=True,
+                    )
+                ),
+            ]
+
+            blackout_screenshot, color_screenshot = await asyncio.gather(*tasks)
+
+            logfire.info(
+                f"Found {image_name_cn}",
+                button_center_x=button_center_x,
+                calibrated_x=calibrated_x,
+                button_center_y=button_center_y,
+                calibrated_y=calibrated_y,
+                button_name_en=image_name_en,
+                button_name_cn=image_name_cn,
+                button_file_path=image_path.as_posix(),
+                auto_click=self.image_cfg.click_this,
+            )
+            mlflow.log_metrics(
+                metrics={
+                    "button_center_x": button_center_x,
+                    "calibrated_x": calibrated_x,
+                    "button_center_y": button_center_y,
+                    "calibrated_y": calibrated_y,
+                }
+            )
             return FoundPosition(
                 button_center_x=button_center_x,
+                calibrated_x=calibrated_x,
                 button_center_y=button_center_y,
+                calibrated_y=calibrated_y,
+                found_button_name_en=image_name_en,
+                found_button_name_cn=image_name_cn,
                 color_screenshot=color_screenshot,
                 blackout_screenshot=blackout_screenshot,
             )
         return FoundPosition(
             button_center_x=None,
+            calibrated_x=None,
             button_center_y=None,
-            color_screenshot=color_screenshot,
-            blackout_screenshot=blackout_screenshot,
+            calibrated_y=None,
+            found_button_name_en=None,
+            found_button_name_cn=None,
+            color_screenshot=None,
+            blackout_screenshot=None,
         )
+
+    def calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
+        """Adjusts the button center coordinates based on the device type.
+
+        Args:
+            button_center_x (int): The x-coordinate of the button center.
+            button_center_y (int): The y-coordinate of the button center.
+
+        Returns:
+            tuple[int, int]: The adjusted button center coordinates.
+        """
+        # if the device is from a window process, we need to add shift_x, shift_y to the button_center_x, button_center_y
+        # since we do not know the exact position of the window.
+        if isinstance(self.device, Page):
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
+        if isinstance(self.device, APage):
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
+        if isinstance(self.device, AdbDevice):
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
+        if isinstance(self.device, ShiftPosition):
+            button_center_x = button_center_x + self.device.shift_x
+            button_center_y = button_center_y + self.device.shift_y
+        return button_center_x, button_center_y
+
+    async def a_calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
+        """Adjusts the button center coordinates based on the device type.
+
+        Args:
+            button_center_x (int): The x-coordinate of the button center.
+            button_center_y (int): The y-coordinate of the button center.
+
+        Returns:
+            tuple[int, int]: The adjusted button center coordinates.
+        """
+        return await asyncio.to_thread(self.calibrate, button_center_x, button_center_y)
