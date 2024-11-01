@@ -48,14 +48,10 @@ class ADBDeviceManager(BaseModel):
         Returns:
             A list of serial numbers for connected devices.
         """
-        for available_device in self.available_devices:
-            adb.connect(addr=f"{self.host}:{available_device}", timeout=3.0)
+        for port in self.available_devices:
+            adb.connect(addr=f"{self.host}:{port}", timeout=3.0)
         devices = adb.device_list()
-        serials = []
-        for device in devices:
-            if device.serial.startswith("emulator"):
-                continue
-            serials.append(device.serial)
+        serials = [device.serial for device in devices if not device.serial.startswith("emulator")]
         return serials
 
     @computed_field
@@ -70,28 +66,30 @@ class ADBDeviceManager(BaseModel):
         for serial in self.serials:
             device = adb.device(serial=serial)
             running_app = device.app_current()
-            running_details = AppInfo(**{"serial": serial, "package": running_app.package})
+            running_details = AppInfo(serial=serial, package=running_app.package)
             running_apps.append(running_details)
         return running_apps
 
     def get_correct_serial(self) -> AppInfo:
-        """Returns the correct serial number for the target app.
+        """Retrieves the correct serial for the target application.
 
-        This method searches for the running apps that match the target app's package name.
-        If there are multiple or no matching apps found, an exception is raised.
-        Otherwise, the serial number of the first matching app is returned.
+        This method filters the running applications to find those that match the target package.
+        It returns the application if exactly one match is found. If no matches are found, it raises
+        a ValueError indicating that no devices running the target app were found. If multiple matches
+        are found, it raises a ValueError indicating that multiple devices running the target app were found.
 
         Returns:
-            AppInfo: The app information for the correct serial number.
+            AppInfo: The application information of the target app.
 
         Raises:
-            Exception: If multiple or no matching apps are found.
+            ValueError: If no devices or multiple devices running the target app are found.
         """
-        apps = [r_app for r_app in self.running_apps if r_app.package == self.target]
-        if len(apps) > 1 or len(apps) == 0:
-            raise Exception("Multiple or no devices found")
-        app = next(iter(apps))
-        return app
+        apps = [app for app in self.running_apps if app.package == self.target]
+        if len(apps) == 1:
+            return apps[0]
+        if len(apps) == 0:
+            raise ValueError("No devices running the target app were found.")
+        raise ValueError("Multiple devices running the target app were found.")
 
 
 if __name__ == "__main__":
