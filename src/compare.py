@@ -1,8 +1,9 @@
 from typing import Union
+import asyncio
 
 import cv2
 import numpy as np
-from pydantic import Field, BaseModel, ConfigDict, computed_field
+from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
@@ -33,9 +34,7 @@ class ImageComparison(BaseModel):
     screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
     device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
 
-    @computed_field
-    @property
-    def __screenshot_array(self) -> tuple[np.ndarray, np.ndarray]:
+    async def __get_screenshot_array(self) -> tuple[np.ndarray, np.ndarray]:
         """Converts the screenshot to color and grayscale arrays.
 
         Returns:
@@ -47,12 +46,17 @@ class ImageComparison(BaseModel):
         gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2GRAY)
         return color_screenshot, gray_screenshot
 
-    def __draw_rectangle(
-        self, matched_image_position: tuple[int, int], max_loc: cv2.typing.Point, draw_black: bool
+    async def __draw_rectangle(
+        self,
+        color_screenshot: np.ndarray,
+        matched_image_position: tuple[int, int],
+        max_loc: cv2.typing.Point,
+        draw_black: bool,
     ) -> cv2.typing.MatLike:
         """Draws a rectangle on the image and saves the resulting image.
 
         Args:
+            color_screenshot (np.ndarray): The screenshot in color format.
             matched_image_position (tuple[int, int]): The position of the matched image.
             max_loc (cv2.typing.Point): The maximum location of the matched image.
             draw_black (bool): Flag indicating whether to draw a black rectangle.
@@ -63,8 +67,6 @@ class ImageComparison(BaseModel):
         Todo:
             Add logging functionality
         """
-        color_screenshot, _ = self.__screenshot_array
-
         if draw_black:
             # Create a mask with a white rectangle to keep the area inside the red box
             masked_color_screenshot = np.zeros_like(color_screenshot)
@@ -82,7 +84,7 @@ class ImageComparison(BaseModel):
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         return color_screenshot
 
-    def find(self) -> FoundPosition:
+    async def find(self) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
 
         Returns:
@@ -94,7 +96,7 @@ class ImageComparison(BaseModel):
             Add logging functionality
         """
         button_center_x, button_center_y = 0, 0
-        _, gray_screenshot = self.__screenshot_array
+        color_screenshot, gray_screenshot = await self.__get_screenshot_array()
         button_image = cv2.imread(self.image_cfg.image_path, 0)
 
         result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
@@ -104,12 +106,26 @@ class ImageComparison(BaseModel):
         button_center_y = int(max_loc[1] + button_image.shape[0])
         matched_image_position = (button_center_x, button_center_y)
 
-        color_screenshot = self.__draw_rectangle(
-            matched_image_position=matched_image_position, max_loc=max_loc, draw_black=False
-        )
-        blackout_screenshot = self.__draw_rectangle(
-            matched_image_position=matched_image_position, max_loc=max_loc, draw_black=True
-        )
+        tasks = [
+            asyncio.create_task(
+                self.__draw_rectangle(
+                    color_screenshot=color_screenshot,
+                    matched_image_position=matched_image_position,
+                    max_loc=max_loc,
+                    draw_black=False,
+                )
+            ),
+            asyncio.create_task(
+                self.__draw_rectangle(
+                    color_screenshot=color_screenshot,
+                    matched_image_position=matched_image_position,
+                    max_loc=max_loc,
+                    draw_black=True,
+                )
+            ),
+        ]
+
+        blackout_screenshot, color_screenshot = await asyncio.gather(*tasks)
 
         if max_val > self.image_cfg.confidence:
             return FoundPosition(

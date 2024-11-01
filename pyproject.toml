@@ -76,6 +76,7 @@ dependencies = [
     "mlflow>=2.16.2",
     "logfire>=1.0.1",
     "tomli>=2.0.2",
+    "anyio>=4.6.2.post1",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -94,6 +95,8 @@ docs = [
 [tool.rye.scripts]
 "deploy:install" = "rye sync --features docs"
 "deploy:docs" = "mkdocs gh-deploy --force"
+
+gen = { cmd = "python ./scripts/gen_docs.py --source ./src --output ./docs/API" }
 docs = { cmd = "mkdocs serve" }
 deploy = { chain = ["deploy:install", "deploy:docs"]}
 build = { cmd = "pyinstaller -F main.py --onefile -n auto_click --hidden-import pydantic --hidden-import logfire --hidden-import mlflow" }
@@ -120,6 +123,7 @@ dev-dependencies = [
     "pytest-xdist>=3.6.1",
     "pytest-asyncio==0.23.8",
     "genbadge[all]>=1.1.1",
+    "fire>=0.7.0",
 ]
 
 [tool.hatch.metadata]
