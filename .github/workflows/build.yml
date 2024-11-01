@@ -42,7 +42,7 @@ jobs:
 
       # - name: Packaging to Executable file
       #   run: |
-      #     pyinstaller -F main.py --onefile -n ${{ github.event.repository.name }} --hidden-import pydantic --hidden-import logfire --hidden-import mlflow
+      #     pyinstaller -F main.py --onefile -n ${{ github.event.repository.name }}
 
       - name: Move and Rename
         shell: pwsh
@@ -57,7 +57,7 @@ jobs:
           path: ./*
           name: ${{ github.event.repository.name }}_${{ steps.metadata.outputs.version }}
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 1
           compression-level: 6
           overwrite: true
 
