@@ -88,12 +88,12 @@ class RemoteController(ConfigModel):
                         )
                         # found = await image_compare.find()
                         if found.calibrated_x and found.calibrated_y:
-                            # await self.click_button(
-                            #     device=device_details.device,
-                            #     calibrated_x=found.calibrated_x,
-                            #     calibrated_y=found.calibrated_y,
-                            #     click_this=config_dict.click_this,
-                            # )
+                            await self.click_button(
+                                device=device_details.device,
+                                calibrated_x=found.calibrated_x,
+                                calibrated_y=found.calibrated_y,
+                                click_this=config_dict.click_this,
+                            )
                             if config_dict.screenshot_option:
                                 await custom_logger.a_save_images(
                                     images={
