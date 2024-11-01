@@ -1,10 +1,13 @@
 from typing import Union, Optional
+import asyncio
+from pathlib import Path
 
 from PIL import Image
-import cv2
+import numpy as np
 from pydantic import Field, BaseModel, ConfigDict
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
+from playwright.async_api import Page as APage
 
 
 class ShiftPosition(BaseModel):
@@ -37,8 +40,8 @@ class FoundPosition(BaseModel):
     button_center_y: Optional[int] = Field(
         default=None, description="The y-coordinate of the button center."
     )
-    color_screenshot: cv2.typing.MatLike
-    blackout_screenshot: cv2.typing.MatLike
+    color_screenshot: np.ndarray
+    blackout_screenshot: np.ndarray
 
 
 class Screenshot(BaseModel):
@@ -47,7 +50,7 @@ class Screenshot(BaseModel):
     Attributes:
         model_config (ConfigDict): The configuration dictionary for the model.
         screenshot (Union[bytes, Image.Image]): The screenshot image data.
-        device (Union[AdbDevice, Page, ShiftPosition]): The device from which the screenshot was captured.
+        device (Union[AdbDevice, Page, APage, ShiftPosition]): The device from which the screenshot was captured.
 
     Methods:
         save: Save the screenshot to a specified path.
@@ -56,24 +59,53 @@ class Screenshot(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot: Union[bytes, Image.Image]
-    device: Union[AdbDevice, Page, ShiftPosition]
+    device: Union[AdbDevice, Page, APage, ShiftPosition]
 
     def save(self, save_path: str) -> str:
-        """Save the screenshot to the specified path.
+        """Saves the screenshot to the specified path.
 
         Args:
-            save_path (str): The path where the screenshot should be saved.
+            save_path (str): The path where the screenshot will be saved. If the path does not end with ".png", it will be appended automatically.
 
         Returns:
-            str: The path where the screenshot was saved.
+            str: The full path where the screenshot was saved.
+
+        Raises:
+            TypeError: If the screenshot is not of a supported type (bytes or PIL Image).
         """
         save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path
+        save_path_obj = Path(save_path)
+
         if isinstance(self.screenshot, bytes):
-            with open(save_path, "wb") as f:
-                f.write(self.screenshot)
+            self._save_bytes(self.screenshot, save_path_obj)
         elif isinstance(self.screenshot, Image.Image):
-            self.screenshot.save(save_path)
-        return save_path
+            self._save_image(self.screenshot, save_path_obj)
+        else:
+            raise TypeError("不支持的屏幕截图类型。")
+        return str(save_path_obj)
+
+    async def a_save(self, save_path: str) -> str:
+        """Asynchronously saves the screenshot to the specified path.
+
+        Args:
+            save_path (str): The path where the screenshot will be saved. If the path does not end with ".png", it will be automatically appended.
+
+        Returns:
+            str: The full path where the screenshot was saved.
+
+        Raises:
+            TypeError: If the screenshot type is not supported.
+        """
+        save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path
+        save_path_obj = Path(save_path)
+
+        if isinstance(self.screenshot, bytes):
+            await asyncio.to_thread(self._save_bytes, self.screenshot, save_path_obj)
+        elif isinstance(self.screenshot, Image.Image):
+            await asyncio.to_thread(self._save_image, self.screenshot, save_path_obj)
+        else:
+            raise TypeError("不支持的屏幕截图类型。")
+        return str(save_path_obj)
 
     def calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
         """Adjusts the button center coordinates based on the device type.
@@ -91,6 +123,10 @@ class Screenshot(BaseModel):
             # button_center_x = button_center_x // 2
             # button_center_y = button_center_y // 2
             pass
+        if isinstance(self.device, APage):
+            # button_center_x = button_center_x // 2
+            # button_center_y = button_center_y // 2
+            pass
         if isinstance(self.device, AdbDevice):
             # button_center_x = button_center_x // 2
             # button_center_y = button_center_y // 2
@@ -99,3 +135,24 @@ class Screenshot(BaseModel):
             button_center_x = button_center_x + self.device.shift_x
             button_center_y = button_center_y + self.device.shift_y
         return button_center_x, button_center_y
+
+    async def a_calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
+        """Adjusts the button center coordinates based on the device type.
+
+        Args:
+            button_center_x (int): The x-coordinate of the button center.
+            button_center_y (int): The y-coordinate of the button center.
+
+        Returns:
+            tuple[int, int]: The adjusted button center coordinates.
+        """
+        return await asyncio.to_thread(self.calibrate, button_center_x, button_center_y)
+
+    @staticmethod
+    def _save_bytes(data: bytes, path: Path) -> None:
+        with open(path, "wb") as f:
+            f.write(data)
+
+    @staticmethod
+    def _save_image(image: Image.Image, path: Path) -> None:
+        image.save(path)

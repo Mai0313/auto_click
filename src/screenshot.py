@@ -1,4 +1,4 @@
-import time
+import asyncio
 
 from PIL import ImageGrab
 from adbutils import adb
@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import pygetwindow as gw
 from pygetwindow import Win32Window  # noqa: F401 for type hinting
 from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 
 from src.types.output_models import Screenshot, ShiftPosition
 
@@ -23,7 +24,7 @@ class GetScreen(BaseModel):
     """
 
     @classmethod
-    def from_exist_window(cls, window_title: str) -> Screenshot:
+    async def from_exist_window(cls, window_title: str) -> Screenshot:
         """Capture a screenshot from an existing window.
 
         Args:
@@ -37,7 +38,7 @@ class GetScreen(BaseModel):
         if window.isMinimized:
             window.restore()
         window.activate()
-        time.sleep(0.1)
+        await asyncio.sleep(1)
         shift_x, shift_y = window.topleft
         width, height = window.size
         bbox = (shift_x, shift_y, shift_x + width, shift_y + height)
@@ -47,7 +48,7 @@ class GetScreen(BaseModel):
         return Screenshot(screenshot=screenshot, device=shift_position)
 
     @classmethod
-    def from_adb_device(cls, url: str, serial: str) -> Screenshot:
+    async def from_adb_device(cls, url: str, serial: str) -> Screenshot:
         """Create a Screenshot object from an Android device using ADB.
 
         Args:
@@ -102,4 +103,33 @@ class GetScreen(BaseModel):
             page = context.new_page()
             page.goto(url)
             screenshot = page.screenshot()
+            return Screenshot(screenshot=screenshot, device=page)
+
+    @classmethod
+    async def a_from_remote_window(cls, url: str) -> Screenshot:
+        """Asynchronously captures a screenshot from a remote window using the provided URL.
+
+        Args:
+            url (str): The URL of the remote window to capture the screenshot from.
+
+        Returns:
+            Screenshot: An instance of the Screenshot class containing the captured screenshot and the device (page) used.
+        """
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=False)
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+                java_script_enabled=True,
+                accept_downloads=False,
+                has_touch=False,
+                is_mobile=False,
+                locale="zh-TW",
+                permissions=[],
+                geolocation=None,
+                color_scheme="light",
+                timezone_id="Asia/Shanghai",
+            )
+            page = await context.new_page()
+            await page.goto(url)
+            screenshot = await page.screenshot()
             return Screenshot(screenshot=screenshot, device=page)
