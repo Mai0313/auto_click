@@ -35,13 +35,53 @@ class FoundPosition(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     button_center_x: Optional[int] = Field(
-        default=None, description="The x-coordinate of the button center."
+        default=None,
+        description="The x-coordinate of the button center.",
+        frozen=True,
+        deprecated=False,
+    )
+    calibrated_x: Optional[int] = Field(
+        default=None,
+        description="The calibrated x-coordinate of the button center.",
+        frozen=True,
+        deprecated=False,
     )
     button_center_y: Optional[int] = Field(
-        default=None, description="The y-coordinate of the button center."
+        default=None,
+        description="The y-coordinate of the button center.",
+        frozen=True,
+        deprecated=False,
     )
-    color_screenshot: np.ndarray
-    blackout_screenshot: np.ndarray
+    calibrated_y: Optional[int] = Field(
+        default=None,
+        description="The calibrated y-coordinate of the button center.",
+        frozen=True,
+        deprecated=False,
+    )
+    found_button_name_en: Optional[str] = Field(
+        default=None,
+        description="The name of the found button in English.",
+        frozen=True,
+        deprecated=False,
+    )
+    found_button_name_cn: Optional[str] = Field(
+        default=None,
+        description="The name of the found button in Chinese.",
+        frozen=True,
+        deprecated=False,
+    )
+    color_screenshot: Optional[np.ndarray] = Field(
+        default=None,
+        description="The screenshot of the button in color.",
+        frozen=True,
+        deprecated=False,
+    )
+    blackout_screenshot: Optional[np.ndarray] = Field(
+        default=None,
+        description="The screenshot of the button with a blackout effect.",
+        frozen=True,
+        deprecated=False,
+    )
 
 
 class Screenshot(BaseModel):
@@ -106,47 +146,6 @@ class Screenshot(BaseModel):
         else:
             raise TypeError("不支持的屏幕截图类型。")
         return str(save_path_obj)
-
-    def calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
-        """Adjusts the button center coordinates based on the device type.
-
-        Args:
-            button_center_x (int): The x-coordinate of the button center.
-            button_center_y (int): The y-coordinate of the button center.
-
-        Returns:
-            tuple[int, int]: The adjusted button center coordinates.
-        """
-        # if the device is from a window process, we need to add shift_x, shift_y to the button_center_x, button_center_y
-        # since we do not know the exact position of the window.
-        if isinstance(self.device, Page):
-            # button_center_x = button_center_x // 2
-            # button_center_y = button_center_y // 2
-            pass
-        if isinstance(self.device, APage):
-            # button_center_x = button_center_x // 2
-            # button_center_y = button_center_y // 2
-            pass
-        if isinstance(self.device, AdbDevice):
-            # button_center_x = button_center_x // 2
-            # button_center_y = button_center_y // 2
-            pass
-        if isinstance(self.device, ShiftPosition):
-            button_center_x = button_center_x + self.device.shift_x
-            button_center_y = button_center_y + self.device.shift_y
-        return button_center_x, button_center_y
-
-    async def a_calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
-        """Adjusts the button center coordinates based on the device type.
-
-        Args:
-            button_center_x (int): The x-coordinate of the button center.
-            button_center_y (int): The y-coordinate of the button center.
-
-        Returns:
-            tuple[int, int]: The adjusted button center coordinates.
-        """
-        return await asyncio.to_thread(self.calibrate, button_center_x, button_center_y)
 
     @staticmethod
     def _save_bytes(data: bytes, path: Path) -> None:
