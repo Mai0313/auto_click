@@ -23,17 +23,17 @@ logfire.configure(send_to_logfire=False)
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-class RemoteContoller(ConfigModel):
+class RemoteController(ConfigModel):
     serial: str = Field(default="")
 
     @model_validator(mode="after")
-    def _init_serial(self) -> "RemoteContoller":
+    def _init_serial(self) -> "RemoteController":
         apps = ADBDeviceManager(host="127.0.0.1", target=self.target).get_correct_serial()
         self.serial = apps.serial
         return self
 
     @model_validator(mode="after")
-    def _init_mlflow(self) -> "RemoteContoller":
+    def _init_mlflow(self) -> "RemoteController":
         mlflow.set_tracking_uri("./mlruns")
         mlflow.set_experiment(experiment_name=self.target)
         return self
@@ -43,12 +43,12 @@ class RemoteContoller(ConfigModel):
             return await GetScreen.a_from_remote_window(url=self.target)
         if self.target.startswith("com"):
             return await GetScreen.from_adb_device(url=self.target, serial=self.serial)
-        # this will return screenshot, shift_position; not device.
+        # 返回 screenshot 和 shift_position，而不是 device
         return await GetScreen.from_exist_window(window_title=self.target)
 
     async def click_button(
         self,
-        device: Union[Page, AdbDevice, ShiftPosition],
+        device: Union[Page, APage, AdbDevice, ShiftPosition],
         calibrated_x: int,
         calibrated_y: int,
         click_this: bool,
@@ -56,20 +56,20 @@ class RemoteContoller(ConfigModel):
         if self.auto_click and click_this:
             if isinstance(device, Page):
                 device.mouse.click(x=calibrated_x, y=calibrated_y)
-            if isinstance(device, APage):
+            elif isinstance(device, APage):
                 await device.mouse.click(x=calibrated_x, y=calibrated_y)
-            if isinstance(device, AdbDevice):
+            elif isinstance(device, AdbDevice):
                 device.click(x=calibrated_x, y=calibrated_y)
-            if isinstance(device, ShiftPosition):
+            elif isinstance(device, ShiftPosition):
                 pyautogui.moveTo(x=calibrated_x, y=calibrated_y)
                 pyautogui.click()
-        logfire.info(
-            "Button Found",
-            x=calibrated_x,
-            y=calibrated_y,
-            auto_click=self.auto_click,
-            click_this=click_this,
-        )
+            logfire.info(
+                "Button Found",
+                x=calibrated_x,
+                y=calibrated_y,
+                auto_click=self.auto_click,
+                click_this=click_this,
+            )
 
     async def main(self) -> None:
         with mlflow.start_run(run_name=current_time):
@@ -77,13 +77,13 @@ class RemoteContoller(ConfigModel):
                 try:
                     device_details = await self.get_screenshot()
                     for config_dict in self.image_list:
-                        image_conpare = ImageComparison(
+                        image_compare = ImageComparison(
                             image_cfg=config_dict,
                             screenshot=device_details.screenshot,
                             device=device_details.device,
                         )
                         custom_logger = CustomLogger(original_image_path=config_dict.image_path)
-                        found = await image_conpare.find()
+                        found = await image_compare.find()
                         if found.button_center_x and found.button_center_y:
                             calibrated_x, calibrated_y = await device_details.a_calibrate(
                                 button_center_x=found.button_center_x,
@@ -111,7 +111,7 @@ class RemoteContoller(ConfigModel):
                                     "calibrated_y": calibrated_y,
                                 }
                             )
-                            if config_dict.screenshot_option is True:
+                            if config_dict.screenshot_option:
                                 await custom_logger.a_save_images(
                                     images={
                                         "color": found.color_screenshot,
@@ -139,10 +139,5 @@ def load_yaml(config_path: str) -> dict:
 if __name__ == "__main__":
     config_path = "./configs/games/all_stars.yaml"
     configs = load_yaml(config_path=config_path)
-    auto_web = RemoteContoller(**configs)
+    auto_web = RemoteController(**configs)
     asyncio.run(auto_web.main())
-
-    # configs = load_hydra_config()
-    # game_config = configs["games"]
-    # auto_web = RemoteContoller(**game_config)
-    # auto_web.main()
