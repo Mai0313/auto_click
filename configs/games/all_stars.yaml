@@ -52,7 +52,7 @@ image_list:
     delay_after_click: 0
     click_this: True
     screenshot_option: True
-    confidence: 0.8
+    confidence: 0.7
 
   - image_name: 勝利
     image_path: ./data/allstars/win.png
