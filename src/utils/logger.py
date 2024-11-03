@@ -5,7 +5,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import mlflow
 from pydantic import BaseModel, computed_field
 
 
@@ -25,7 +24,7 @@ class CustomLogger(BaseModel):
     def save_images(
         self,
         images: Union[np.ndarray, dict[ImageType, np.ndarray]],
-        save_to: Literal["local", "mlflow", "both"] = "both",
+        save_to: Literal["local", "both"] = "both",
     ) -> None:
         if isinstance(images, np.ndarray):
             images = {ImageType.COLOR: images}
@@ -33,13 +32,11 @@ class CustomLogger(BaseModel):
         for image_type, screenshot in images.items():
             if save_to in ("local", "both"):
                 self._save_image_local(screenshot, image_type)
-            if save_to in ("mlflow", "both"):
-                self._save_image_mlflow(screenshot, image_type)
 
     async def a_save_images(
         self,
         images: Union[np.ndarray, dict[ImageType, np.ndarray]],
-        save_to: Literal["local", "mlflow", "both"] = "both",
+        save_to: Literal["local", "both"] = "both",
     ) -> None:
         if isinstance(images, np.ndarray):
             images = {ImageType.COLOR: images}
@@ -48,8 +45,6 @@ class CustomLogger(BaseModel):
         for image_type, screenshot in images.items():
             if save_to in ("local", "both"):
                 tasks.append(self._a_save_image_local(screenshot, image_type))
-            if save_to in ("mlflow", "both"):
-                tasks.append(self._a_save_image_mlflow(screenshot, image_type))
         await asyncio.gather(*tasks)
 
     def _save_image_local(self, screenshot: np.ndarray, image_type: ImageType) -> None:
@@ -61,10 +56,3 @@ class CustomLogger(BaseModel):
 
     async def _a_save_image_local(self, screenshot: np.ndarray, image_type: ImageType) -> None:
         await asyncio.to_thread(self._save_image_local, screenshot, image_type)
-
-    def _save_image_mlflow(self, screenshot: np.ndarray, image_type: ImageType) -> None:
-        screenshot_rgb = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
-        mlflow.log_image(image=screenshot_rgb, artifact_file=f"{image_type}/{self.image_name}")
-
-    async def _a_save_image_mlflow(self, screenshot: np.ndarray, image_type: ImageType) -> None:
-        await asyncio.to_thread(self._save_image_mlflow, screenshot, image_type)
