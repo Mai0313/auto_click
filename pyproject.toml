@@ -73,7 +73,6 @@ dependencies = [
     "pydantic>=2.7.3",
     "pyinstaller>=6.7.0",
     "pyyaml>=6.0.2",
-    "mlflow>=2.16.2",
     "logfire>=1.0.1",
     "tomli>=2.0.2",
     "anyio>=4.6.2.post1",
