@@ -27,7 +27,6 @@ jobs:
         id: metadata
         uses: battila7/get-version-action@v2
 
-      # # Disable build steps.
       # - name: Setup Python
       #   uses: actions/setup-python@v5.1.0
       #   with:

@@ -8,8 +8,7 @@ LABEL maintainer="Wei Lee <mai@mai0313.com>" \
     com.centurylinklabs.watchtower.stop-signal="SIGINT"
 
 # Install git
-RUN apt-get -y update && apt-get install -y git make \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get -y update && apt-get install -y git make
 RUN git config --global http.sslVerify false
 
 # Install Node.js
@@ -27,8 +26,13 @@ WORKDIR /base_env
 COPY ./requirements.lock ./requirements.lock
 RUN pip install -r ./requirements.lock && pip cache purge
 
+FROM builder as auto_click_dev_base
+WORKDIR /base_env
+COPY ./requirements-dev.lock ./requirements-dev.lock
+RUN pip install -r ./requirements-dev.lock && pip cache purge
+
 ########################################################################################
 
-FROM auto_click_base as auto_click
+FROM template_base as auto_click
 WORKDIR /app
 COPY . .
