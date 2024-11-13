@@ -9,6 +9,7 @@ addopts = [
     "--cov-report=term-missing:skip-covered",
     "--junitxml=./.github/reports/pytest.xml",
     "--cov-report=xml:./.github/reports/coverage.xml",
+    "--cov-report=html:./.github/coverage_html_report",
     "--cache-clear",
     "-n=auto",
     "--no-header",
@@ -59,9 +60,9 @@ omit = ["./src/ameba/*"]
 [project]
 name = "auto-click"
 version = "2.0.0"
-description = "Add your description here"
+description = "Auto clicker for multi platforms."
 authors = [
-    { name = "Wei", email = "mai@mai0313.com" }
+    { name = "Wei", email = "mai@mai0313.com" },
 ]
 dependencies = [
     "pillow>=10.3.0",
@@ -84,34 +85,42 @@ requires-python = ">= 3.9"
 Homepage = "https://github.com/Mai0313/auto_click"
 Repository = "https://github.com/Mai0313/auto_click"
 
-[project.optional-dependencies]
-docs = [
-    "mkdocs-material>=9.5.39",
-    "mkdocstrings-python>=1.11.1",
-    "griffe-typingdoc>=0.2.7",
-]
-
 [tool.rye.scripts]
-"deploy:install" = "rye sync --features docs"
-"deploy:docs" = "mkdocs gh-deploy --force"
 
-gen = { cmd = "python ./scripts/gen_docs.py --source ./src --output ./docs/API" }
-docs = { cmd = "mkdocs serve" }
-deploy = { chain = ["deploy:install", "deploy:docs"]}
-build = { cmd = "pyinstaller -F main.py --onefile -n auto_click --hidden-import pydantic --hidden-import logfire --hidden-import mlflow" }
-main = { cmd = "python main.py" }
+api = { cmd = "python ./api.py" }
+main = { cmd = "python ./main.py" }
+
+# Documentation
+"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/API --exclude .venv"
+"docs:deploy" = "mkdocs gh-deploy --force --clean"
+"docs:run" = "mkdocs serve"
+
+gen = { chain = ["docs:src", "docs:deploy"] }
+docs = { chain = ["docs:src", "docs:deploy", "docs:run"] }
+
 
 [[tool.rye.sources]]
 name = "default"
 url = "https://pypi.org/simple"
+# url = "http://10.9.16.152/simple"
+# type = "index"
+
+# [[tool.rye.sources]]
+# name = "pytorch"
+# url = "https://download.pytorch.org/whl"
+# type = "index"
+
+# [[tool.rye.proxy]]
+# http = "http://mtkdrone01.mediatek.inc:23984"
+# https = "http://mtkdrone01.mediatek.inc:23984"
 
 [build-system]
 requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 [tool.rye]
-managed = false
-virtual = false
+managed = true
+virtual = true
 universal = true
 dev-dependencies = [
     "ipykernel>=6.29.5",
@@ -122,6 +131,9 @@ dev-dependencies = [
     "pytest-xdist>=3.6.1",
     "pytest-asyncio==0.23.8",
     "genbadge[all]>=1.1.1",
+    "mkdocs-material>=9.5.39",
+    "mkdocstrings-python>=1.11.1",
+    "griffe-typingdoc>=0.2.7",
     "fire>=0.7.0",
 ]
 
@@ -136,7 +148,17 @@ packages = ["*"]
 
 [tool.hatch.build.targets.sdist]
 # Basically everything except hidden files/directories (such as .github, .devcontainers, .python-version, etc)
-include = ["*"]
+include = [
+    "/*.toml",
+    "/*.json",
+    "/*.lock",
+    "/*.md",
+    "/noxfile.py",
+    "bin/*",
+    "examples/*",
+    "src/*",
+    "tests/*",
+]
 exclude = [
     "/.github",
     "/.devcontainers",
@@ -403,7 +425,6 @@ preview = true
 quote-style = "double"
 skip-magic-trailing-comma = true
 
-
 # ================== #
 #      Logfire       #
 # ================== #
@@ -419,7 +440,7 @@ console_colors = "auto"
 console_span_style = "show-parents"
 console_include_timestamps = true
 console_verbose = true
-console_min_log_level = "trace"
+console_min_log_level = "debug"
 show_summary = true
 data_dir = "./.cache/.logfire"
 # base_url = ""
