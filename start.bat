@@ -4,4 +4,5 @@ chcp 65001
 setlocal enabledelayedexpansion
 
 rye sync
-start powershell -NoExit -Command "rye run main"
+rye run main
+@REM start powershell -NoExit -Command "rye run main"

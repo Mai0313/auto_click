@@ -39,7 +39,7 @@ class DocsGenerator(BaseModel):
             shutil.rmtree(self._output_path.absolute())
             self._output_path.mkdir(parents=True, exist_ok=True)
 
-    def __call__(self) -> None:
+    def gen_docs(self) -> None:
         with Progress() as progress:
             task = progress.add_task("[green]Generating docs...")
             if self._source_path.is_dir():
