@@ -45,6 +45,7 @@ colorama==0.4.6
     # via mkdocs
     # via mkdocs-material
     # via pytest
+    # via tqdm
 comm==0.2.2
     # via ipykernel
     # via ipywidgets
@@ -75,12 +76,15 @@ executing==2.1.0
     # via logfire
     # via stack-data
 filelock==3.16.1
+    # via huggingface-hub
     # via virtualenv
 fire==0.7.0
 flake8==7.1.1
     # via flake8-html
 flake8-html==0.4.3
     # via genbadge
+fsspec==2024.10.0
+    # via huggingface-hub
 genbadge==1.1.1
 ghp-import==2.1.0
     # via mkdocs
@@ -92,6 +96,7 @@ griffe==1.5.1
     # via griffe-typingdoc
     # via mkdocstrings-python
 griffe-typingdoc==0.2.7
+huggingface-hub==0.26.2
 identify==2.6.1
     # via pre-commit
 idna==3.10
@@ -198,6 +203,7 @@ opentelemetry-semantic-conventions==0.48b0
     # via opentelemetry-sdk
 packaging==24.1
     # via deprecation
+    # via huggingface-hub
     # via ipykernel
     # via mkdocs
     # via pyinstaller
@@ -303,6 +309,7 @@ pywin32==308 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
     # via pyinstaller
 pyyaml==6.0.2
+    # via huggingface-hub
     # via mkdocs
     # via mkdocs-get-deps
     # via pre-commit
@@ -318,11 +325,12 @@ regex==2024.9.11
 requests==2.32.3
     # via adbutils
     # via genbadge
+    # via huggingface-hub
     # via mkdocs-material
     # via opentelemetry-exporter-otlp-proto-http
 retry==0.9.2
     # via adbutils
-rich==13.9.3
+rich==13.9.4
     # via logfire
 rubicon-objc==0.4.9 ; platform_system == 'Darwin'
     # via mouseinfo
@@ -347,6 +355,8 @@ tomli==2.0.2
 tornado==6.4.1
     # via ipykernel
     # via jupyter-client
+tqdm==4.67.0
+    # via huggingface-hub
 traitlets==5.14.3
     # via comm
     # via ipykernel
@@ -358,6 +368,7 @@ traitlets==5.14.3
 typing-extensions==4.12.2
     # via anyio
     # via griffe-typingdoc
+    # via huggingface-hub
     # via ipython
     # via logfire
     # via mkdocstrings
