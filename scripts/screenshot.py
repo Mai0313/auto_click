@@ -1,22 +1,24 @@
 from adbutils import adb
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 
 
-class Scripts(BaseModel):
-    port: int
+class Screenshot(BaseModel):
+    port: int = Field(default=5557, description="The port number of the device.")
+    output_path: str = Field(default="./debug.png")
 
-    def screenshots(self, output_path: str) -> None:
+    async def screenshots(self) -> None:
         serial = f"127.0.0.1:{self.port}"
         adb.connect(addr=serial)
         device = adb.device(serial=serial)
         # running_app = device.app_current()
         current_screent = device.screenshot()
-        current_screent.save(output_path)
+        current_screent.save(self.output_path)
+
+    async def __call__(self) -> None:
+        await self.screenshots()
 
 
 if __name__ == "__main__":
-    port = 5557
-    output_path = "./data/allstars_test/debug.png"
+    import fire
 
-    scripts = Scripts(port=port)
-    scripts.screenshots(output_path=output_path)
+    fire.Fire(Screenshot)

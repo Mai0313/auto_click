@@ -16,7 +16,9 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    serial: str = Field(default="", description="The serial number of the device.")
+    serials: list[str] = Field(
+        default=["16384", "16416"], description="The serial number of the device."
+    )
     random_interval: int = Field(
         ...,
         description="The interval between each click in seconds.",

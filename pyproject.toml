@@ -91,7 +91,7 @@ api = { cmd = "python ./api.py" }
 main = { cmd = "python ./main.py" }
 
 # Documentation
-"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/API --exclude .venv"
+"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/Reference --exclude .venv"
 "docs:deploy" = "mkdocs gh-deploy --force --clean"
 "docs:run" = "mkdocs serve"
 
