@@ -1,6 +1,8 @@
 target: 雀魂麻将  # "http://localhost:9222"
-auto_click: true
-
+save2db: False
+auto_click: True
+serials:
+  - ""
 random_interval: 5
 
 image_list:

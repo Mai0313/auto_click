@@ -1,5 +1,4 @@
 from typing import Union, Optional
-import asyncio
 from pathlib import Path
 
 from PIL import Image
@@ -101,30 +100,7 @@ class Screenshot(BaseModel):
     screenshot: Union[bytes, Image.Image]
     device: Union[AdbDevice, Page, APage, ShiftPosition]
 
-    def save(self, save_path: str) -> str:
-        """Saves the screenshot to the specified path.
-
-        Args:
-            save_path (str): The path where the screenshot will be saved. If the path does not end with ".png", it will be appended automatically.
-
-        Returns:
-            str: The full path where the screenshot was saved.
-
-        Raises:
-            TypeError: If the screenshot is not of a supported type (bytes or PIL Image).
-        """
-        save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path
-        save_path_obj = Path(save_path)
-
-        if isinstance(self.screenshot, bytes):
-            self._save_bytes(self.screenshot, save_path_obj)
-        elif isinstance(self.screenshot, Image.Image):
-            self._save_image(self.screenshot, save_path_obj)
-        else:
-            raise TypeError("不支持的屏幕截图类型。")
-        return str(save_path_obj)
-
-    async def a_save(self, save_path: str) -> str:
+    async def save(self, save_path: str) -> str:
         """Asynchronously saves the screenshot to the specified path.
 
         Args:
@@ -132,26 +108,17 @@ class Screenshot(BaseModel):
 
         Returns:
             str: The full path where the screenshot was saved.
-
-        Raises:
-            TypeError: If the screenshot type is not supported.
         """
-        save_path = f"{save_path}.png" if not save_path.endswith(".png") else save_path
-        save_path_obj = Path(save_path)
+        output_path = (
+            Path(f"{save_path}.png") if not save_path.endswith(".png") else Path(save_path)
+        )
+        await self.__save_image(output_path=output_path)
+        return output_path.absolute().as_posix()
 
+    async def __save_image(self, output_path: Path) -> None:
         if isinstance(self.screenshot, bytes):
-            await asyncio.to_thread(self._save_bytes, self.screenshot, save_path_obj)
+            output_path.write_bytes(self.screenshot)
         elif isinstance(self.screenshot, Image.Image):
-            await asyncio.to_thread(self._save_image, self.screenshot, save_path_obj)
+            self.screenshot.save(output_path)
         else:
             raise TypeError("不支持的屏幕截图类型。")
-        return str(save_path_obj)
-
-    @staticmethod
-    def _save_bytes(data: bytes, path: Path) -> None:
-        with open(path, "wb") as f:
-            f.write(data)
-
-    @staticmethod
-    def _save_image(image: Image.Image, path: Path) -> None:
-        image.save(path)
