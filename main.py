@@ -87,9 +87,10 @@ class RemoteController(ConfigModel):
         }
         async with await anyio.open_file(f"./logs/{start_time_string}.json", "w") as f:
             await f.write(json.dumps(win_lost_dict))
-        engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
-        data = pd.DataFrame([win_lost_dict])
-        data.to_sql(name="all_star_match_history", con=engine, if_exists="append", index=False)
+        if self.save2db:
+            engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
+            data = pd.DataFrame([win_lost_dict])
+            data.to_sql(name="all_star_match_history", con=engine, if_exists="append", index=False)
 
     async def count_win_rate(self) -> None:
         if self.found_result.found_button_name_en == "win":
