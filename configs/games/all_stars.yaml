@@ -1,6 +1,7 @@
 target: com.longe.allstarhmt
 auto_click: true
-serial: "16416"
+serials:
+  - "16416"
 
 random_interval: 5
 

@@ -21,14 +21,7 @@ class GameResult(BaseModel):
             "lose_rate": self.lose / (self.win + self.lose),
         }
 
-    def export(self, today: str) -> dict[str, Any]:
-        log_path = Path("./logs")
-        log_path.mkdir(parents=True, exist_ok=True)
-        with open(f"./logs/{today}.json", "w") as f:
-            json.dump(self.win_lost_dict, f)
-        return self.win_lost_dict
-
-    async def a_export(self, today: str) -> dict[str, Any]:
+    async def export(self, today: str) -> dict[str, Any]:
         log_path = Path("./logs")
         log_path.mkdir(parents=True, exist_ok=True)
         async with await anyio.open_file(f"./logs/{today}.json", "w") as f:

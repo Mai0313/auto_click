@@ -23,25 +23,21 @@ current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
 class RemoteController(ConfigModel, GameResult):
+    target_serial: str = Field(default="", description="The serial number of the target device.")
     found_result: FoundPosition = Field(default_factory=FoundPosition)
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
-        if self.serial:
-            adb_manager = ADBDeviceManager(
-                host="127.0.0.1", ports=[self.serial], target=self.target
-            )
-        else:
-            adb_manager = ADBDeviceManager(host="127.0.0.1", target=self.target)
+        adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
         apps = adb_manager.get_correct_serial()
-        self.serial = apps.serial
+        self.target_serial = apps.serial
         return self
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
-            return await GetScreen.a_from_remote_window(url=self.target)
+            return await GetScreen.from_remote_window(url=self.target)
         if self.target.startswith("com"):
-            return await GetScreen.from_adb_device(url=self.target, serial=self.serial)
+            return await GetScreen.from_adb_device(url=self.target, serial=self.target_serial)
         # 返回 screenshot 和 shift_position，而不是 device
         return await GetScreen.from_exist_window(window_title=self.target)
 
@@ -66,10 +62,10 @@ class RemoteController(ConfigModel, GameResult):
     async def count_win_rate(self) -> None:
         if self.found_result.found_button_name_en == "win":
             self.win += 1
-            await self.a_export(today=current_time)
+            await self.export(today=current_time)
         elif self.found_result.found_button_name_en == "lose":
             self.lose += 1
-            await self.a_export(today=current_time)
+            await self.export(today=current_time)
 
     async def main(self) -> None:
         while True:
@@ -82,7 +78,10 @@ class RemoteController(ConfigModel, GameResult):
                         device=device_details.device,
                     )
 
-                    self.found_result = await image_compare.find()
+                    # self.found_result = await image_compare.find()
+                    self.found_result = await image_compare.find_and_select(
+                        vertical_align="top", horizontal_align="right"
+                    )
 
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
