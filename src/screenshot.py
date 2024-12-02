@@ -3,12 +3,10 @@ import asyncio
 from PIL import ImageGrab
 from adbutils import adb
 from pydantic import BaseModel
-import pygetwindow as gw
-from pygetwindow import Win32Window  # noqa: F401 for type hinting
-from playwright.sync_api import sync_playwright
+from pygetwindow import Win32Window, getWindowsWithTitle
 from playwright.async_api import async_playwright
 
-from src.types.output_models import Screenshot, ShiftPosition
+from .types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
@@ -34,7 +32,7 @@ class GetScreen(BaseModel):
             Screenshot: An object containing the captured screenshot and the shift position.
 
         """
-        window = gw.getWindowsWithTitle(window_title)[0]  # type: Win32Window
+        window: Win32Window = getWindowsWithTitle(window_title)[0]
         if window.isMinimized:
             window.restore()
         window.activate()
@@ -76,37 +74,7 @@ class GetScreen(BaseModel):
         return Screenshot(screenshot=screenshot, device=device)
 
     @classmethod
-    def from_remote_window(cls, url: str) -> Screenshot:
-        """Create a screenshot of a remote window using Playwright.
-
-        Args:
-            url (str): The URL of the remote window.
-
-        Returns:
-            Screenshot: An object containing the screenshot and the page.
-
-        """
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-                java_script_enabled=True,
-                accept_downloads=False,
-                has_touch=False,
-                is_mobile=False,
-                locale="zh-TW",
-                permissions=[],
-                geolocation=None,
-                color_scheme="light",
-                timezone_id="Asia/Shanghai",
-            )
-            page = context.new_page()
-            page.goto(url)
-            screenshot = page.screenshot()
-            return Screenshot(screenshot=screenshot, device=page)
-
-    @classmethod
-    async def a_from_remote_window(cls, url: str) -> Screenshot:
+    async def from_remote_window(cls, url: str) -> Screenshot:
         """Asynchronously captures a screenshot from a remote window using the provided URL.
 
         Args:

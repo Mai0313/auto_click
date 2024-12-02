@@ -77,6 +77,10 @@ dependencies = [
     "logfire>=1.0.1",
     "tomli>=2.0.2",
     "anyio>=4.6.2.post1",
+    "pydantic-settings>=2.6.1",
+    "pandas>=2.2.3",
+    "sqlalchemy>=2.0.36",
+    "psycopg2-binary>=2.9.10",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -91,7 +95,7 @@ api = { cmd = "python ./api.py" }
 main = { cmd = "python ./main.py" }
 
 # Documentation
-"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/API --exclude .venv"
+"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/Reference --exclude .venv"
 "docs:deploy" = "mkdocs gh-deploy --force --clean"
 "docs:run" = "mkdocs serve"
 
@@ -388,7 +392,7 @@ force-to-top = []
 force-wrap-aliases = false
 forced-separate = []
 from-first = false
-known-first-party = []
+known-first-party = ["src"]
 known-local-folder = []
 known-third-party = []
 length-sort = true

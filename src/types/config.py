@@ -1,6 +1,6 @@
 from pydantic import Field, BaseModel
 
-from src.types.image_models import ImageModel
+from .image_models import ImageModel
 
 
 class ConfigModel(BaseModel):
@@ -10,13 +10,21 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
+    save2db: bool = Field(
+        ...,
+        description="Indicates whether to save the results to the database or not.",
+        frozen=True,
+        deprecated=False,
+    )
     auto_click: bool = Field(
         ...,
         description="Indicates whether auto click is enabled or not.",
         frozen=True,
         deprecated=False,
     )
-    serial: str = Field(default="", description="The serial number of the device.")
+    serials: list[str] = Field(
+        default=["16384", "16416"], description="The serial number of the device."
+    )
     random_interval: int = Field(
         ...,
         description="The interval between each click in seconds.",

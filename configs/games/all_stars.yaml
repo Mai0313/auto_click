@@ -1,7 +1,8 @@
 target: com.longe.allstarhmt
-auto_click: true
-serial: "16416"
-
+save2db: True
+auto_click: True
+serials:
+  - "16416"
 random_interval: 5
 
 image_list:
