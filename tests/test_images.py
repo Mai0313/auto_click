@@ -2,6 +2,7 @@ import os
 
 import yaml
 import pytest
+
 from src.types.image_models import ImageModel
 
 root_path = "./configs/games"

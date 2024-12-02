@@ -1,5 +1,5 @@
 from adbutils import adb
-from pydantic import Field, BaseModel, computed_field
+from pydantic import Field, BaseModel, model_validator
 
 
 class AppInfo(BaseModel):
@@ -10,14 +10,20 @@ class AppInfo(BaseModel):
 class ADBDeviceManager(BaseModel):
     host: str = Field(default="127.0.0.1")
     ports: list[str] = Field(
-        default=["16384", "16416"],
+        ...,
         description="The list of ports to connect to; defaults to ['16384', '16416'], 16384 and 16416 are for MuMu Player, 5555 and 5557 are for LD Player.",
     )
     target: str = Field(default="com.longe.allstarhmt", description="The game you wanna afk.")
 
-    @computed_field
-    @property
-    def serials(self) -> list[str]:
+    serials: list[str] = Field(
+        default=[], description="The list of serial numbers for connected devices."
+    )
+    running_apps: list[AppInfo] = Field(
+        default=[], description="The list of running apps on the connected devices."
+    )
+
+    @model_validator(mode="after")
+    def _setup_device(self) -> "ADBDeviceManager":
         """Retrieves a list of serial numbers for connected devices.
 
         Returns:
@@ -25,25 +31,17 @@ class ADBDeviceManager(BaseModel):
         """
         for port in self.ports:
             adb.connect(addr=f"{self.host}:{port}", timeout=3.0)
-        devices = adb.device_list()
-        serials = [device.serial for device in devices if not device.serial.startswith("emulator")]
-        return serials
 
-    @computed_field
-    @property
-    def running_apps(self) -> list[AppInfo]:
-        """Retrieves the running apps on the connected devices.
+        for device in adb.device_list():
+            if not device.serial.startswith("emulator"):
+                self.serials.append(device.serial)
 
-        Returns:
-            A list of AppInfo objects representing the running apps on the connected devices.
-        """
-        running_apps = []
         for serial in self.serials:
             device = adb.device(serial=serial)
             running_app = device.app_current()
             running_details = AppInfo(serial=serial, package=running_app.package)
-            running_apps.append(running_details)
-        return running_apps
+            self.running_apps.append(running_details)
+        return self
 
     def get_correct_serial(self) -> AppInfo:
         """Retrieves the correct serial for the target application.
@@ -66,7 +64,11 @@ class ADBDeviceManager(BaseModel):
             raise ValueError("No devices running the target app were found.")
         raise ValueError("Multiple devices running the target app were found.")
 
+    def __call__(self) -> AppInfo:
+        return self.get_correct_serial()
+
 
 if __name__ == "__main__":
     target = "com.longe.allstarhmt"
-    apps = ADBDeviceManager(host="127.0.0.1", target=target).get_correct_serial()
+    adb_manager = ADBDeviceManager(host="127.0.0.1", ports=["16384", "16416"], target=target)
+    result = adb_manager.get_correct_serial()
