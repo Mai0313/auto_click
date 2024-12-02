@@ -11,7 +11,6 @@ from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
 
-from src.utils.logger import CustomLogger
 from src.types.image_models import ImageModel
 from src.types.output_models import FoundPosition, ShiftPosition
 
@@ -49,6 +48,17 @@ class ImageComparison(BaseModel):
         color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
         gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_BGR2GRAY)
         return color_screenshot, gray_screenshot
+
+    async def save_images(self, images: dict[Literal["color", "blackout"], np.ndarray]) -> None:
+        log_dir = Path("./logs")
+        log_dir.mkdir(exist_ok=True, parents=True)
+
+        for image_type, screenshot in images.items():
+            screenshot_path = (
+                log_dir / Path(self.image_cfg.image_path).with_suffix(f"_{image_type}.png").name
+            )
+            if not screenshot_path.exists():
+                cv2.imwrite(str(screenshot_path.absolute()), screenshot)
 
     async def __draw_rectangle(
         self,
@@ -191,11 +201,9 @@ class ImageComparison(BaseModel):
                 button_file_path=image_path.as_posix(),
                 auto_click=self.image_cfg.click_this,
             )
-            custom_logger = CustomLogger(original_image_path=self.image_cfg.image_path)
             if self.image_cfg.screenshot_option:
-                await custom_logger.save_images(
-                    images={"color": color_screenshot, "blackout": blackout_screenshot},
-                    save_to="local",
+                await self.save_images(
+                    images={"color": color_screenshot, "blackout": blackout_screenshot}
                 )
 
             return FoundPosition(
@@ -281,11 +289,9 @@ class ImageComparison(BaseModel):
                 button_file_path=image_path.as_posix(),
                 auto_click=self.image_cfg.click_this,
             )
-            custom_logger = CustomLogger(original_image_path=self.image_cfg.image_path)
             if self.image_cfg.screenshot_option:
-                await custom_logger.save_images(
-                    images={"color": color_screenshot, "blackout": blackout_screenshot},
-                    save_to="local",
+                await self.save_images(
+                    images={"color": color_screenshot, "blackout": blackout_screenshot}
                 )
             return FoundPosition(
                 button_center_x=button_center_x,
