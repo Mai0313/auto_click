@@ -11,8 +11,8 @@ from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
 
-from src.types.image_models import ImageModel
-from src.types.output_models import FoundPosition, ShiftPosition
+from .types.image_models import ImageModel
+from .types.output_models import FoundPosition, ShiftPosition
 
 
 class ImageComparison(BaseModel):
@@ -55,7 +55,7 @@ class ImageComparison(BaseModel):
 
         for image_type, screenshot in images.items():
             screenshot_path = (
-                log_dir / Path(self.image_cfg.image_path).with_suffix(f"_{image_type}.png").name
+                log_dir / Path(self.image_cfg.image_path).with_suffix(f".{image_type}.png").name
             )
             if not screenshot_path.exists():
                 cv2.imwrite(str(screenshot_path.absolute()), screenshot)

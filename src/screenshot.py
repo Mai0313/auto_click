@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pygetwindow import Win32Window, getWindowsWithTitle
 from playwright.async_api import async_playwright
 
-from src.types.output_models import Screenshot, ShiftPosition
+from .types.output_models import Screenshot, ShiftPosition
 
 
 class GetScreen(BaseModel):
