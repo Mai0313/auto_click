@@ -6,31 +6,31 @@ from pydantic_settings import BaseSettings
 
 class PostgreSQLConfig(BaseSettings):
     postgres_host: str = Field(
-        ...,
+        default="mai0313.com",
         validation_alias=AliasChoices("POSTGRES_HOST"),
         title="PostgreSQL Host",
         description="The hostname or IP address of the PostgreSQL server.",
     )
     postgres_port: str = Field(
-        ...,
+        default="5432",
         validation_alias=AliasChoices("POSTGRES_PORT"),
         title="PostgreSQL Port",
         description="The port number on which the PostgreSQL server is listening.",
     )
     postgres_db: str = Field(
-        ...,
+        default="postgres",
         validation_alias=AliasChoices("POSTGRES_DB"),
         title="PostgreSQL Database Name",
         description="The name of the PostgreSQL database to connect to.",
     )
     postgres_user: str = Field(
-        ...,
+        default="postgres",
         validation_alias=AliasChoices("POSTGRES_USER"),
         title="PostgreSQL User",
         description="The username used to authenticate with the PostgreSQL server.",
     )
     postgres_password: str = Field(
-        ...,
+        default="postgres",
         validation_alias=AliasChoices("POSTGRES_PASSWORD"),
         title="PostgreSQL Password",
         description="The password used to authenticate with the PostgreSQL server.",
@@ -44,7 +44,7 @@ class PostgreSQLConfig(BaseSettings):
 
 class SQLiteConfig(BaseSettings):
     sqlite_file_path: str = Field(
-        ...,
+        default="./data/sqlite.db",
         validation_alias=AliasChoices("SQLITE_FILE_PATH"),
         title="SQLite File Path",
         description="The file path to the SQLite database file.",
@@ -59,7 +59,7 @@ class SQLiteConfig(BaseSettings):
 
 class RedisConfig(BaseSettings):
     redis_host: str = Field(
-        ...,
+        default="localhost",
         validation_alias=AliasChoices("REDIS_HOST"),
         title="Redis Host",
         description="The hostname or IP address of the Redis server.",
