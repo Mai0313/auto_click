@@ -15,12 +15,12 @@ from sqlalchemy import create_engine
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
 
-from src.compare import ImageComparison
-from src.screenshot import GetScreen
-from src.types.config import ConfigModel
-from src.types.database import DatabaseConfig
-from src.utils.get_serial import ADBDeviceManager
-from src.types.output_models import Screenshot, FoundPosition, ShiftPosition
+from .compare import ImageComparison
+from .screenshot import GetScreen
+from .types.config import ConfigModel
+from .types.database import DatabaseConfig
+from .utils.get_serial import ADBDeviceManager
+from .types.output_models import Screenshot, FoundPosition, ShiftPosition
 
 
 class RemoteController(ConfigModel):
