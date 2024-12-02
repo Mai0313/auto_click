@@ -95,6 +95,7 @@ protobuf==4.25.5
     # via googleapis-common-protos
     # via logfire
     # via opentelemetry-proto
+psycopg2-binary==2.9.10
 py==1.11.0
     # via retry
 pyautogui==0.9.54
