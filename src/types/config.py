@@ -10,6 +10,12 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
+    save2db: bool = Field(
+        ...,
+        description="Indicates whether to save the results to the database or not.",
+        frozen=True,
+        deprecated=False,
+    )
     auto_click: bool = Field(
         ...,
         description="Indicates whether auto click is enabled or not.",
