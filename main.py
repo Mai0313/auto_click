@@ -11,11 +11,12 @@ import logfire
 from adbutils import AdbDevice
 from pydantic import Field, computed_field, model_validator
 import pyautogui
+from playwright.sync_api import Page
+from playwright.async_api import Page as APage
+
 from src.compare import ImageComparison
 from src.screenshot import GetScreen
 from src.types.config import ConfigModel
-from playwright.sync_api import Page
-from playwright.async_api import Page as APage
 from src.utils.get_serial import ADBDeviceManager
 from src.types.output_models import Screenshot, FoundPosition, ShiftPosition
 
