@@ -1,16 +1,18 @@
-from typing import Union
+import json
+from typing import Any, Union
 import asyncio
+from pathlib import Path
 import secrets
 import datetime
 
 import yaml
+import anyio
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, model_validator
+from pydantic import Field, computed_field, model_validator
 import pyautogui
 from src.compare import ImageComparison
 from src.screenshot import GetScreen
-from src.types.game import GameResult
 from src.types.config import ConfigModel
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
@@ -22,9 +24,12 @@ logfire.configure(send_to_logfire=False)
 current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
-class RemoteController(ConfigModel, GameResult):
+class RemoteController(ConfigModel):
     target_serial: str = Field(default="", description="The serial number of the target device.")
     found_result: FoundPosition = Field(default_factory=FoundPosition)
+
+    win: int = Field(default=0, title="Win", description="Number of wins")
+    lose: int = Field(default=0, title="Lose", description="Number of loses")
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
@@ -32,6 +37,24 @@ class RemoteController(ConfigModel, GameResult):
         apps = adb_manager.get_correct_serial()
         self.target_serial = apps.serial
         return self
+
+    @computed_field
+    @property
+    def win_lost_dict(self) -> dict[str, Any]:
+        return {
+            "win": self.win,
+            "lose": self.lose,
+            "total": self.win + self.lose,
+            "win_rate": self.win / (self.win + self.lose),
+            "lose_rate": self.lose / (self.win + self.lose),
+        }
+
+    async def export(self, today: str) -> dict[str, Any]:
+        log_path = Path("./logs")
+        log_path.mkdir(parents=True, exist_ok=True)
+        async with await anyio.open_file(f"./logs/{today}.json", "w") as f:
+            await f.write(json.dumps(self.win_lost_dict))
+        return self.win_lost_dict
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
