@@ -91,8 +91,8 @@ Repository = "https://github.com/Mai0313/auto_click"
 
 [tool.rye.scripts]
 
-api = { cmd = "python ./api.py" }
-main = { cmd = "python ./main.py" }
+api = { cmd = "python ./api.py", env-file = ".env" }
+main = { cmd = "python ./main.py", env-file = ".env" }
 
 # Documentation
 "docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/Reference --exclude .venv"
