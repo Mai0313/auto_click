@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import Any, Union
 import asyncio
 import logging
 from pathlib import Path
@@ -11,7 +11,7 @@ import anyio
 import pandas as pd
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, model_validator
+from pydantic import Field, BaseModel, model_validator
 import pyautogui
 from sqlalchemy import create_engine
 from playwright.sync_api import Page
@@ -133,14 +133,25 @@ class RemoteController(ConfigModel):
             await asyncio.sleep(_random_interval)
 
 
-def load_yaml(config_path: str) -> dict:
-    with open(config_path, encoding="utf-8") as file:
-        configs = yaml.safe_load(file)
-    return configs
+class AutoClicker(BaseModel):
+    config_path: str = Field(default="./configs/games/all_stars.yaml")
+
+    async def load_yaml(self) -> dict[str, Any]:
+        config_obj = Path(self.config_path)
+        config_content = config_obj.read_text(encoding="utf-8")
+        config_dict = yaml.safe_load(config_content)
+        return config_dict
+
+    async def main(self) -> None:
+        config = await self.load_yaml()
+        auto_web = RemoteController(**config)
+        await auto_web.main()
+
+    async def __call__(self) -> None:
+        await self.main()
 
 
 if __name__ == "__main__":
-    config_path = "./configs/games/all_stars.yaml"
-    configs = load_yaml(config_path=config_path)
-    auto_web = RemoteController(**configs)
-    asyncio.run(auto_web.main())
+    import fire
+
+    fire.Fire(AutoClicker)
