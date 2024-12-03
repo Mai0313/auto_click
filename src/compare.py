@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Union
 import asyncio
 from pathlib import Path
 
@@ -35,7 +35,7 @@ class ImageComparison(BaseModel):
     screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
     device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
 
-    async def save_images(self, images: dict[Literal["color", "blackout"], np.ndarray]) -> None:
+    async def save_images(self, images: dict[str, np.ndarray]) -> None:
         log_dir = Path("./logs")
         log_dir.mkdir(exist_ok=True, parents=True)
 
@@ -66,8 +66,10 @@ class ImageComparison(BaseModel):
         Returns:
             color_screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
         """
+        image_type = "color"
         matched_image_position = (button_center_x, button_center_y)
         if draw_black:
+            image_type = "blackout"
             # Create a mask with a white rectangle to keep the area inside the red box
             masked_color_screenshot = np.zeros_like(color_screenshot)
             cv2.rectangle(
@@ -82,6 +84,7 @@ class ImageComparison(BaseModel):
 
         # Draw the red rectangle on the image
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+        await self.save_images(images={image_type: color_screenshot})
         return color_screenshot
 
     async def __color_similarity_2d(self, image: np.ndarray, color: tuple) -> np.ndarray:
@@ -119,11 +122,12 @@ class ImageComparison(BaseModel):
         Returns:
             FoundPosition: The found position of the button image.
         """
+        _image_path = Path(self.image_cfg.image_path)
+
         color_screenshot = np.array(self.screenshot)
         color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
         gray_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_BGR2GRAY)
 
-        _image_path = Path(self.image_cfg.image_path)
         button_image = cv2.imread(_image_path.as_posix(), 0)
 
         gray_matched = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
@@ -150,10 +154,7 @@ class ImageComparison(BaseModel):
                     )
                     tasks.append(task)
 
-                color_screenshot, blackout_screenshot = await asyncio.gather(*tasks)
-                await self.save_images(
-                    images={"color": color_screenshot, "blackout": blackout_screenshot}
-                )
+                await asyncio.gather(*tasks)
             return FoundPosition(
                 button_center_x=button_center_x,
                 button_center_y=button_center_y,
