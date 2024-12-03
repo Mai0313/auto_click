@@ -81,6 +81,7 @@ dependencies = [
     "pandas>=2.2.3",
     "sqlalchemy>=2.0.36",
     "psycopg2-binary>=2.9.10",
+    "openai>=1.56.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
