@@ -48,22 +48,32 @@ class RemoteController(ConfigModel):
         return await GetScreen.from_exist_window(window_title=self.target)
 
     async def click_button(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
-        if self.found_result.calibrated_x and self.found_result.calibrated_y:
+        if self.found_result.button_center_x and self.found_result.button_center_y:
             if isinstance(device, Page):
                 device.mouse.click(
-                    x=self.found_result.calibrated_x, y=self.found_result.calibrated_y
+                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
                 )
             elif isinstance(device, APage):
                 await device.mouse.click(
-                    x=self.found_result.calibrated_x, y=self.found_result.calibrated_y
+                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
                 )
             elif isinstance(device, AdbDevice):
-                device.click(x=self.found_result.calibrated_x, y=self.found_result.calibrated_y)
+                device.click(
+                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
+                )
             elif isinstance(device, ShiftPosition):
+                await self.found_result.calibrate(shift_x=device.shift_x, shift_y=device.shift_y)
                 pyautogui.moveTo(
-                    x=self.found_result.calibrated_x, y=self.found_result.calibrated_y
+                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
                 )
                 pyautogui.click()
+            logfire.info(
+                f"Found {self.found_result.found_button_name_cn}",
+                button_x=self.found_result.button_center_x,
+                button_y=self.found_result.button_center_y,
+                button_name_en=self.found_result.found_button_name_en,
+                button_name_cn=self.found_result.found_button_name_cn,
+            )
 
     async def export_win_rate(self) -> None:
         log_path = Path("./logs")
@@ -83,17 +93,25 @@ class RemoteController(ConfigModel):
         async with await anyio.open_file(f"./logs/{_start_time_string}.json", "w") as f:
             await f.write(json.dumps(win_lost_dict))
         if self.save2db:
-            engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
-            data = pd.DataFrame([win_lost_dict])
-            data.to_sql(name="all_star_match_history", con=engine, if_exists="append", index=False)
+            try:
+                engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
+                data = pd.DataFrame([win_lost_dict])
+                data.to_sql(
+                    name="all_star_match_history", con=engine, if_exists="append", index=False
+                )
+            except Exception:
+                logfire.error("Error Occurred while saving to database", _exc_info=True)
 
     async def count_win_rate(self) -> None:
-        if self.found_result.found_button_name_en == "win":
-            self.win += 1
-            await self.export_win_rate()
-        elif self.found_result.found_button_name_en == "lose":
-            self.lose += 1
-            await self.export_win_rate()
+        conditions = ["win", "lose"]
+        button_name = self.found_result.found_button_name_en
+        if button_name in conditions:
+            if button_name == "win":
+                self.win += 1
+                await self.export_win_rate()
+            elif button_name == "lose":
+                self.lose += 1
+                await self.export_win_rate()
 
     async def start(self) -> None:
         while True:
@@ -106,11 +124,7 @@ class RemoteController(ConfigModel):
                         device=device_details.device,
                     )
 
-                    # self.found_result = await image_compare.find()
-                    self.found_result = await image_compare.find_and_select(
-                        vertical_align="top", horizontal_align="right"
-                    )
-
+                    self.found_result = await image_compare.find(strategy=self.strategy)
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
 
@@ -118,10 +132,10 @@ class RemoteController(ConfigModel):
 
                         await asyncio.sleep(config_dict.delay_after_click)
 
-            except Exception as e:
+            except Exception:
                 _random_interval = secrets.randbelow(self.random_interval)
                 logfire.error(
-                    f"Error: {e}, Retrying in {_random_interval} seconds", _exc_info=True
+                    f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
                 )
                 await asyncio.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
