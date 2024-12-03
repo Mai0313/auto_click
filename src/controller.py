@@ -119,7 +119,7 @@ class RemoteController(ConfigModel):
                         device=device_details.device,
                     )
 
-                    self.found_result = await image_compare.find()
+                    self.found_result = await image_compare.find(strategy=self.strategy)
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
 

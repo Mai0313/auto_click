@@ -4,6 +4,8 @@ auto_click: True
 serials:
   - ""
 random_interval: 5
+strategy: TM_CCOEFF_NORMED
+# strategy: TM_CCORR_NORMED
 
 image_list:
   - image_name: "開始段位"
