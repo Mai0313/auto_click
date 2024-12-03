@@ -84,6 +84,35 @@ class ImageComparison(BaseModel):
         cv2.rectangle(color_screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
         return color_screenshot
 
+    async def __color_similarity_2d(self, image: np.ndarray, color: tuple) -> np.ndarray:
+        """Calculate the similarity between a given color and each pixel in a 2D image.
+
+        Args:
+            image (np.ndarray): 2D array representing the image.
+            color (tuple): A tuple representing the RGB color (r, g, b).
+
+        Returns:
+            np.ndarray: A 2D array of uint8 values representing the similarity of each pixel to the given color.
+        """
+        # r, g, b = cv2.split(cv2.subtract(image, (*color, 0)))
+        # positive = cv2.max(cv2.max(r, g), b)
+        # r, g, b = cv2.split(cv2.subtract((*color, 0), image))
+        # negative = cv2.max(cv2.max(r, g), b)
+        # return cv2.subtract(255, cv2.add(positive, negative))
+        diff = cv2.subtract(image, (*color, 0))
+        r, g, b = cv2.split(diff)
+        cv2.max(r, g, dst=r)
+        cv2.max(r, b, dst=r)
+        positive = r
+        cv2.subtract((*color, 0), image, dst=diff)
+        r, g, b = cv2.split(diff)
+        cv2.max(r, g, dst=r)
+        cv2.max(r, b, dst=r)
+        negative = r
+        cv2.add(positive, negative, dst=positive)
+        cv2.subtract(255, positive, dst=positive)
+        return positive
+
     async def find(self) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
 
@@ -97,8 +126,9 @@ class ImageComparison(BaseModel):
         _image_path = Path(self.image_cfg.image_path)
         button_image = cv2.imread(_image_path.as_posix(), 0)
 
-        result = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        gray_matched = cv2.matchTemplate(gray_screenshot, button_image, cv2.TM_CCOEFF_NORMED)
+
+        _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
 
         if max_val > self.image_cfg.confidence:
             button_center_x = int(max_loc[0] + button_image.shape[1])
