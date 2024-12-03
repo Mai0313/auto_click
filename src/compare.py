@@ -4,7 +4,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import logfire
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
@@ -188,19 +187,6 @@ class ImageComparison(BaseModel):
             cv2.rectangle(
                 blackout_screenshot, small_rect_top_left, small_rect_bottom_right, (0, 0, 0), -1
             )
-
-            # Logging and metrics (adjust as needed)
-            logfire.info(
-                f"Found {image_name_cn}",
-                button_x=button_x,
-                calibrated_x=calibrated_x,
-                button_y=button_y,
-                calibrated_y=calibrated_y,
-                button_name_en=image_name_en,
-                button_name_cn=image_name_cn,
-                button_file_path=image_path.as_posix(),
-                auto_click=self.image_cfg.click_this,
-            )
             if self.image_cfg.screenshot_option:
                 await self.save_images(
                     images={"color": color_screenshot, "blackout": blackout_screenshot}
@@ -216,16 +202,7 @@ class ImageComparison(BaseModel):
                 color_screenshot=color_screenshot,
                 blackout_screenshot=blackout_screenshot,
             )
-        return FoundPosition(
-            button_center_x=None,
-            calibrated_x=None,
-            button_center_y=None,
-            calibrated_y=None,
-            found_button_name_en=None,
-            found_button_name_cn=None,
-            color_screenshot=None,
-            blackout_screenshot=None,
-        )
+        return FoundPosition()
 
     async def find(self) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
@@ -278,17 +255,6 @@ class ImageComparison(BaseModel):
 
             blackout_screenshot, color_screenshot = await asyncio.gather(*tasks)
 
-            logfire.info(
-                f"Found {image_name_cn}",
-                button_center_x=button_center_x,
-                calibrated_x=calibrated_x,
-                button_center_y=button_center_y,
-                calibrated_y=calibrated_y,
-                button_name_en=image_name_en,
-                button_name_cn=image_name_cn,
-                button_file_path=image_path.as_posix(),
-                auto_click=self.image_cfg.click_this,
-            )
             if self.image_cfg.screenshot_option:
                 await self.save_images(
                     images={"color": color_screenshot, "blackout": blackout_screenshot}
@@ -303,16 +269,7 @@ class ImageComparison(BaseModel):
                 color_screenshot=color_screenshot,
                 blackout_screenshot=blackout_screenshot,
             )
-        return FoundPosition(
-            button_center_x=None,
-            calibrated_x=None,
-            button_center_y=None,
-            calibrated_y=None,
-            found_button_name_en=None,
-            found_button_name_cn=None,
-            color_screenshot=None,
-            blackout_screenshot=None,
-        )
+        return FoundPosition()
 
     async def calibrate(self, button_center_x: int, button_center_y: int) -> tuple[int, int]:
         """Adjusts the button center coordinates based on the device type.

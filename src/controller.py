@@ -64,6 +64,15 @@ class RemoteController(ConfigModel):
                     x=self.found_result.calibrated_x, y=self.found_result.calibrated_y
                 )
                 pyautogui.click()
+            logfire.info(
+                f"Found {self.found_result.found_button_name_cn}",
+                button_x=self.found_result.button_center_x,
+                calibrated_x=self.found_result.calibrated_x,
+                button_y=self.found_result.button_center_y,
+                calibrated_y=self.found_result.calibrated_y,
+                button_name_en=self.found_result.found_button_name_en,
+                button_name_cn=self.found_result.found_button_name_cn,
+            )
 
     async def export_win_rate(self) -> None:
         log_path = Path("./logs")
@@ -88,12 +97,15 @@ class RemoteController(ConfigModel):
             data.to_sql(name="all_star_match_history", con=engine, if_exists="append", index=False)
 
     async def count_win_rate(self) -> None:
-        if self.found_result.found_button_name_en == "win":
-            self.win += 1
-            await self.export_win_rate()
-        elif self.found_result.found_button_name_en == "lose":
-            self.lose += 1
-            await self.export_win_rate()
+        conditions = ["win", "lose"]
+        button_name = self.found_result.found_button_name_en
+        if button_name in conditions:
+            if button_name == "win":
+                self.win += 1
+                await self.export_win_rate()
+            elif button_name == "lose":
+                self.lose += 1
+                await self.export_win_rate()
 
     async def start(self) -> None:
         while True:
@@ -106,10 +118,10 @@ class RemoteController(ConfigModel):
                         device=device_details.device,
                     )
 
-                    # self.found_result = await image_compare.find()
-                    self.found_result = await image_compare.find_and_select(
-                        vertical_align="top", horizontal_align="right"
-                    )
+                    self.found_result = await image_compare.find()
+                    # self.found_result = await image_compare.find_and_select(
+                    #     vertical_align="top", horizontal_align="right"
+                    # )
 
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
