@@ -93,9 +93,14 @@ class RemoteController(ConfigModel):
         async with await anyio.open_file(f"./logs/{_start_time_string}.json", "w") as f:
             await f.write(json.dumps(win_lost_dict))
         if self.save2db:
-            engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
-            data = pd.DataFrame([win_lost_dict])
-            data.to_sql(name="all_star_match_history", con=engine, if_exists="append", index=False)
+            try:
+                engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
+                data = pd.DataFrame([win_lost_dict])
+                data.to_sql(
+                    name="all_star_match_history", con=engine, if_exists="append", index=False
+                )
+            except Exception:
+                logfire.error("Error Occurred while saving to database", _exc_info=True)
 
     async def count_win_rate(self) -> None:
         conditions = ["win", "lose"]
@@ -127,10 +132,10 @@ class RemoteController(ConfigModel):
 
                         await asyncio.sleep(config_dict.delay_after_click)
 
-            except Exception as e:
+            except Exception:
                 _random_interval = secrets.randbelow(self.random_interval)
                 logfire.error(
-                    f"Error: {e}, Retrying in {_random_interval} seconds", _exc_info=True
+                    f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
                 )
                 await asyncio.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
