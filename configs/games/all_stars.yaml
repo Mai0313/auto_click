@@ -4,8 +4,6 @@ auto_click: True
 serials:
   - "16416"
 random_interval: 5
-strategy: TM_CCOEFF_NORMED
-# strategy: TM_CCORR_NORMED
 
 image_list:
   - image_name: 開始配對
@@ -14,6 +12,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 點擊空白區域繼續
     image_path: ./data/allstars/click2continue.png
@@ -21,6 +21,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 返回大廳
     image_path: ./data/allstars/back2lobby.png
@@ -28,6 +30,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 確認
     image_path: ./data/allstars/confirm.png
@@ -35,6 +39,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 等級提升
     image_path: ./data/allstars/levelup.png
@@ -42,6 +48,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 返回
     image_path: ./data/allstars/back.png
@@ -49,6 +57,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 已完成王朝
     image_path: ./data/allstars/game_limit.png
@@ -56,6 +66,8 @@ image_list:
     click_this: False
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 勝利
     image_path: ./data/allstars/win.png
@@ -63,6 +75,8 @@ image_list:
     click_this: False
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
   - image_name: 失敗
     image_path: ./data/allstars/lose.png
@@ -70,6 +84,8 @@ image_list:
     click_this: False
     screenshot_option: True
     confidence: 0.8
+    vertical: center
+    horizontal: center
 
 # switch_conditions:
 #   - image_name: 確認
@@ -78,24 +94,38 @@ image_list:
 #     click_this: True
 #     screenshot_option: True
 #     confidence: 0.8
+#     vertical: center
+#     horizontal: center
 
 #   - image_name: 打開切換選單
 #     image_path: ./data/allstars/switch_game.png
-#     delay_after_click: 0
-#     click_this: False
+#     delay_after_click: 2
+#     click_this: True
 #     screenshot_option: True
 #     confidence: 0.6
+#     vertical: center
+#     horizontal: center
+#     force_x: 1600
+#     force_y: 630
 
 #   - image_name: 五對五全場爭霸
 #     image_path: ./data/allstars/game_5v5.png
-#     delay_after_click: 0
-#     click_this: False
+#     delay_after_click: 2
+#     click_this: True
 #     screenshot_option: True
 #     confidence: 0.6
+#     vertical: bottom
+#     horizontal: center
+#     force_x: 1600
+#     force_y: 830
 
 #   - image_name: 點擊選擇
 #     image_path: ./data/allstars/select.png
-#     delay_after_click: 0
-#     click_this: False
+#     delay_after_click: 2
+#     click_this: True
 #     screenshot_option: True
 #     confidence: 0.8
+#     vertical: center
+#     horizontal: center
+#     force_x: 1600
+#     force_y: 930
