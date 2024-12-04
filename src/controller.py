@@ -20,6 +20,7 @@ from .screenshot import GetScreen
 from .types.config import ConfigModel
 from .types.database import DatabaseConfig
 from .utils.get_serial import ADBDeviceManager
+from .utils.notification import Notification
 from .types.output_models import Screenshot, FoundPosition, ShiftPosition
 
 
@@ -31,6 +32,7 @@ class RemoteController(ConfigModel):
 
     win: int = Field(default=0, title="Win", description="Number of wins")
     lose: int = Field(default=0, title="Lose", description="Number of loses")
+    switch_nums: int = Field(default=0, title="Switch", description="Number of switch games")
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
@@ -107,6 +109,24 @@ class RemoteController(ConfigModel):
                 self.lose += 1
                 await self.export_win_rate()
 
+    async def switch_game(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
+        if isinstance(device, AdbDevice) and self.switch_nums == 0:
+            logfire.warn("Switching Game!!")
+            device.click(x=1600, y=630)
+            await asyncio.sleep(5)
+            device.click(x=1600, y=830)
+            await asyncio.sleep(5)
+            device.click(x=1600, y=930)
+            await asyncio.sleep(5)
+            self.switch_nums += 1
+
+            notify = Notification(
+                title="尊敬的老闆, 我已經幫您打完王朝了",
+                current_status="成功",
+                description="王朝已完成，現在開始執行五對五全場爭霸，沒有其他事情的話我先去採棉花了。",
+            )
+            await notify.send_discord_notification()
+
     async def start(self) -> None:
         while True:
             try:
@@ -119,20 +139,29 @@ class RemoteController(ConfigModel):
                     )
 
                     self.found_result = await image_compare.find(
-                        vertical_align="center", horizontal_align="center"
+                        vertical_align=config_dict.vertical,
+                        horizontal_align=config_dict.horizontal,
                     )
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
+                        if self.found_result.found_button_name_en == "confirm":
+                            await self.switch_game(device=device_details.device)
 
                         await self.count_win_rate()
 
                         await asyncio.sleep(config_dict.delay_after_click)
 
-            except Exception:
+            except Exception as e:
                 _random_interval = secrets.randbelow(self.random_interval)
                 logfire.error(
                     f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
                 )
+                notify = Notification(
+                    title="尊敬的老闆, 發生錯誤!!",
+                    current_status="錯誤",
+                    description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
+                )
+                await notify.send_discord_notification()
                 await asyncio.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             await asyncio.sleep(_random_interval)
