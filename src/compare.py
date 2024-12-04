@@ -55,23 +55,35 @@ class ImageComparison(BaseModel):
         button_y: int,
         max_loc: cv2.typing.Point,
         draw_black: bool,
+        click_x: int,
+        click_y: int,
     ) -> np.ndarray:
-        """Draws a rectangle on the image and saves the resulting image.
+        """Draws a rectangle on the image, draws a small square at the click position, and saves the resulting image.
 
         Args:
             screenshot (np.ndarray): The screenshot in color format.
-            button_x (int): The x-coordinate of the button center.
-            button_y (int): The y-coordinate of the button center.
-            max_loc (cv2.typing.Point): The maximum location of the matched image.
+            button_x (int): The x-coordinate of the bottom-right corner of the matched template.
+            button_y (int): The y-coordinate of the bottom-right corner of the matched template.
+            max_loc (cv2.typing.Point): The top-left corner of the matched template.
             draw_black (bool): Flag indicating whether to draw a black rectangle.
+            click_x (int): The x-coordinate of the click position.
+            click_y (int): The y-coordinate of the click position.
 
         Returns:
-            screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
+            screenshot (np.ndarray): The screenshot with the rectangle and click position drawn on it.
         """
         matched_image_position = (button_x, button_y)
 
         # Draw the red rectangle on the image
         cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+
+        # Draw the small green square at the click position
+        square_size = 10  # Adjust size as needed
+        half_square = square_size // 2
+        top_left_square = (click_x - half_square, click_y - half_square)
+        bottom_right_square = (click_x + half_square, click_y + half_square)
+        cv2.rectangle(screenshot, top_left_square, bottom_right_square, (61, 145, 64), 2)
+
         await self.__save_images(image_type="color", screenshot=screenshot)
 
         if draw_black:
@@ -102,8 +114,11 @@ class ImageComparison(BaseModel):
         """Finds the position of a button image within a screenshot.
 
         Args:
-            vertical_align (Literal["top", "center", "bottom"], optional): The vertical alignment of the button image. Defaults to "center".
-            horizontal_align (Literal["left", "center", "right"], optional): The horizontal alignment of the button image. Defaults to "center".
+            vertical_align (Literal["top", "center", "bottom"], optional): The vertical alignment within the matched template. Defaults to "center".
+            horizontal_align (Literal["left", "center", "right"], optional): The horizontal alignment within the matched template. Defaults to "center".
+
+        Raises:
+            ValueError: If an invalid alignment value is provided.
 
         Returns:
             FoundPosition: The found position of the button image.
@@ -128,29 +143,54 @@ class ImageComparison(BaseModel):
         _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
 
         if max_val > self.image_cfg.confidence:
-            button_x = int(max_loc[0] + button_image.shape[1])
-            button_y = int(max_loc[1] + button_image.shape[0])
-            # cv2.imwrite("gray_screenshot.png", gray_screenshot)
-            # cv2.imwrite("button_image.png", button_image)
+            width = button_image.shape[1]
+            height = button_image.shape[0]
+
+            # Calculate the bottom-right corner of the matched template
+            button_x = int(max_loc[0] + width)
+            button_y = int(max_loc[1] + height)
+
+            # Calculate click_x based on horizontal alignment
+            if horizontal_align == "left":
+                click_x = int(max_loc[0])
+            elif horizontal_align == "center":
+                click_x = int(max_loc[0] + width // 2)
+            elif horizontal_align == "right":
+                click_x = int(max_loc[0] + width)
+            else:
+                raise ValueError(f"Invalid horizontal_align value: {horizontal_align}")
+
+            # Calculate click_y based on vertical alignment
+            if vertical_align == "top":
+                click_y = int(max_loc[1])
+            elif vertical_align == "center":
+                click_y = int(max_loc[1] + height // 2)
+            elif vertical_align == "bottom":
+                click_y = int(max_loc[1] + height)
+            else:
+                raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
             if self.image_cfg.screenshot_option:
                 tasks = []
                 for draw_black in [True, False]:
                     task = asyncio.create_task(
                         self.__draw_rectangle(
-                            screenshot=color_screenshot,
+                            screenshot=color_screenshot.copy(),
                             button_x=button_x,
                             button_y=button_y,
                             max_loc=max_loc,
                             draw_black=draw_black,
+                            click_x=click_x,
+                            click_y=click_y,
                         )
                     )
                     tasks.append(task)
 
                 await asyncio.gather(*tasks)
+
             return FoundPosition(
-                button_x=button_x,
-                button_y=button_y,
+                button_x=click_x,
+                button_y=click_y,
                 found_button_name_en=Path(self.image_cfg.image_path).stem,
                 found_button_name_cn=self.image_cfg.image_name,
             )
