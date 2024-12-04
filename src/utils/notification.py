@@ -57,9 +57,12 @@ class Notification(BaseSettings):
 
 
 if __name__ == "__main__":
-    notification = Notification(
-        title="系統管理員", current_status="更新完成", description="伺服器已成功部署新的更新版本。"
-    )
     import asyncio
+
+    notification = Notification(
+        title="尊敬的老闆, 我已經幫您打完王朝了",
+        current_status="成功",
+        description="王朝已完成，現在開始執行五對五全場爭霸，沒有其他事情的話我先去採棉花了。",
+    )
 
     asyncio.run(notification.send_discord_notification())
