@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Literal
 import asyncio
 from pathlib import Path
 
@@ -28,7 +28,7 @@ class ImageComparison(BaseModel):
         device (Union[Page, AdbDevice, ShiftPosition]): The device.
 
     Methods:
-        __screenshot_array: Converts the screenshot to color and grayscale arrays.
+        __save_images: Saves the images to the logs directory.
         __draw_rectangle: Draws a rectangle on the image and saves the resulting image.
         find: Finds the position of a button image within a screenshot.
     """
@@ -39,7 +39,7 @@ class ImageComparison(BaseModel):
     screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
     device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
 
-    async def save_images(self, image_type: str, screenshot: np.ndarray) -> None:
+    async def __save_images(self, image_type: str, screenshot: np.ndarray) -> None:
         log_dir = Path("./logs")
         log_dir.mkdir(exist_ok=True, parents=True)
         screenshot_path = (
@@ -51,8 +51,8 @@ class ImageComparison(BaseModel):
     async def __draw_rectangle(
         self,
         screenshot: np.ndarray,
-        button_center_x: int,
-        button_center_y: int,
+        button_x: int,
+        button_y: int,
         max_loc: cv2.typing.Point,
         draw_black: bool,
     ) -> np.ndarray:
@@ -60,19 +60,19 @@ class ImageComparison(BaseModel):
 
         Args:
             screenshot (np.ndarray): The screenshot in color format.
-            button_center_x (int): The x-coordinate of the button center.
-            button_center_y (int): The y-coordinate of the button center.
+            button_x (int): The x-coordinate of the button center.
+            button_y (int): The y-coordinate of the button center.
             max_loc (cv2.typing.Point): The maximum location of the matched image.
             draw_black (bool): Flag indicating whether to draw a black rectangle.
 
         Returns:
             screenshot (np.ndarray): The screenshot with the red rectangle drawn on it.
         """
-        matched_image_position = (button_center_x, button_center_y)
+        matched_image_position = (button_x, button_y)
 
         # Draw the red rectangle on the image
         cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
-        await self.save_images(image_type="color", screenshot=screenshot)
+        await self.__save_images(image_type="color", screenshot=screenshot)
 
         if draw_black:
             # Create a mask with a white rectangle to keep the area inside the red box
@@ -84,18 +84,26 @@ class ImageComparison(BaseModel):
             screenshot = cv2.bitwise_and(screenshot, masked_screenshot) + cv2.bitwise_and(
                 black_img, cv2.bitwise_not(masked_screenshot)
             )
-            await self.save_images(image_type="blackout", screenshot=screenshot)
+            await self.__save_images(image_type="blackout", screenshot=screenshot)
 
         # Crop the internal region of the rectangle
         top_left = max_loc
-        bottom_right = (button_center_x, button_center_y)
+        bottom_right = (button_x, button_y)
         cropped_region = screenshot[top_left[1] : bottom_right[1], top_left[0] : bottom_right[0]]
-        await self.save_images(image_type="cropped", screenshot=cropped_region)
+        await self.__save_images(image_type="cropped", screenshot=cropped_region)
 
         return screenshot
 
-    async def find(self, strategy: str) -> FoundPosition:
+    async def find(
+        self,
+        vertical_align: Literal["top", "center", "bottom"] = "center",
+        horizontal_align: Literal["left", "center", "right"] = "center",
+    ) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
+
+        Args:
+            vertical_align (Literal["top", "center", "bottom"], optional): The vertical alignment of the button image. Defaults to "center".
+            horizontal_align (Literal["left", "center", "right"], optional): The horizontal alignment of the button image. Defaults to "center".
 
         Returns:
             FoundPosition: The found position of the button image.
@@ -112,7 +120,7 @@ class ImageComparison(BaseModel):
         gray_matched = cv2.matchTemplate(
             image=gray_screenshot,
             templ=button_image,
-            method=getattr(cv2, strategy),
+            method=cv2.TM_CCOEFF_NORMED,
             result=None,
             mask=None,
         )
@@ -120,8 +128,8 @@ class ImageComparison(BaseModel):
         _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
 
         if max_val > self.image_cfg.confidence:
-            button_center_x = int(max_loc[0] + button_image.shape[1])
-            button_center_y = int(max_loc[1] + button_image.shape[0])
+            button_x = int(max_loc[0] + button_image.shape[1])
+            button_y = int(max_loc[1] + button_image.shape[0])
             # cv2.imwrite("gray_screenshot.png", gray_screenshot)
             # cv2.imwrite("button_image.png", button_image)
 
@@ -131,8 +139,8 @@ class ImageComparison(BaseModel):
                     task = asyncio.create_task(
                         self.__draw_rectangle(
                             screenshot=color_screenshot,
-                            button_center_x=button_center_x,
-                            button_center_y=button_center_y,
+                            button_x=button_x,
+                            button_y=button_y,
                             max_loc=max_loc,
                             draw_black=draw_black,
                         )
@@ -141,8 +149,8 @@ class ImageComparison(BaseModel):
 
                 await asyncio.gather(*tasks)
             return FoundPosition(
-                button_center_x=button_center_x,
-                button_center_y=button_center_y,
+                button_x=button_x,
+                button_y=button_y,
                 found_button_name_en=Path(self.image_cfg.image_path).stem,
                 found_button_name_cn=self.image_cfg.image_name,
             )

@@ -48,29 +48,23 @@ class RemoteController(ConfigModel):
         return await GetScreen.from_exist_window(window_title=self.target)
 
     async def click_button(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
-        if self.found_result.button_center_x and self.found_result.button_center_y:
+        if self.found_result.button_x and self.found_result.button_y:
             if isinstance(device, Page):
-                device.mouse.click(
-                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
-                )
+                device.mouse.click(x=self.found_result.button_x, y=self.found_result.button_y)
             elif isinstance(device, APage):
                 await device.mouse.click(
-                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
+                    x=self.found_result.button_x, y=self.found_result.button_y
                 )
             elif isinstance(device, AdbDevice):
-                device.click(
-                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
-                )
+                device.click(x=self.found_result.button_x, y=self.found_result.button_y)
             elif isinstance(device, ShiftPosition):
                 await self.found_result.calibrate(shift_x=device.shift_x, shift_y=device.shift_y)
-                pyautogui.moveTo(
-                    x=self.found_result.button_center_x, y=self.found_result.button_center_y
-                )
+                pyautogui.moveTo(x=self.found_result.button_x, y=self.found_result.button_y)
                 pyautogui.click()
             logfire.info(
                 f"Found {self.found_result.found_button_name_cn}",
-                button_x=self.found_result.button_center_x,
-                button_y=self.found_result.button_center_y,
+                button_x=self.found_result.button_x,
+                button_y=self.found_result.button_y,
                 button_name_en=self.found_result.found_button_name_en,
                 button_name_cn=self.found_result.found_button_name_cn,
             )
@@ -124,7 +118,7 @@ class RemoteController(ConfigModel):
                         device=device_details.device,
                     )
 
-                    self.found_result = await image_compare.find(strategy=self.strategy)
+                    self.found_result = await image_compare.find()
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
 
