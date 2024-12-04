@@ -4,8 +4,6 @@ auto_click: True
 serials:
   - ""
 random_interval: 5
-strategy: TM_CCOEFF_NORMED
-# strategy: TM_CCORR_NORMED
 
 image_list:
   - image_name: "開始段位"
@@ -14,6 +12,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "胡了"
     image_path: "./data/mahjong/hule.png"
@@ -21,6 +21,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "對局結束"
     image_path: "./data/mahjong/match_end.png"
@@ -28,6 +30,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "結算畫面"
     image_path: "./data/mahjong/score.png"
@@ -35,6 +39,8 @@ image_list:
     click_this: True
     screenshot_option: True
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "遊戲結束確認"
     image_path: "./data/mahjong/confirm.png"
@@ -42,6 +48,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "遊戲結束確認2"
     image_path: "./data/mahjong/confirm2.png"
@@ -49,6 +57,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "簽到"
     image_path: "./data/mahjong/assign_v2.png"
@@ -56,6 +66,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "關閉"
     image_path: "./data/mahjong/turn_off.png"
@@ -63,6 +75,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "叉叉"
     image_path: "./data/mahjong/xx.png"
@@ -70,6 +84,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "進入遊戲"
     image_path: "./data/mahjong/login.png"
@@ -77,6 +93,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "好的"
     image_path: "./data/mahjong/haode.png"
@@ -84,6 +102,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   # 這段三選一
   - image_name: "一般場"
@@ -92,6 +112,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "銅之間"
     image_path: "./data/mahjong/tong.png"
@@ -99,6 +121,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "銀之間"
     image_path: "./data/mahjong/silver.png"
@@ -106,6 +130,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "金之間"
     image_path: "./data/mahjong/gold.png"
@@ -113,6 +139,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "玉之間"
     image_path: "./data/mahjong/yu.png"
@@ -120,6 +148,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "王座之間"
     image_path: "./data/mahjong/king.png"
@@ -127,6 +157,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   # 這段二選一
   - image_name: "四人東"
@@ -135,6 +167,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "四人南"
     image_path: "./data/mahjong/south_4p.png"
@@ -142,6 +176,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center
 
   - image_name: "三人東"
     image_path: "./data/mahjong/east_3p.png"
@@ -149,6 +185,8 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.95
+    vertical: center
+    horizontal: center
 
   - image_name: "三人南"
     image_path: "./data/mahjong/south_3p.png"
@@ -156,3 +194,5 @@ image_list:
     click_this: True
     screenshot_option: False
     confidence: 0.9
+    vertical: center
+    horizontal: center

@@ -31,19 +31,6 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    strategy: str = Field(
-        ...,
-        description="The image matching strategy",
-        examples=[
-            "TM_SQDIFF",
-            "TM_SQDIFF_NORMED",
-            "TM_CCORR",
-            "TM_CCORR_NORMED",
-            "TM_CCOEFF",
-            "TM_CCOEFF_NORMED",
-        ],
-        pattern="^TM_(SQDIFF|SQDIFF_NORMED|CCORR|CCORR_NORMED|CCOEFF|CCOEFF_NORMED)$",
-    )
     image_list: list[ImageModel] = Field(
         ...,
         description="The list of images to compare, it should contain path and name.",

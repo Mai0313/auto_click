@@ -1,3 +1,5 @@
+from typing import Literal, Optional
+
 from pydantic import Field, BaseModel
 
 
@@ -28,4 +30,18 @@ class ImageModel(BaseModel):
     )
     confidence: float = Field(
         ..., description="The confidence level for image matching", frozen=True, deprecated=False
+    )
+    vertical: Literal["top", "center", "bottom"] = Field(default="center")
+    horizontal: Literal["left", "center", "right"] = Field(default="center")
+    force_x: Optional[int] = Field(
+        default=None,
+        description="The x-coordinate of the force click",
+        frozen=True,
+        deprecated=True,
+    )
+    force_y: Optional[int] = Field(
+        default=None,
+        description="The y-coordinate of the force click",
+        frozen=True,
+        deprecated=True,
     )
