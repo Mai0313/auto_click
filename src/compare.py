@@ -80,8 +80,15 @@ class ImageComparison(BaseModel):
         # Draw the small green square at the click position
         square_size = 10  # Adjust size as needed
         half_square = square_size // 2
-        top_left_square = (click_x - half_square, click_y - half_square)
-        bottom_right_square = (click_x + half_square, click_y + half_square)
+
+        # Ensure the green square stays within the red rectangle
+        top_left_square_x = max(click_x - half_square, max_loc[0])
+        top_left_square_y = max(click_y - half_square, max_loc[1])
+        bottom_right_square_x = min(click_x + half_square, button_x)
+        bottom_right_square_y = min(click_y + half_square, button_y)
+        top_left_square = (top_left_square_x, top_left_square_y)
+        bottom_right_square = (bottom_right_square_x, bottom_right_square_y)
+
         cv2.rectangle(screenshot, top_left_square, bottom_right_square, (61, 145, 64), 2)
 
         await self.__save_images(image_type="color", screenshot=screenshot)
@@ -108,14 +115,14 @@ class ImageComparison(BaseModel):
 
     async def find(
         self,
-        vertical_align: Literal["top", "center", "bottom"] = "center",
-        horizontal_align: Literal["left", "center", "right"] = "center",
+        vertical_align: Literal["top", "center", "bottom"],
+        horizontal_align: Literal["left", "center", "right"],
     ) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
 
         Args:
-            vertical_align (Literal["top", "center", "bottom"], optional): The vertical alignment within the matched template. Defaults to "center".
-            horizontal_align (Literal["left", "center", "right"], optional): The horizontal alignment within the matched template. Defaults to "center".
+            vertical_align (Literal["top", "center", "bottom"]): The vertical alignment within the matched template. Defaults to "center".
+            horizontal_align (Literal["left", "center", "right"]): The horizontal alignment within the matched template. Defaults to "center".
 
         Raises:
             ValueError: If an invalid alignment value is provided.
