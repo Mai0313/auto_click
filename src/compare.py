@@ -40,11 +40,9 @@ class ImageComparison(BaseModel):
     device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
 
     async def __save_images(self, image_type: str, screenshot: np.ndarray) -> None:
-        log_dir = Path("./logs")
+        log_dir = Path(f"./logs/{image_type}")
         log_dir.mkdir(exist_ok=True, parents=True)
-        screenshot_path = (
-            log_dir / Path(self.image_cfg.image_path).with_suffix(f".{image_type}.png").name
-        )
+        screenshot_path = log_dir / Path(self.image_cfg.image_path).with_suffix(".png").name
         if not screenshot_path.exists():
             cv2.imwrite(str(screenshot_path.absolute()), screenshot)
 
@@ -167,7 +165,7 @@ class ImageComparison(BaseModel):
 
             if self.image_cfg.screenshot_option:
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
-                tasks = [
+                _ = [
                     asyncio.create_task(
                         self.__draw_red_rectangle(
                             screenshot=color_screenshot.copy(),
