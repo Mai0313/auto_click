@@ -48,40 +48,26 @@ class ImageComparison(BaseModel):
         if not screenshot_path.exists():
             cv2.imwrite(str(screenshot_path.absolute()), screenshot)
 
-    async def __draw_rectangle(
+    async def __draw_red_rectangle(
+        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
+    ) -> np.ndarray:
+        matched_image_position = (button_x, button_y)
+        cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
+        await self.__save_images(image_type="color", screenshot=screenshot)
+        return screenshot
+
+    async def __draw_green_square(
         self,
         screenshot: np.ndarray,
         button_x: int,
         button_y: int,
         max_loc: cv2.typing.Point,
-        draw_black: bool,
         click_x: int,
         click_y: int,
     ) -> np.ndarray:
-        """Draws a rectangle on the image, draws a small square at the click position, and saves the resulting image.
-
-        Args:
-            screenshot (np.ndarray): The screenshot in color format.
-            button_x (int): The x-coordinate of the bottom-right corner of the matched template.
-            button_y (int): The y-coordinate of the bottom-right corner of the matched template.
-            max_loc (cv2.typing.Point): The top-left corner of the matched template.
-            draw_black (bool): Flag indicating whether to draw a black rectangle.
-            click_x (int): The x-coordinate of the click position.
-            click_y (int): The y-coordinate of the click position.
-
-        Returns:
-            screenshot (np.ndarray): The screenshot with the rectangle and click position drawn on it.
-        """
-        matched_image_position = (button_x, button_y)
-
-        # Draw the red rectangle on the image
-        cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
-
-        # Draw the small green square at the click position
-        square_size = 10  # Adjust size as needed
+        square_size = 10  # Adjust as needed
         half_square = square_size // 2
 
-        # Ensure the green square stays within the red rectangle
         top_left_square_x = max(click_x - half_square, max_loc[0])
         top_left_square_y = max(click_y - half_square, max_loc[1])
         bottom_right_square_x = min(click_x + half_square, button_x)
@@ -90,28 +76,30 @@ class ImageComparison(BaseModel):
         bottom_right_square = (bottom_right_square_x, bottom_right_square_y)
 
         cv2.rectangle(screenshot, top_left_square, bottom_right_square, (61, 145, 64), 2)
-
         await self.__save_images(image_type="color", screenshot=screenshot)
+        return screenshot
 
-        if draw_black:
-            # Create a mask with a white rectangle to keep the area inside the red box
-            masked_screenshot = np.zeros_like(screenshot)
-            cv2.rectangle(masked_screenshot, max_loc, matched_image_position, (255, 255, 255), -1)
-            # Create a fully black image
-            black_img = np.zeros_like(screenshot)
-            # Keep the red box area, black out the rest
-            screenshot = cv2.bitwise_and(screenshot, masked_screenshot) + cv2.bitwise_and(
-                black_img, cv2.bitwise_not(masked_screenshot)
-            )
-            await self.__save_images(image_type="blackout", screenshot=screenshot)
+    async def __blackout_region(
+        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
+    ) -> np.ndarray:
+        matched_image_position = (button_x, button_y)
+        masked_screenshot = np.zeros_like(screenshot)
+        cv2.rectangle(masked_screenshot, max_loc, matched_image_position, (255, 255, 255), -1)
+        black_img = np.zeros_like(screenshot)
+        screenshot = cv2.bitwise_and(screenshot, masked_screenshot) + cv2.bitwise_and(
+            black_img, cv2.bitwise_not(masked_screenshot)
+        )
+        await self.__save_images(image_type="blackout", screenshot=screenshot)
+        return screenshot
 
-        # Crop the internal region of the rectangle
+    async def __crop_and_save(
+        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
+    ) -> np.ndarray:
         top_left = max_loc
         bottom_right = (button_x, button_y)
         cropped_region = screenshot[top_left[1] : bottom_right[1], top_left[0] : bottom_right[0]]
         await self.__save_images(image_type="cropped", screenshot=cropped_region)
-
-        return screenshot
+        return cropped_region
 
     async def find(
         self,
@@ -178,22 +166,45 @@ class ImageComparison(BaseModel):
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
             if self.image_cfg.screenshot_option:
-                tasks = []
-                for draw_black in [True, False]:
-                    task = asyncio.create_task(
-                        self.__draw_rectangle(
+                await self.__save_images(image_type="color", screenshot=color_screenshot)
+                tasks = [
+                    asyncio.create_task(
+                        self.__draw_red_rectangle(
                             screenshot=color_screenshot.copy(),
                             button_x=button_x,
                             button_y=button_y,
                             max_loc=max_loc,
-                            draw_black=draw_black,
+                        )
+                    ),
+                    asyncio.create_task(
+                        self.__draw_green_square(
+                            screenshot=color_screenshot.copy(),
+                            button_x=button_x,
+                            button_y=button_y,
+                            max_loc=max_loc,
                             click_x=click_x,
                             click_y=click_y,
                         )
-                    )
-                    tasks.append(task)
+                    ),
+                    asyncio.create_task(
+                        self.__blackout_region(
+                            screenshot=color_screenshot.copy(),
+                            button_x=button_x,
+                            button_y=button_y,
+                            max_loc=max_loc,
+                        )
+                    ),
+                    asyncio.create_task(
+                        self.__crop_and_save(
+                            screenshot=color_screenshot.copy(),
+                            button_x=button_x,
+                            button_y=button_y,
+                            max_loc=max_loc,
+                        )
+                    ),
+                ]
 
-                await asyncio.gather(*tasks)
+                # await asyncio.gather(*tasks)
 
             return FoundPosition(
                 button_x=click_x,
