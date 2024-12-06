@@ -51,7 +51,7 @@ class ImageComparison(BaseModel):
     ) -> np.ndarray:
         matched_image_position = (button_x, button_y)
         cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
-        await self.__save_images(image_type="color", screenshot=screenshot)
+        await self.__save_images(image_type="detected", screenshot=screenshot)
         return screenshot
 
     async def __draw_green_square(
@@ -74,7 +74,7 @@ class ImageComparison(BaseModel):
         bottom_right_square = (bottom_right_square_x, bottom_right_square_y)
 
         cv2.rectangle(screenshot, top_left_square, bottom_right_square, (61, 145, 64), 2)
-        await self.__save_images(image_type="color", screenshot=screenshot)
+        await self.__save_images(image_type="point", screenshot=screenshot)
         return screenshot
 
     async def __blackout_region(
@@ -165,44 +165,36 @@ class ImageComparison(BaseModel):
 
             if self.image_cfg.screenshot_option:
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
-                _ = [
-                    asyncio.create_task(
-                        self.__draw_red_rectangle(
-                            screenshot=color_screenshot.copy(),
-                            button_x=button_x,
-                            button_y=button_y,
-                            max_loc=max_loc,
-                        )
+                tasks = [
+                    self.__draw_red_rectangle(
+                        screenshot=color_screenshot.copy(),
+                        button_x=button_x,
+                        button_y=button_y,
+                        max_loc=max_loc,
                     ),
-                    asyncio.create_task(
-                        self.__draw_green_square(
-                            screenshot=color_screenshot.copy(),
-                            button_x=button_x,
-                            button_y=button_y,
-                            max_loc=max_loc,
-                            click_x=click_x,
-                            click_y=click_y,
-                        )
+                    self.__draw_green_square(
+                        screenshot=color_screenshot.copy(),
+                        button_x=button_x,
+                        button_y=button_y,
+                        max_loc=max_loc,
+                        click_x=click_x,
+                        click_y=click_y,
                     ),
-                    asyncio.create_task(
-                        self.__blackout_region(
-                            screenshot=color_screenshot.copy(),
-                            button_x=button_x,
-                            button_y=button_y,
-                            max_loc=max_loc,
-                        )
+                    self.__blackout_region(
+                        screenshot=color_screenshot.copy(),
+                        button_x=button_x,
+                        button_y=button_y,
+                        max_loc=max_loc,
                     ),
-                    asyncio.create_task(
-                        self.__crop_and_save(
-                            screenshot=color_screenshot.copy(),
-                            button_x=button_x,
-                            button_y=button_y,
-                            max_loc=max_loc,
-                        )
+                    self.__crop_and_save(
+                        screenshot=color_screenshot.copy(),
+                        button_x=button_x,
+                        button_y=button_y,
+                        max_loc=max_loc,
                     ),
                 ]
 
-                # await asyncio.gather(*tasks)
+                await asyncio.gather(*tasks)
 
             return FoundPosition(
                 button_x=click_x,
