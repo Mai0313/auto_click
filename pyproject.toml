@@ -114,10 +114,10 @@ url = "https://pypi.org/simple"
 # url = "http://10.9.16.152/simple"
 # type = "index"
 
-[[tool.rye.sources]]
-name = "pytorch"
-url = "https://download.pytorch.org/whl"
-type = "index"
+# [[tool.rye.sources]]
+# name = "pytorch"
+# url = "https://download.pytorch.org/whl"
+# type = "index"
 
 # [[tool.rye.proxy]]
 # http = "http://mtkdrone01.mediatek.inc:23984"
