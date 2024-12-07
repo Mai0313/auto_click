@@ -81,10 +81,10 @@ dependencies = [
     "pandas>=2.2.3",
     "sqlalchemy>=2.0.36",
     "psycopg2-binary>=2.9.10",
-    "ultralytics>=8.3.47",
-    "torch==2.5.1+cu124",
-    "torchvision==0.20.1+cu124",
-    "torchaudio==2.5.1+cu124",
+    # "ultralytics>=8.3.47",
+    # "torch==2.5.1+cu124",
+    # "torchvision==0.20.1+cu124",
+    # "torchaudio==2.5.1+cu124",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
