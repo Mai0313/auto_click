@@ -81,6 +81,7 @@ dependencies = [
     "pandas>=2.2.3",
     "sqlalchemy>=2.0.36",
     "psycopg2-binary>=2.9.10",
+    "httpx>=0.28.1",
     # "ultralytics>=8.3.47",
     # "torch==2.5.1+cu124",
     # "torchvision==0.20.1+cu124",
