@@ -16,9 +16,12 @@ altgraph==0.17.4
 annotated-types==0.7.0
     # via pydantic
 anyio==4.6.2.post1
+    # via httpx
 apkutils2==1.0.0
     # via adbutils
 certifi==2022.12.7
+    # via httpcore
+    # via httpx
     # via requests
 charset-normalizer==2.1.1
     # via requests
@@ -41,8 +44,14 @@ googleapis-common-protos==1.65.0
 greenlet==3.1.1
     # via playwright
     # via sqlalchemy
+h11==0.14.0
+    # via httpcore
+httpcore==1.0.7
+    # via httpx
+httpx==0.28.1
 idna==3.4
     # via anyio
+    # via httpx
     # via requests
 importlib-metadata==8.4.0
     # via opentelemetry-api
