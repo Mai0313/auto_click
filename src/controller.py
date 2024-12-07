@@ -121,9 +121,9 @@ class RemoteController(ConfigModel):
             self.switch_nums += 1
 
             notify = Notification(
-                title="尊敬的老闆, 我已經幫您打完王朝了",
+                title="老大, 我已經幫您打完王朝了",
                 current_status="成功",
-                description="王朝已完成，現在開始執行五對五全場爭霸，沒有其他事情的話我先去採棉花了。",
+                description="王朝已完成，將繼續為您採棉花。",
             )
             await notify.send_discord_notification()
 
