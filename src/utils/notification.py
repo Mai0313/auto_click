@@ -13,6 +13,21 @@ from pydantic_settings import BaseSettings
 class Notification(BaseSettings):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    avatar_url: str = Field(
+        default="https://i.imgur.com/QoOwyXJ.png",
+        title="Avatar URL",
+        description="The URL of the avatar image.",
+        frozen=True,
+        deprecated=False,
+    )
+    content: str = Field(
+        default="",
+        title="Content",
+        description="The content of the notification message.",
+        frozen=True,
+        deprecated=False,
+    )
+
     title: str = Field(
         ...,
         title="Title",
@@ -55,7 +70,7 @@ class Notification(BaseSettings):
             "title": f"📢 {self.title}",
             "url": "https://mai0313.com",
             "description": self.description,
-            "color": 65280,
+            "color": 14177041,
             "fields": [
                 {"name": "更多資訊", "value": "[點擊這裡](https://mai0313.com)", "inline": True},
                 {"name": "狀態更新", "value": "此通知為自動生成", "inline": True},
@@ -82,7 +97,7 @@ class Notification(BaseSettings):
             files = {"file": ("image.jpg", image_path.read_bytes(), "image/jpeg")}
             embed["image"] = {"url": "attachment://image.jpg"}
 
-        payload = {"embeds": [embed]}
+        payload = {"avatar_url": self.avatar_url, "content": self.content, "embeds": [embed]}
 
         # 發送請求到 Discord Webhook
         async with httpx.AsyncClient() as client:
