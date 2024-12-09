@@ -1,5 +1,4 @@
 import json
-from typing import Union
 import asyncio
 from pathlib import Path
 import secrets
@@ -32,7 +31,9 @@ class RemoteController(ConfigModel):
 
     win: int = Field(default=0, title="Win", description="Number of wins")
     lose: int = Field(default=0, title="Lose", description="Number of loses")
-    switch_nums: int = Field(default=0, title="Switch", description="Number of switch games")
+    game_switched: bool = Field(
+        default=False, title="Game Switched", description="Whether the game has been switched"
+    )
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
@@ -49,18 +50,24 @@ class RemoteController(ConfigModel):
         # 返回 screenshot 和 shift_position，而不是 device
         return await GetScreen.from_exist_window(window_title=self.target)
 
-    async def click_button(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
+    async def click_button(self, device_details: Screenshot) -> None:
         if self.found_result.button_x and self.found_result.button_y:
-            if isinstance(device, Page):
-                device.mouse.click(x=self.found_result.button_x, y=self.found_result.button_y)
-            elif isinstance(device, APage):
-                await device.mouse.click(
+            if isinstance(device_details.device, Page):
+                device_details.device.mouse.click(
                     x=self.found_result.button_x, y=self.found_result.button_y
                 )
-            elif isinstance(device, AdbDevice):
-                device.click(x=self.found_result.button_x, y=self.found_result.button_y)
-            elif isinstance(device, ShiftPosition):
-                await self.found_result.calibrate(shift_x=device.shift_x, shift_y=device.shift_y)
+            elif isinstance(device_details.device, APage):
+                await device_details.device.mouse.click(
+                    x=self.found_result.button_x, y=self.found_result.button_y
+                )
+            elif isinstance(device_details.device, AdbDevice):
+                device_details.device.click(
+                    x=self.found_result.button_x, y=self.found_result.button_y
+                )
+            elif isinstance(device_details.device, ShiftPosition):
+                await self.found_result.calibrate(
+                    shift_x=device_details.device.shift_x, shift_y=device_details.device.shift_y
+                )
                 pyautogui.moveTo(x=self.found_result.button_x, y=self.found_result.button_y)
                 pyautogui.click()
             logfire.info(
@@ -71,19 +78,17 @@ class RemoteController(ConfigModel):
                 button_name_cn=self.found_result.found_button_name_cn,
             )
 
-    async def export_win_rate(self) -> None:
+    async def __export_win_rate(self) -> None:
         log_path = Path("./logs")
         log_path.mkdir(parents=True, exist_ok=True)
         total_games = self.win + self.lose
-        _current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        _current_date = datetime.datetime.now().strftime("%Y%m%d")
         win_lost_dict = {
-            "date": _current_date,
-            "time": _current_time,
+            "date": datetime.datetime.now().strftime("%Y%m%d"),
+            "time": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
             "win": self.win,
             "lose": self.lose,
             "total": total_games,
-            "win_rate": self.win / total_games,
+            "win_rate": self.win / total_games if total_games > 0 else 0,
         }
         _start_time_string = self.start_time.strftime("%Y%m%d%H%M%S")
         async with await anyio.open_file(f"./logs/{_start_time_string}.json", "w") as f:
@@ -99,34 +104,43 @@ class RemoteController(ConfigModel):
                 logfire.error("Error Occurred while saving to database", _exc_info=True)
 
     async def count_win_rate(self) -> None:
-        conditions = ["win", "lose"]
         button_name = self.found_result.found_button_name_en
-        if button_name in conditions:
-            if button_name == "win":
-                self.win += 1
-                await self.export_win_rate()
-            elif button_name == "lose":
-                self.lose += 1
-                await self.export_win_rate()
+        if button_name == "win":
+            self.win += 1
+            await self.__export_win_rate()
+        elif button_name == "lose":
+            self.lose += 1
+            await self.__export_win_rate()
 
-    async def switch_game(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
+    async def switch_game(self, device_details: Screenshot) -> None:
+        if self.found_result.found_button_name_en != "confirm":
+            return
         total_games = self.win + self.lose
-        if isinstance(device, AdbDevice) and self.switch_nums == 0 and total_games > 10:
-            logfire.warn("Switching Game!!")
-            device.click(x=1600, y=630)
-            await asyncio.sleep(5)
-            device.click(x=1600, y=830)
-            await asyncio.sleep(5)
-            device.click(x=1600, y=930)
-            await asyncio.sleep(5)
-            self.switch_nums += 1
+        if isinstance(device_details.device, AdbDevice) and total_games >= 1:
+            if self.game_switched is False:
+                logfire.warn("Switching Game!!")
+                device_details.device.click(x=1600, y=630)
+                await asyncio.sleep(5)
+                device_details.device.click(x=1600, y=830)
+                await asyncio.sleep(5)
+                device_details.device.click(x=1600, y=930)
+                await asyncio.sleep(5)
+                self.game_switched = True
 
-            notify = Notification(
-                title="老大, 我已經幫您打完王朝了",
-                current_status="成功",
-                description="王朝已完成，將繼續為您採棉花。",
-            )
-            await notify.send_discord_notification()
+                notify = Notification(
+                    title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
+                    description=f"王朝已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}\n勝率: {self.win / total_games}",
+                    target_image=device_details.screenshot,
+                )
+                await notify.send_discord_notification()
+            else:
+                logfire.info("Game has been completed.")
+                notify = Notification(
+                    title="老闆!! 我已經幫您打完王朝/五對五了",
+                    description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}\n勝率: {self.win / total_games}",
+                    target_image=device_details.screenshot,
+                )
+                await notify.send_discord_notification()
 
     async def start(self) -> None:
         while True:
@@ -144,9 +158,14 @@ class RemoteController(ConfigModel):
                         horizontal_align=config_dict.horizontal,
                     )
                     if self.auto_click and config_dict.click_this:
-                        await self.click_button(device=device_details.device)
-                        if self.found_result.found_button_name_en == "confirm":
-                            await self.switch_game(device=device_details.device)
+                        # notify = Notification(
+                        #     title="我開始採棉花拉拉拉拉",
+                        #     description=f"已找到圖片 {config_dict.image_name}，正在點擊",
+                        #     target_image=device_details.screenshot,
+                        # )
+                        # await notify.send_discord_notification()
+                        await self.click_button(device_details=device_details)
+                        await self.switch_game(device_details=device_details)
 
                         await self.count_win_rate()
 
@@ -159,8 +178,8 @@ class RemoteController(ConfigModel):
                 )
                 notify = Notification(
                     title="尊敬的老闆, 發生錯誤!!",
-                    current_status="錯誤",
                     description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
+                    target_image=None,
                 )
                 await notify.send_discord_notification()
                 await asyncio.sleep(_random_interval)
