@@ -155,6 +155,12 @@ class RemoteController(ConfigModel):
                         horizontal_align=config_dict.horizontal,
                     )
                     if self.auto_click and config_dict.click_this:
+                        # notify = Notification(
+                        #     title="我開始採棉花拉拉拉拉",
+                        #     description=f"已找到圖片 {config_dict.image_name}，正在點擊",
+                        #     target_image=device_details.screenshot,
+                        # )
+                        # await notify.send_discord_notification()
                         await self.click_button(device=device_details.device)
                         await self.switch_game(device=device_details.device)
 
@@ -169,8 +175,8 @@ class RemoteController(ConfigModel):
                 )
                 notify = Notification(
                     title="尊敬的老闆, 發生錯誤!!",
-                    current_status="錯誤",
                     description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
+                    target_image=None,
                 )
                 await notify.send_discord_notification()
                 await asyncio.sleep(_random_interval)
