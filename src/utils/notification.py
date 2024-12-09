@@ -86,7 +86,7 @@ class Notification(BaseSettings):
         files: dict[str, tuple[str, Union[bytes, io.BytesIO], str]] = {}
         if isinstance(self.target_image, Image.Image):
             image_bytes = io.BytesIO()
-            self.target_image.save(image_bytes, format="JPEG")
+            self.target_image.save(image_bytes, format=self.target_image.format or "PNG")
             image_bytes.seek(0)
             files = {"file": ("image.jpg", image_bytes, "image/jpeg")}
             embed["image"] = {"url": "attachment://image.jpg"}
@@ -104,7 +104,7 @@ class Notification(BaseSettings):
             if files:
                 response = await client.post(
                     url=self.discord_webhook_url,
-                    data={"payload_json": orjson.dumps(payload)},
+                    data={"payload_json": orjson.dumps(payload).decode("utf-8")},
                     files=files,
                 )
             else:
