@@ -32,7 +32,9 @@ class RemoteController(ConfigModel):
 
     win: int = Field(default=0, title="Win", description="Number of wins")
     lose: int = Field(default=0, title="Lose", description="Number of loses")
-    switch_nums: int = Field(default=0, title="Switch", description="Number of switch games")
+    game_switched: bool = Field(
+        default=False, title="Game Switched", description="Whether the game has been switched"
+    )
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
@@ -71,7 +73,7 @@ class RemoteController(ConfigModel):
                 button_name_cn=self.found_result.found_button_name_cn,
             )
 
-    async def export_win_rate(self) -> None:
+    async def __export_win_rate(self) -> None:
         log_path = Path("./logs")
         log_path.mkdir(parents=True, exist_ok=True)
         total_games = self.win + self.lose
@@ -99,34 +101,43 @@ class RemoteController(ConfigModel):
                 logfire.error("Error Occurred while saving to database", _exc_info=True)
 
     async def count_win_rate(self) -> None:
-        conditions = ["win", "lose"]
         button_name = self.found_result.found_button_name_en
-        if button_name in conditions:
-            if button_name == "win":
-                self.win += 1
-                await self.export_win_rate()
-            elif button_name == "lose":
-                self.lose += 1
-                await self.export_win_rate()
+        if button_name == "win":
+            self.win += 1
+            await self.__export_win_rate()
+        elif button_name == "lose":
+            self.lose += 1
+            await self.__export_win_rate()
 
     async def switch_game(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
+        if self.found_result.found_button_name_en != "confirm":
+            return
         total_games = self.win + self.lose
-        if isinstance(device, AdbDevice) and self.switch_nums == 0 and total_games > 10:
-            logfire.warn("Switching Game!!")
-            device.click(x=1600, y=630)
-            await asyncio.sleep(5)
-            device.click(x=1600, y=830)
-            await asyncio.sleep(5)
-            device.click(x=1600, y=930)
-            await asyncio.sleep(5)
-            self.switch_nums += 1
+        if isinstance(device, AdbDevice) and total_games >= 1:
+            if self.game_switched is False:
+                logfire.warn("Switching Game!!")
+                device.click(x=1600, y=630)
+                await asyncio.sleep(5)
+                device.click(x=1600, y=830)
+                await asyncio.sleep(5)
+                device.click(x=1600, y=930)
+                await asyncio.sleep(5)
+                self.game_switched = True
 
-            notify = Notification(
-                title="老大, 我已經幫您打完王朝了",
-                current_status="成功",
-                description="王朝已完成，將繼續為您採棉花。",
-            )
-            await notify.send_discord_notification()
+                notify = Notification(
+                    title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
+                    description=f"王朝已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}\n勝率: {self.win / total_games}",
+                    target_image=device.screenshot(),
+                )
+                await notify.send_discord_notification()
+            else:
+                logfire.info("Game has been completed.")
+                notify = Notification(
+                    title="老闆!! 我已經幫您打完王朝/五對五了",
+                    description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}\n勝率: {self.win / total_games}",
+                    target_image=device.screenshot(),
+                )
+                await notify.send_discord_notification()
 
     async def start(self) -> None:
         while True:
@@ -145,8 +156,7 @@ class RemoteController(ConfigModel):
                     )
                     if self.auto_click and config_dict.click_this:
                         await self.click_button(device=device_details.device)
-                        if self.found_result.found_button_name_en == "confirm":
-                            await self.switch_game(device=device_details.device)
+                        await self.switch_game(device=device_details.device)
 
                         await self.count_win_rate()
 
