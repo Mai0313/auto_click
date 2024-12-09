@@ -110,7 +110,8 @@ class RemoteController(ConfigModel):
                 await self.export_win_rate()
 
     async def switch_game(self, device: Union[Page, APage, AdbDevice, ShiftPosition]) -> None:
-        if isinstance(device, AdbDevice) and self.switch_nums == 0:
+        total_games = self.win + self.lose
+        if isinstance(device, AdbDevice) and self.switch_nums == 0 and total_games > 10:
             logfire.warn("Switching Game!!")
             device.click(x=1600, y=630)
             await asyncio.sleep(5)
