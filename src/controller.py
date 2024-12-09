@@ -82,15 +82,13 @@ class RemoteController(ConfigModel):
         log_path = Path("./logs")
         log_path.mkdir(parents=True, exist_ok=True)
         total_games = self.win + self.lose
-        _current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        _current_date = datetime.datetime.now().strftime("%Y%m%d")
         win_lost_dict = {
-            "date": _current_date,
-            "time": _current_time,
+            "date": datetime.datetime.now().strftime("%Y%m%d"),
+            "time": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
             "win": self.win,
             "lose": self.lose,
             "total": total_games,
-            "win_rate": self.win / total_games,
+            "win_rate": self.win / total_games if total_games > 0 else 0,
         }
         _start_time_string = self.start_time.strftime("%Y%m%d%H%M%S")
         async with await anyio.open_file(f"./logs/{_start_time_string}.json", "w") as f:
