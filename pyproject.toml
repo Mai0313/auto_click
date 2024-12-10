@@ -84,6 +84,7 @@ dependencies = [
     "httpx>=0.28.1",
     "orjson>=3.10.12",
     "discord-py>=2.4.0",
+    "openai>=1.57.2",
     # "ultralytics>=8.3.47",
     # "torch==2.5.1+cu124",
     # "torchvision==0.20.1+cu124",

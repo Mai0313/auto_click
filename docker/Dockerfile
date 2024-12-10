@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.10.14
-FROM python:${PYTHON_VERSION} as builder
+FROM python:${PYTHON_VERSION}-slim as builder
 
 LABEL maintainer="Wei Lee <mai@mai0313.com>" \
     org.label-schema.name="auto-click" \
