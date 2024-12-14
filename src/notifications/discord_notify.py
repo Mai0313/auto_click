@@ -6,40 +6,18 @@ import datetime
 from PIL import Image
 import httpx
 import orjson
-import logfire
 from pydantic import Field, ConfigDict, AliasChoices
-from pydantic_settings import BaseSettings
+
+from src.notifications.base_notify import BaseNotify
 
 
-class DiscordNotify(BaseSettings):
+class DiscordNotify(BaseNotify):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     avatar_url: str = Field(
         default="https://i.imgur.com/QoOwyXJ.png",
         title="Avatar URL",
         description="The URL of the avatar image.",
-        frozen=True,
-        deprecated=False,
-    )
-    content: str = Field(
-        default="",
-        title="Content",
-        description="The content of the notification message.",
-        frozen=True,
-        deprecated=False,
-    )
-
-    title: str = Field(
-        ...,
-        title="Title",
-        description="The title of the notification message.",
-        frozen=True,
-        deprecated=False,
-    )
-    description: str = Field(
-        ...,
-        title="Description",
-        description="The description of the notification message.",
         frozen=True,
         deprecated=False,
     )
@@ -58,12 +36,6 @@ class DiscordNotify(BaseSettings):
         frozen=True,
         deprecated=False,
     )
-
-    async def send_notify(self) -> None:
-        try:
-            await self._send_notify()
-        except Exception:
-            logfire.error("Failed to send Discord notification.")
 
     async def _send_notify(self) -> None:
         timestamp = datetime.datetime.now().isoformat()  # ISO 8601 格式

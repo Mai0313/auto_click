@@ -20,7 +20,7 @@ from .types.config import ConfigModel
 from .types.database import DatabaseConfig
 from .utils.get_serial import ADBDeviceManager
 from .types.output_models import Screenshot, FoundPosition, ShiftPosition
-from .notifications.notification import DiscordNotify
+from .notifications.discord_notify import DiscordNotify
 
 
 class RemoteController(ConfigModel):
