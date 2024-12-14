@@ -6,11 +6,12 @@ import datetime
 from PIL import Image
 import httpx
 import orjson
+import logfire
 from pydantic import Field, ConfigDict, AliasChoices
 from pydantic_settings import BaseSettings
 
 
-class Notification(BaseSettings):
+class DiscordNotify(BaseSettings):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     avatar_url: str = Field(
@@ -58,7 +59,13 @@ class Notification(BaseSettings):
         deprecated=False,
     )
 
-    async def send_discord_notification(self) -> None:
+    async def send_notify(self) -> None:
+        try:
+            await self._send_notify()
+        except Exception:
+            logfire.error("Failed to send Discord notification.")
+
+    async def _send_notify(self) -> None:
         timestamp = datetime.datetime.now().isoformat()  # ISO 8601 格式
 
         embed = {
@@ -115,10 +122,10 @@ class Notification(BaseSettings):
 if __name__ == "__main__":
     import asyncio
 
-    notify = Notification(
+    notify = DiscordNotify(
         title="老大, 我已經幫您打完王朝了",
         description="王朝已完成，將繼續為您採棉花。",
         target_image="./data/allstars/back.png",
     )
 
-    asyncio.run(notify.send_discord_notification())
+    asyncio.run(notify.send_notify())
