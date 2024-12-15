@@ -19,8 +19,8 @@ from .screenshot import GetScreen
 from .types.config import ConfigModel
 from .types.database import DatabaseConfig
 from .utils.get_serial import ADBDeviceManager
-from .utils.notification import Notification
 from .types.output_models import Screenshot, FoundPosition, ShiftPosition
+from .notifications.discord_notify import DiscordNotify
 
 
 class RemoteController(ConfigModel):
@@ -115,7 +115,7 @@ class RemoteController(ConfigModel):
     async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
         if isinstance(device_details.device, AdbDevice):
-            if self.game_switched is False and total_games > 3:
+            if self.game_switched is False:
                 logfire.warn("Switching Game!!")
                 device_details.device.click(x=1600, y=630)
                 await asyncio.sleep(5)
@@ -127,20 +127,20 @@ class RemoteController(ConfigModel):
 
                 logfire.info("Game has been switched.")
                 _current_device = await self.get_screenshot()
-                notify = Notification(
+                notify = DiscordNotify(
                     title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
                     description=f"王朝已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
                     target_image=_current_device.screenshot,
                 )
-                await notify.send_discord_notification()
+                await notify.send_notify()
             else:
                 logfire.info("Game has been completed.")
-                notify = Notification(
+                notify = DiscordNotify(
                     title="老闆!! 我已經幫您打完王朝/五對五了",
                     description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
                     target_image=device_details.screenshot,
                 )
-                await notify.send_discord_notification()
+                await notify.send_notify()
 
     async def start(self) -> None:
         while True:
@@ -158,12 +158,12 @@ class RemoteController(ConfigModel):
                         horizontal_align=config_dict.horizontal,
                     )
                     if self.auto_click and config_dict.click_this:
-                        # notify = Notification(
+                        # notify = DiscordNotify(
                         #     title="我開始採棉花拉拉拉拉",
                         #     description=f"已找到圖片 {config_dict.image_name}，正在點擊",
                         #     target_image=device_details.screenshot,
                         # )
-                        # await notify.send_discord_notification()
+                        # await notify.send_notify()
                         await self.click_button(device_details=device_details)
 
                         if self.found_result.found_button_name_en == "confirm":
@@ -178,12 +178,12 @@ class RemoteController(ConfigModel):
                 logfire.error(
                     f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
                 )
-                notify = Notification(
+                notify = DiscordNotify(
                     title="尊敬的老闆, 發生錯誤!!",
                     description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
                     target_image=None,
                 )
-                await notify.send_discord_notification()
+                await notify.send_notify()
                 await asyncio.sleep(_random_interval)
             _random_interval = secrets.randbelow(self.random_interval)
             await asyncio.sleep(_random_interval)
