@@ -34,6 +34,9 @@ class RemoteController(ConfigModel):
     game_switched: bool = Field(
         default=False, title="Game Switched", description="Whether the game has been switched"
     )
+    notified_count: int = Field(
+        default=0, title="Notified", description="Whether the notification has been sent"
+    )
 
     @model_validator(mode="after")
     def _init_serial(self) -> "RemoteController":
@@ -133,14 +136,16 @@ class RemoteController(ConfigModel):
                     target_image=_current_device.screenshot,
                 )
                 await notify.send_notify()
+                self.notified_count += 1
             else:
-                logfire.info("Game has been completed.")
-                notify = DiscordNotify(
-                    title="老闆!! 我已經幫您打完王朝/五對五了",
-                    description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
-                    target_image=device_details.screenshot,
-                )
-                await notify.send_notify()
+                if self.notified_count == 1:
+                    logfire.info("Game has been completed.")
+                    notify = DiscordNotify(
+                        title="老闆!! 我已經幫您打完王朝/五對五了",
+                        description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
+                        target_image=device_details.screenshot,
+                    )
+                    await notify.send_notify()
 
     async def start(self) -> None:
         while True:
