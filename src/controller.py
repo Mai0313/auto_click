@@ -4,6 +4,7 @@ from pathlib import Path
 import secrets
 import datetime
 
+import pytz
 import anyio
 import pandas as pd
 import logfire
@@ -117,9 +118,8 @@ class RemoteController(ConfigModel):
 
     async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
-        if datetime.datetime.now().hour == 0:
-            # 這段目的是希望在十二點以後才開始確認是否要切換，因為有時候我想十一點睡覺
-            # 但我又希望他可以從王朝開始打 再打五對五
+        current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
+        if 22 <= current_hour < 24:
             return
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
