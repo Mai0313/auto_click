@@ -151,7 +151,6 @@ class RemoteController(ConfigModel):
                     await notify.send_notify()
 
     async def start(self) -> None:
-        print(datetime.datetime.now().hour)
         while True:
             try:
                 device_details = await self.get_screenshot()
