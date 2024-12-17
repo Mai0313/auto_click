@@ -129,11 +129,10 @@ class RemoteController(ConfigModel):
                 self.game_switched = True
 
                 logfire.info("Game has been switched.")
-                _current_device = await self.get_screenshot()
                 notify = DiscordNotify(
                     title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
                     description=f"王朝已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
-                    target_image=_current_device.screenshot,
+                    target_image=device_details.screenshot,
                 )
                 await notify.send_notify()
                 self.notified_count += 1
