@@ -117,6 +117,10 @@ class RemoteController(ConfigModel):
 
     async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
+        if datetime.datetime.now().hour == 0:
+            # 這段目的是希望在十二點以後才開始確認是否要切換，因為有時候我想十一點睡覺
+            # 但我又希望他可以從王朝開始打 再打五對五
+            return
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
                 logfire.warn("Switching Game!!")
@@ -147,6 +151,7 @@ class RemoteController(ConfigModel):
                     await notify.send_notify()
 
     async def start(self) -> None:
+        print(datetime.datetime.now().hour)
         while True:
             try:
                 device_details = await self.get_screenshot()
