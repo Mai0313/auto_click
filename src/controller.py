@@ -1,17 +1,12 @@
-import json
 import asyncio
-from pathlib import Path
 import secrets
 import datetime
 
 import pytz
-import anyio
-import pandas as pd
 import logfire
 from adbutils import AdbDevice
 from pydantic import Field, model_validator
 import pyautogui
-from sqlalchemy import create_engine
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
 
@@ -82,40 +77,6 @@ class RemoteController(ConfigModel):
                 button_name_cn=self.found_result.found_button_name_cn,
             )
 
-    async def __export_win_rate(self) -> None:
-        log_path = Path("./logs")
-        log_path.mkdir(parents=True, exist_ok=True)
-        total_games = self.win + self.lose
-        win_lost_dict = {
-            "date": datetime.datetime.now().strftime("%Y%m%d"),
-            "time": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
-            "win": self.win,
-            "lose": self.lose,
-            "total": total_games,
-            "win_rate": self.win / total_games if total_games > 0 else 0,
-        }
-        _start_time_string = self.start_time.strftime("%Y%m%d%H%M%S")
-        async with await anyio.open_file(f"./logs/{_start_time_string}.json", "w") as f:
-            await f.write(json.dumps(win_lost_dict))
-        if self.save2db:
-            try:
-                engine = create_engine(self.database.postgres.postgres_dsn, echo=True)
-                data = pd.DataFrame([win_lost_dict])
-                data.to_sql(
-                    name="all_star_match_history", con=engine, if_exists="append", index=False
-                )
-            except Exception:
-                logfire.error("Error Occurred while saving to database", _exc_info=True)
-
-    async def count_win_rate(self) -> None:
-        button_name = self.found_result.found_button_name_en
-        if button_name == "win":
-            self.win += 1
-            await self.__export_win_rate()
-        elif button_name == "lose":
-            self.lose += 1
-            await self.__export_win_rate()
-
     async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
@@ -166,18 +127,10 @@ class RemoteController(ConfigModel):
                         horizontal_align=config_dict.horizontal,
                     )
                     if self.auto_click and config_dict.click_this:
-                        # notify = DiscordNotify(
-                        #     title="我開始採棉花拉拉拉拉",
-                        #     description=f"已找到圖片 {config_dict.image_name}，正在點擊",
-                        #     target_image=device_details.screenshot,
-                        # )
-                        # await notify.send_notify()
                         await self.click_button(device_details=device_details)
 
                         if self.found_result.found_button_name_en == "confirm":
                             await self.switch_game(device_details=device_details)
-
-                        await self.count_win_rate()
 
                         await asyncio.sleep(config_dict.delay_after_click)
 
