@@ -128,14 +128,7 @@ idna==3.4
     # via requests
     # via yarl
 importlib-metadata==8.4.0
-    # via jupyter-client
-    # via markdown
-    # via mkdocs
-    # via mkdocs-get-deps
-    # via mkdocstrings
     # via opentelemetry-api
-    # via pyinstaller
-    # via pyinstaller-hooks-contrib
 iniconfig==2.0.0
     # via pytest
 ipykernel==6.29.5
@@ -413,9 +406,7 @@ traitlets==5.14.3
 typing-extensions==4.12.2
     # via anyio
     # via griffe-typingdoc
-    # via ipython
     # via logfire
-    # via mkdocstrings
     # via multidict
     # via openai
     # via opentelemetry-sdk
