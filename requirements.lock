@@ -78,7 +78,7 @@ importlib-metadata==8.4.0
     # via opentelemetry-api
 jiter==0.8.2
     # via openai
-logfire==2.1.1
+logfire==2.11.1
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
 markdown-it-py==3.0.0
