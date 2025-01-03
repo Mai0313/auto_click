@@ -27,6 +27,6 @@ This is a information grabber for pictures. It can be used to extract informatio
 
 ## For More info, check the [Docs](https://mai0313.github.io/auto_click/)
 
-> \[!IMPORTANT\]
+> [!IMPORTANT]
 >
 > - Some actions may not work if you don't give the correct secrets or environment variables.

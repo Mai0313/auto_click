@@ -94,7 +94,7 @@ dependencies = [
 ]
 dynamic = ["readme"]
 readme = "README.md"
-requires-python = ">= 3.10"
+requires-python = ">= 3.9"
 license = { text = "MIT" }
 
 [project.urls]
@@ -258,8 +258,8 @@ extend-include = ["**/*.ipynb", "*.sh"]
 # Allow imports relative to the "src" and "test" directories.
 src = ["src", "tests"]
 
-# Assume Python 3.10.*
-target-version = "py310"
+# Assume Python 3.9.*
+target-version = "py39"
 
 # Set the cache directory to `logs/ruff_cache`.
 cache-dir = "./.cache/ruff"  # default: ".ruff_cache", now it is not allowed to create cache dir in logs
@@ -370,10 +370,6 @@ ignore = [
     "W505",
     # "N804",
     "E266",
-    # No need annotation for `self`
-    "ANN101",
-    # No need annotation for `cls`
-    "ANN102",
     # No need annotation for `__init__`
     "ANN204",
     # no need timeout for requests
@@ -514,7 +510,7 @@ ignore-words-list = ["longe"]
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 # strict = true
-python_version = "3.10"
+python_version = "3.9"
 explicit_package_bases = true
 cache_dir = "./.cache/.mypy_cache"
 exclude = ["^tests/"]
