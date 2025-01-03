@@ -75,7 +75,7 @@ dependencies = [
     "pydantic>=2.7.3",
     "pyinstaller>=6.7.0",
     "pyyaml>=6.0.2",
-    "logfire>=2.11.1",
+    "logfire<=2.11.1",
     "tomli>=2.0.2",
     "anyio>=4.6.2.post1",
     "pydantic-settings>=2.6.1",
@@ -87,6 +87,7 @@ dependencies = [
     "discord-py>=2.4.0",
     "openai>=1.57.2",
     "pytz>=2024.2",
+    "paddlepaddle-gpu==2.6.2",
     # "ultralytics>=8.3.47",
     # "torch==2.5.1+cu124",
     # "torchvision==0.20.1+cu124",
@@ -120,9 +121,10 @@ name = "default"
 url = "https://pypi.org/simple"
 # url = "http://10.9.16.152/simple"
 
-# [[tool.rye.sources]]
-# name = "paddle-ocr"
-# url = "https://www.paddlepaddle.org.cn/packages/stable/cu118"
+[[tool.rye.sources]]
+name = "paddle-ocr"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu118"
+type = "find-links"
 
 # [[tool.rye.sources]]
 # name = "pytorch"
