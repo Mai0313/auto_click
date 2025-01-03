@@ -76,8 +76,6 @@ idna==3.4
     # via yarl
 importlib-metadata==8.4.0
     # via opentelemetry-api
-    # via pyinstaller
-    # via pyinstaller-hooks-contrib
 jiter==0.8.2
     # via openai
 logfire==2.1.1
