@@ -2,7 +2,7 @@
 # use `rye lock` or `rye sync` to update this lockfile
 #
 # last locked with the following flags:
-#   pre: false
+#   pre: true
 #   features: ["docs"]
 #   all-features: false
 #   with-sources: false
@@ -16,6 +16,11 @@ aiohttp==3.11.10
     # via discord-py
 aiosignal==1.3.1
     # via aiohttp
+albucore==0.0.13
+    # via albumentations
+    # via paddleocr
+albumentations==1.4.10
+    # via paddleocr
 altgraph==0.17.4
     # via macholib
     # via pyinstaller
@@ -29,7 +34,7 @@ apkutils2==1.0.0
 appnope==0.1.4 ; platform_system == 'Darwin'
     # via ipykernel
 astor==0.8.1
-    # via paddlepaddle-gpu
+    # via paddlepaddle
 asttokens==2.4.1
     # via stack-data
 async-timeout==5.0.1 ; python_full_version < '3.11'
@@ -38,6 +43,8 @@ attrs==24.2.0
     # via aiohttp
 babel==2.16.0
     # via mkdocs-material
+beautifulsoup4==4.12.3
+    # via paddleocr
 certifi==2022.12.7
     # via httpcore
     # via httpx
@@ -65,20 +72,22 @@ colorama==0.4.6
 comm==0.2.2
     # via ipykernel
     # via ipywidgets
+contourpy==1.3.1
+    # via matplotlib
 coverage==7.6.4
     # via pytest-cov
+cycler==0.12.1
+    # via matplotlib
+cython==3.0.11
+    # via paddleocr
 debugpy==1.8.7
     # via ipykernel
 decorator==5.1.1
     # via ipython
-    # via paddlepaddle-gpu
+    # via paddlepaddle
     # via retry
 defusedxml==0.7.1
     # via genbadge
-deprecated==1.2.14 ; platform_system != 'Windows'
-    # via opentelemetry-api
-    # via opentelemetry-exporter-otlp-proto-http
-    # via opentelemetry-semantic-conventions
 deprecation==2.1.0
     # via adbutils
 discord-py==2.4.0
@@ -93,23 +102,24 @@ exceptiongroup==1.2.2 ; python_full_version < '3.11'
 execnet==2.1.1
     # via pytest-xdist
 executing==2.1.0
-    # via logfire
     # via stack-data
 filelock==3.13.1
     # via virtualenv
 fire==0.7.0
+    # via paddleocr
 flake8==7.1.1
     # via flake8-html
 flake8-html==0.4.3
     # via genbadge
+fonttools==4.55.3
+    # via matplotlib
+    # via paddleocr
 frozenlist==1.5.0
     # via aiohttp
     # via aiosignal
 genbadge==1.1.1
 ghp-import==2.1.0
     # via mkdocs
-googleapis-common-protos==1.65.0 ; platform_system != 'Windows'
-    # via opentelemetry-exporter-otlp-proto-http
 greenlet==3.1.1
     # via playwright
     # via sqlalchemy
@@ -124,7 +134,7 @@ httpcore==1.0.7
 httpx==0.28.1
     # via logfire
     # via openai
-    # via paddlepaddle-gpu
+    # via paddlepaddle
 identify==2.6.1
     # via pre-commit
 idna==3.4
@@ -132,8 +142,11 @@ idna==3.4
     # via httpx
     # via requests
     # via yarl
-importlib-metadata==8.4.0 ; platform_system != 'Windows'
-    # via opentelemetry-api
+imageio==2.36.1
+    # via imgaug
+    # via scikit-image
+imgaug==0.4.0
+    # via paddleocr
 iniconfig==2.0.0
     # via pytest
 ipykernel==6.29.5
@@ -150,6 +163,8 @@ jinja2==3.1.3
     # via mkdocstrings
 jiter==0.8.2
     # via openai
+joblib==1.4.2
+    # via scikit-learn
 jupyter-client==8.6.3
     # via ipykernel
 jupyter-core==5.7.2
@@ -157,8 +172,15 @@ jupyter-core==5.7.2
     # via jupyter-client
 jupyterlab-widgets==3.0.13
     # via ipywidgets
-logfire==0.0.1 ; platform_system == 'Windows'
-logfire==2.11.1 ; platform_system != 'Windows'
+kiwisolver==1.4.8
+    # via matplotlib
+lazy-loader==0.4
+    # via scikit-image
+lmdb==1.5.1
+    # via paddleocr
+logfire==0.0.1
+lxml==5.3.0
+    # via python-docx
 macholib==1.16.3 ; sys_platform == 'darwin'
     # via pyinstaller
 markdown==3.7
@@ -167,19 +189,21 @@ markdown==3.7
     # via mkdocs-material
     # via mkdocstrings
     # via pymdown-extensions
-markdown-it-py==3.0.0 ; platform_system != 'Windows'
+markdown-it-py==3.0.0
     # via rich
 markupsafe==3.0.2
     # via jinja2
     # via mkdocs
     # via mkdocs-autorefs
     # via mkdocstrings
+matplotlib==3.10.0
+    # via imgaug
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
 mccabe==0.7.0
     # via flake8
-mdurl==0.1.2 ; platform_system != 'Windows'
+mdurl==0.1.2
     # via markdown-it-py
 mergedeep==1.3.4
     # via mkdocs
@@ -206,45 +230,54 @@ multidict==6.1.0
     # via yarl
 nest-asyncio==1.6.0
     # via ipykernel
+networkx==3.4.2
+    # via paddlepaddle
+    # via scikit-image
 nodeenv==1.9.1
     # via pre-commit
 numpy==1.26.3
+    # via albucore
+    # via albumentations
+    # via contourpy
+    # via imageio
+    # via imgaug
+    # via matplotlib
+    # via opencv-contrib-python
     # via opencv-python
+    # via opencv-python-headless
     # via opt-einsum
-    # via paddlepaddle-gpu
+    # via paddleocr
+    # via paddlepaddle
     # via pandas
+    # via scikit-image
+    # via scikit-learn
+    # via scipy
+    # via shapely
+    # via tifffile
 openai==1.57.2
+opencv-contrib-python==4.10.0.84
+    # via paddleocr
 opencv-python==4.10.0.84
-opentelemetry-api==1.27.0 ; platform_system != 'Windows'
-    # via opentelemetry-exporter-otlp-proto-http
-    # via opentelemetry-instrumentation
-    # via opentelemetry-sdk
-    # via opentelemetry-semantic-conventions
-opentelemetry-exporter-otlp-proto-common==1.27.0 ; platform_system != 'Windows'
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-exporter-otlp-proto-http==1.27.0 ; platform_system != 'Windows'
-    # via logfire
-opentelemetry-instrumentation==0.48b0 ; platform_system != 'Windows'
-    # via logfire
-opentelemetry-proto==1.27.0 ; platform_system != 'Windows'
-    # via opentelemetry-exporter-otlp-proto-common
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-sdk==1.27.0 ; platform_system != 'Windows'
-    # via logfire
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-semantic-conventions==0.48b0 ; platform_system != 'Windows'
-    # via opentelemetry-sdk
+    # via imgaug
+    # via paddleocr
+opencv-python-headless==4.10.0.84
+    # via albucore
+    # via albumentations
 opt-einsum==3.3.0
-    # via paddlepaddle-gpu
+    # via paddlepaddle
 orjson==3.10.12
 packaging==24.1
     # via deprecation
     # via ipykernel
+    # via lazy-loader
+    # via matplotlib
     # via mkdocs
     # via pyinstaller
     # via pyinstaller-hooks-contrib
     # via pytest
-paddlepaddle-gpu==2.6.2
+    # via scikit-image
+paddleocr==2.9.1
+paddlepaddle==3.0.0b2
 paginate==0.5.7
     # via mkdocs-material
 pandas==2.2.3
@@ -259,8 +292,13 @@ pexpect==4.9.0 ; sys_platform != 'win32'
 pillow==10.2.0
     # via adbutils
     # via genbadge
-    # via paddlepaddle-gpu
+    # via imageio
+    # via imgaug
+    # via matplotlib
+    # via paddleocr
+    # via paddlepaddle
     # via pyscreeze
+    # via scikit-image
 platformdirs==4.3.6
     # via jupyter-core
     # via mkdocs-get-deps
@@ -275,13 +313,8 @@ prompt-toolkit==3.0.48
 propcache==0.2.1
     # via aiohttp
     # via yarl
-protobuf==3.20.2 ; platform_system == 'Windows'
-    # via paddlepaddle-gpu
-protobuf==4.25.5 ; platform_system != 'Windows'
-    # via googleapis-common-protos
-    # via logfire
-    # via opentelemetry-proto
-    # via paddlepaddle-gpu
+protobuf==3.20.2
+    # via paddlepaddle
 psutil==6.1.0
     # via ipykernel
 psycopg2-binary==2.9.10
@@ -292,11 +325,14 @@ pure-eval==0.2.3
 py==1.11.0
     # via retry
 pyautogui==0.9.54
+pyclipper==1.3.0.post6
+    # via paddleocr
 pycodestyle==2.12.1
     # via flake8
 pycparser==2.22 ; implementation_name == 'pypy'
     # via cffi
 pydantic==2.7.4
+    # via albumentations
     # via openai
     # via pydantic-settings
 pydantic-core==2.18.4
@@ -331,6 +367,8 @@ pyobjc-framework-cocoa==10.3.1 ; platform_system == 'Darwin'
     # via pyobjc-framework-quartz
 pyobjc-framework-quartz==10.3.1 ; platform_system == 'Darwin'
     # via pyautogui
+pyparsing==3.2.1
+    # via matplotlib
 pyperclip==1.9.0
     # via mouseinfo
 pyrect==0.2.0
@@ -347,7 +385,10 @@ pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
     # via ghp-import
     # via jupyter-client
+    # via matplotlib
     # via pandas
+python-docx==1.1.2
+    # via paddleocr
 python-dotenv==1.0.1
     # via pydantic-settings
 python3-xlib==0.15 ; platform_system == 'Linux'
@@ -362,8 +403,10 @@ pywin32==308 ; platform_python_implementation != 'PyPy' and sys_platform == 'win
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
     # via pyinstaller
 pyyaml==6.0.2
+    # via albumentations
     # via mkdocs
     # via mkdocs-get-deps
+    # via paddleocr
     # via pre-commit
     # via pymdown-extensions
     # via pyyaml-env-tag
@@ -372,44 +415,66 @@ pyyaml-env-tag==0.1
 pyzmq==26.2.0
     # via ipykernel
     # via jupyter-client
+rapidfuzz==3.11.0
+    # via paddleocr
 regex==2024.9.11
     # via mkdocs-material
 requests==2.28.1
     # via adbutils
     # via genbadge
     # via mkdocs-material
-    # via opentelemetry-exporter-otlp-proto-http
+    # via paddleocr
 retry==0.9.2
     # via adbutils
-rich==13.9.3 ; platform_system != 'Windows'
-    # via logfire
+rich==13.9.4
 rubicon-objc==0.4.9 ; platform_system == 'Darwin'
     # via mouseinfo
+scikit-image==0.25.0
+    # via albumentations
+    # via imgaug
+    # via paddleocr
+scikit-learn==1.6.0
+    # via albumentations
+scipy==1.14.1
+    # via albumentations
+    # via imgaug
+    # via scikit-image
+    # via scikit-learn
 setuptools==70.0.0
     # via genbadge
-    # via opentelemetry-instrumentation
     # via pyinstaller
     # via pyinstaller-hooks-contrib
+shapely==2.0.6
+    # via imgaug
+    # via paddleocr
 six==1.16.0
     # via asttokens
+    # via imgaug
     # via python-dateutil
 sniffio==1.3.1
     # via anyio
     # via openai
+soupsieve==2.6
+    # via beautifulsoup4
 sqlalchemy==2.0.36
 stack-data==0.6.3
     # via ipython
 termcolor==2.5.0
     # via fire
+threadpoolctl==3.5.0
+    # via scikit-learn
+tifffile==2024.12.12
+    # via scikit-image
 tomli==2.0.2
+    # via albucore
     # via coverage
-    # via logfire
     # via pytest
 tornado==6.4.1
     # via ipykernel
     # via jupyter-client
 tqdm==4.67.1
     # via openai
+    # via paddleocr
 traitlets==5.14.3
     # via comm
     # via ipykernel
@@ -419,15 +484,17 @@ traitlets==5.14.3
     # via jupyter-core
     # via matplotlib-inline
 typing-extensions==4.12.2
+    # via albucore
+    # via albumentations
     # via anyio
     # via griffe-typingdoc
-    # via logfire
     # via multidict
     # via openai
-    # via opentelemetry-sdk
+    # via paddlepaddle
     # via pydantic
     # via pydantic-core
     # via pyee
+    # via python-docx
     # via rich
     # via sqlalchemy
 tzdata==2024.2
@@ -442,12 +509,7 @@ wcwidth==0.2.13
     # via prompt-toolkit
 widgetsnbextension==4.0.13
     # via ipywidgets
-wrapt==1.16.0 ; platform_system != 'Windows'
-    # via deprecated
-    # via opentelemetry-instrumentation
 xmltodict==0.14.2
     # via apkutils2
 yarl==1.18.3
     # via aiohttp
-zipp==3.20.2 ; platform_system != 'Windows'
-    # via importlib-metadata
