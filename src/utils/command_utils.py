@@ -1,4 +1,4 @@
-import subprocess  # noqa: S404
+import subprocess
 
 from pydantic import Field, BaseModel
 

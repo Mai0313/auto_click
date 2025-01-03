@@ -9,10 +9,10 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![tests](https://github.com/Mai0313/auto_click/actions/workflows/test.yml/badge.svg)](https://github.com/Mai0313/auto_click/actions/workflows/test.yml)
 [![code-quality](https://github.com/Mai0313/auto_click/actions/workflows/code-quality-check.yml/badge.svg)](https://github.com/Mai0313/auto_click/actions/workflows/code-quality-check.yml)
-[![codecov](https://codecov.io/gh/Mai0313/template/branch/master/graph/badge.svg)](https://codecov.io/gh/Mai0313/template)
+[![codecov](https://codecov.io/gh/Mai0313/auto_click/branch/master/graph/badge.svg)](https://codecov.io/gh/Mai0313/auto_click)
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/Mai0313/auto_click/tree/master?tab=License-1-ov-file)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mai0313/auto_click/pulls)
-[![contributors](https://img.shields.io/github/contributors/Mai0313/template.svg)](https://github.com/Mai0313/auto_click/graphs/contributors)
+[![contributors](https://img.shields.io/github/contributors/Mai0313/auto_click.svg)](https://github.com/Mai0313/auto_click/graphs/contributors)
 
 </center>
 
@@ -27,6 +27,6 @@ This is a information grabber for pictures. It can be used to extract informatio
 
 ## For More info, check the [Docs](https://mai0313.github.io/auto_click/)
 
-> \[!IMPORTANT\]
+> [!IMPORTANT]
 >
 > - Some actions may not work if you don't give the correct secrets or environment variables.
