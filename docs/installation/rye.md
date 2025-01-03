@@ -9,7 +9,7 @@
 ```bash
 # clone project
 git clone https://github.com/Mai0313/auto_click
-mv template your-repo-name
+mv auto_click your-repo-name
 
 # change directory
 cd your-repo-name
