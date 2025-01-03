@@ -75,7 +75,7 @@ dependencies = [
     "pydantic>=2.7.3",
     "pyinstaller>=6.7.0",
     "pyyaml>=6.0.2",
-    "logfire>=1.0.1",
+    "logfire>=2.11.1",
     "tomli>=2.0.2",
     "anyio>=4.6.2.post1",
     "pydantic-settings>=2.6.1",
@@ -119,6 +119,10 @@ docs = { chain = ["docs:src", "docs:deploy", "docs:run"] }
 name = "default"
 url = "https://pypi.org/simple"
 # url = "http://10.9.16.152/simple"
+
+# [[tool.rye.sources]]
+# name = "paddle-ocr"
+# url = "https://www.paddlepaddle.org.cn/packages/stable/cu118"
 
 # [[tool.rye.sources]]
 # name = "pytorch"
