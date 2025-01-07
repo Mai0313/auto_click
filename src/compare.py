@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import pandas as pd
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
@@ -163,6 +164,15 @@ class ImageComparison(BaseModel):
             else:
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
+            data_dict = {
+                "image_name": [self.image_cfg.image_name],
+                "image_path": [self.image_cfg.image_path],
+                "x": [click_x],
+                "y": [click_y],
+            }
+            data = pd.DataFrame(data_dict)
+            data = data.astype(str)
+            data.to_csv("./logs/positions.csv", mode="a", header=True, index=False)
             if self.image_cfg.screenshot_option:
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
                 tasks = [
