@@ -164,15 +164,18 @@ class ImageComparison(BaseModel):
             else:
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
-            data_dict = {
+            position_log_path = Path("./logs/positions.csv")
+            data = pd.DataFrame({
                 "image_name": [self.image_cfg.image_name],
                 "image_path": [self.image_cfg.image_path],
                 "x": [click_x],
                 "y": [click_y],
-            }
-            data = pd.DataFrame(data_dict)
-            data = data.astype(str)
-            data.to_csv("./logs/positions.csv", mode="a", header=True, index=False)
+            }).astype(str)
+
+            if position_log_path.exists():
+                data.to_csv(position_log_path.as_posix(), mode="a", header=False, index=False)
+            else:
+                data.to_csv(position_log_path.as_posix())
             if self.image_cfg.screenshot_option:
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
                 tasks = [
