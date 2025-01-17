@@ -97,7 +97,6 @@ dependencies = [
     # "torchvision==0.20.1+cu124",
     # "torchaudio==2.5.1+cu124",
 ]
-dynamic = ["readme"]
 readme = "README.md"
 requires-python = ">= 3.9"
 license = { text = "MIT" }
