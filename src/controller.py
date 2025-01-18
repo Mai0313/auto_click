@@ -80,7 +80,7 @@ class RemoteController(ConfigModel):
     async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
-        if 22 <= current_hour < 24:
+        if (22 <= current_hour < 24) or (0 <= current_hour < 1):
             return
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
