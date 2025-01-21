@@ -5,6 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pandas as pd
+import logfire
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
@@ -100,6 +101,16 @@ class ImageComparison(BaseModel):
         await self.__save_images(image_type="cropped", screenshot=cropped_region)
         return cropped_region
 
+    async def record_position(self, click_x: int, click_y: int) -> None:
+        position_log_path = Path("./logs/positions.csv")
+        position_data = pd.read_csv(position_log_path)
+        data_dict_list = [self.image_cfg.model_dump()]
+        new_position_data = pd.DataFrame(data_dict_list).astype(str)
+        merged_data = pd.concat([position_data, new_position_data], ignore_index=True)
+        merged_data = merged_data.drop_duplicates(subset=["image_name", "image_path"], keep="last")
+        merged_data = merged_data.reset_index(drop=True)
+        merged_data.to_csv(position_log_path.as_posix(), index=False)
+
     async def find(
         self,
         vertical_align: Literal["top", "center", "bottom"],
@@ -135,6 +146,12 @@ class ImageComparison(BaseModel):
         )
 
         _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
+        logfire.info(
+            "Searching for Image",
+            name=self.image_cfg.image_name,
+            path=self.image_cfg.image_path,
+            confidence=max_val,
+        )
 
         if max_val > self.image_cfg.confidence:
             width = button_image.shape[1]
@@ -164,19 +181,8 @@ class ImageComparison(BaseModel):
             else:
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
-            position_log_path = Path("./logs/positions.csv")
-            data = pd.DataFrame({
-                "image_name": [self.image_cfg.image_name],
-                "image_path": [self.image_cfg.image_path],
-                "x": [click_x],
-                "y": [click_y],
-            }).astype(str)
-
-            if position_log_path.exists():
-                data.to_csv(position_log_path.as_posix(), mode="a", header=False, index=False)
-            else:
-                data.to_csv(position_log_path.as_posix())
             if self.image_cfg.screenshot_option:
+                await self.record_position(click_x=click_x, click_y=click_y)
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
                 tasks = [
                     self.__draw_red_rectangle(
