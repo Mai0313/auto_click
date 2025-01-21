@@ -55,7 +55,7 @@ data_file = './.github/reports/.coverage'
 omit = ["./src/ameba/*"]
 
 # ================== #
-#      Rye/uv        #
+#        uv          #
 # ================== #
 
 [project]
@@ -66,36 +66,26 @@ authors = [
     { name = "Wei", email = "mai@mai0313.com" },
 ]
 dependencies = [
-    "pillow<=10.2.0",
     "adbutils>=2.8.0",
-    "pyautogui>=0.9.54",
-    "playwright>=1.44.0",
-    "pygetwindow>=0.0.9",
-    "opencv-python>=4.10.0.82",
-    "pydantic>=2.7.3",
-    "pyinstaller>=6.7.0",
-    "pyyaml>=6.0.2",
-    "logfire>=2.11.1",
-    "tomli>=2.0.2",
-    "anyio>=4.6.2.post1",
-    "pydantic-settings>=2.6.1",
-    "pandas>=2.2.3",
-    "sqlalchemy>=2.0.36",
-    "psycopg2-binary>=2.9.10",
-    "httpx>=0.28.1",
-    "orjson>=3.10.12",
-    "discord-py>=2.4.0",
-    "openai>=1.57.2",
-    "pytz>=2024.2",
-    "paddlepaddle>=2.6.2",
-    "paddleocr>=2.9.1",
+    "anyio>=4.8.0",
     "fire>=0.7.0",
+    "httpx>=0.28.1",
+    "logfire>=3.2.0",
+    "opencv-python>=4.11.0.86",
+    "orjson>=3.10.15",
+    "pandas>=2.2.3",
+    "pillow>=11.1.0",
+    "playwright>=1.49.1",
+    "psycopg2-binary>=2.9.10",
+    "pyautogui>=0.9.54",
+    "pydantic>=2.10.5",
+    "pydantic-settings>=2.7.1",
+    "pygetwindow>=0.0.9",
+    "pytz>=2024.2",
+    "pyyaml>=6.0.2",
     "rich>=13.9.4",
-    "scrapegraphai>=1.20.1",
-    # "ultralytics>=8.3.47",
-    # "torch==2.5.1+cu124",
-    # "torchvision==0.20.1+cu124",
-    # "torchaudio==2.5.1+cu124",
+    "sqlalchemy>=2.0.37",
+    "tomli>=2.2.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -105,64 +95,24 @@ license = { text = "MIT" }
 Homepage = "https://github.com/Mai0313/auto_click"
 Repository = "https://github.com/Mai0313/auto_click"
 
-[tool.rye.scripts]
-
-api = { cmd = "python ./api.py", env-file = ".env" }
-main = { cmd = "python ./main.py", env-file = ".env" }
-
-# Documentation
-"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/Reference --exclude .venv"
-"docs:deploy" = "mkdocs gh-deploy --force --clean"
-"docs:run" = "mkdocs serve"
-
-gen = { chain = ["docs:src", "docs:deploy"] }
-docs = { chain = ["docs:src", "docs:deploy", "docs:run"] }
-
-
-[[tool.rye.sources]]
-name = "default"
-url = "https://pypi.org/simple"
-# url = "http://10.9.16.152/simple"
-
-# [[tool.rye.sources]]
-# name = "pytorch"
-# url = "https://download.pytorch.org/whl"
-
-# [[tool.rye.proxy]]
-# http = "http://mtkdrone01.mediatek.inc:23984"
-# https = "http://mtkdrone01.mediatek.inc:23984"
-
-[[tool.uv.index]]
-name = "default"
-url = "https://pypi.org/simple"
-default = true
-
-# [[tool.uv.index]]
-# name = "pytorch"
-# url = "https://download.pytorch.org/whl"
-# default = false
-
-[tool.rye]
-managed = true
-virtual = true
-universal = false
-dev-dependencies = [
-    "ipykernel>=6.29.5",
-    "ipywidgets>=8.1.5",
-    "pre-commit>=4.0.1",
-    "pytest>=8.3.4",
-    "pytest-cov>=6.0.0",
-    "pytest-xdist>=3.6.1",
-    "pytest-asyncio==0.23.8",
-    "genbadge[all]>=1.1.1",
-    "mkdocstrings-python>=1.13.0",
-    "mkdocs-material>=9.5.49",
-    "griffe-typingdoc>=0.2.7",
-]
-
 [build-system]
 requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "genbadge[all]>=1.1.1",
+    "griffe-typingdoc>=0.2.7",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
+    "mkdocs-material>=9.5.49",
+    "mkdocstrings[python]>=0.27.0",
+    "pre-commit>=4.0.1",
+    "pytest>=8.3.4",
+    "pytest-asyncio==0.23.8",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.1",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -220,6 +170,51 @@ path = "README.md"
 # replace relative links with absolute links
 pattern = '\[(.+?)\]\(((?!https?://)\S+?)\)'
 replacement = '[\1](https://github.com/openai/openai-python/tree/main/\g<2>)'
+
+[tool.rye.scripts]
+api = { cmd = "python ./api.py", env-file = ".env" }
+main = { cmd = "python ./main.py", env-file = ".env" }
+
+# Documentation
+"docs:src" = "python ./scripts/gen_docs.py --source ./src --output ./docs/Reference --exclude .venv"
+"docs:deploy" = "mkdocs gh-deploy --force --clean"
+"docs:run" = "mkdocs serve"
+
+gen = { chain = ["docs:src", "docs:deploy"] }
+docs = { chain = ["docs:src", "docs:deploy", "docs:run"] }
+
+# https://docs.astral.sh/uv/reference/settings
+[tool.uv]
+managed = true
+package = false
+check-url = "https://test.pypi.org/simple"
+compile-bytecode = true
+# concurrent-builds = 4
+# concurrent-downloads = 4
+# concurrent-installs = 4
+index-strategy = "unsafe-best-match"
+link-mode = "copy"
+native-tls = false
+no-binary = false
+offline = false
+prerelease = "if-necessary"
+preview = true
+
+# https://docs.astral.sh/uv/reference/settings/#index
+[[tool.uv.index]]
+name = "default"
+url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu118"
+# If you set it to `true`, it will be moved to the end of the prioritized list.
+# In other words, it will search pypi first, then here.
+default = true
+
+[tool.uv.pip]
+annotation-style = "line"
+output-file = "requirements.txt"
 
 # ================== #
 #        RUFF        #
@@ -415,7 +410,6 @@ keep-runtime-typing = true
 "tests/*" = ["S101", "ANN"]
 "notebooks/*.ipynb" = ["UP", "DOC", "RUF", "D", "C", "F401", "T201"]
 "examples/*.py" = ["UP", "DOC", "RUF", "D", "C", "F401", "T201"]
-"scripts/tos.py" = ["ANN", "N", "S", "SLF", "D", "C", "RUF"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
@@ -517,7 +511,7 @@ plugins = ["pydantic.mypy"]
 python_version = "3.9"
 explicit_package_bases = true
 cache_dir = "./.cache/.mypy_cache"
-exclude = ["^tests/", "scripts/tos.py"]
+exclude = ["^tests/"]
 ignore_missing_imports = true
 # install_types = true
 # non_interactive = true

@@ -1,0 +1,8 @@
+image_name,image_path,x,y
+返回大廳,./data/allstars/back2lobby.png,1484,952
+勝利,./data/allstars/win.png,365,99
+點擊空白區域繼續,./data/allstars/click2continue.png,1227,958
+返回,./data/allstars/back.png,1481,952
+失敗,./data/allstars/lose.png,394,98
+確認,./data/allstars/confirm.png,1331,852
+開始配對,./data/allstars/start.png,1697,863
