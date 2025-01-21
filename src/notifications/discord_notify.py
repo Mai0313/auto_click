@@ -5,10 +5,13 @@ import datetime
 
 from PIL import Image
 import httpx
+from dotenv import load_dotenv
 import orjson
 from pydantic import Field, ConfigDict, AliasChoices
 
 from src.notifications.base_notify import BaseNotify
+
+load_dotenv()
 
 
 class DiscordNotify(BaseNotify):

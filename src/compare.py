@@ -101,15 +101,39 @@ class ImageComparison(BaseModel):
         await self.__save_images(image_type="cropped", screenshot=cropped_region)
         return cropped_region
 
-    async def record_position(self, click_x: int, click_y: int) -> None:
+    async def record_position(self) -> None:
+        position_data = pd.DataFrame()
         position_log_path = Path("./logs/positions.csv")
-        position_data = pd.read_csv(position_log_path)
+        if position_log_path.exists():
+            position_data = pd.read_csv(position_log_path)
+
         data_dict_list = [self.image_cfg.model_dump()]
         new_position_data = pd.DataFrame(data_dict_list).astype(str)
         merged_data = pd.concat([position_data, new_position_data], ignore_index=True)
         merged_data = merged_data.drop_duplicates(subset=["image_name", "image_path"], keep="last")
         merged_data = merged_data.reset_index(drop=True)
         merged_data.to_csv(position_log_path.as_posix(), index=False)
+
+    async def get_position(
+        self,
+        vertical_align: Literal["top", "center", "bottom"],
+        horizontal_align: Literal["left", "center", "right"],
+    ) -> FoundPosition:
+        position_log_path = Path("./data/positions.csv")
+        position_data = pd.read_csv(position_log_path)
+        found_position = position_data[
+            (position_data["image_name"] == self.image_cfg.image_name)
+            & (position_data["image_path"] == self.image_cfg.image_path)
+        ]
+        if not found_position.empty:
+            logfire.info("Found Position from Existing Data", **self.image_cfg.model_dump())
+            return FoundPosition(
+                button_x=int(found_position["x"].to_numpy()[0]),
+                button_y=int(found_position["y"].to_numpy()[0]),
+                found_button_name_en=found_position["image_path"].to_numpy()[0],
+                found_button_name_cn=found_position["image_name"].to_numpy()[0],
+            )
+        return await self.find(vertical_align=vertical_align, horizontal_align=horizontal_align)
 
     async def find(
         self,
@@ -146,14 +170,13 @@ class ImageComparison(BaseModel):
         )
 
         _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
-        logfire.info(
-            "Searching for Image",
-            name=self.image_cfg.image_name,
-            path=self.image_cfg.image_path,
-            confidence=max_val,
-        )
 
         if max_val > self.image_cfg.confidence:
+            logfire.info(
+                "Found Position from Current Screen",
+                max_val=max_val,
+                **self.image_cfg.model_dump(),
+            )
             width = button_image.shape[1]
             height = button_image.shape[0]
 
@@ -182,7 +205,7 @@ class ImageComparison(BaseModel):
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
             if self.image_cfg.screenshot_option:
-                await self.record_position(click_x=click_x, click_y=click_y)
+                await self.record_position()
                 await self.__save_images(image_type="color", screenshot=color_screenshot)
                 tasks = [
                     self.__draw_red_rectangle(
