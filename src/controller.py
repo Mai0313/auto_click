@@ -85,11 +85,14 @@ class RemoteController(ConfigModel):
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
                 logfire.warn("Switching Game!!")
-                device_details.device.click(x=1600, y=630)
+                # device_details.device.click(x=1600, y=630)
+                device_details.device.shell("input tap 1600 630")
                 await asyncio.sleep(5)
-                device_details.device.click(x=1600, y=830)
+                # device_details.device.click(x=1600, y=830)
+                device_details.device.shell("input tap 1600 830")
                 await asyncio.sleep(5)
-                device_details.device.click(x=1600, y=930)
+                # device_details.device.click(x=1600, y=930)
+                device_details.device.shell("input tap 1600 930")
                 await asyncio.sleep(5)
                 self.game_switched = True
 
