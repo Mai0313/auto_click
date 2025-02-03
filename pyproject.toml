@@ -88,7 +88,7 @@ dependencies = [
     "tomli>=2.2.1",
 ]
 readme = "README.md"
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 license = { text = "MIT" }
 
 [project.urls]
@@ -256,8 +256,8 @@ extend-include = ["**/*.ipynb", "*.sh"]
 # Allow imports relative to the "src" and "test" directories.
 src = ["src", "tests"]
 
-# Assume Python 3.9.*
-target-version = "py39"
+# Assume Python 3.10.*
+target-version = "py310"
 
 # Set the cache directory to `logs/ruff_cache`.
 cache-dir = "./.cache/ruff"  # default: ".ruff_cache", now it is not allowed to create cache dir in logs
@@ -508,7 +508,7 @@ ignore-words-list = ["longe"]
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 # strict = true
-python_version = "3.9"
+python_version = "3.10"
 explicit_package_bases = true
 cache_dir = "./.cache/.mypy_cache"
 exclude = ["^tests/"]

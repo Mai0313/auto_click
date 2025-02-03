@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Literal
 import asyncio
 from pathlib import Path
 
@@ -38,8 +38,8 @@ class ImageComparison(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
-    screenshot: Union[Image.Image, bytes] = Field(..., description="The screenshot image")
-    device: Union[Page, AdbDevice, ShiftPosition] = Field(..., description="The device")
+    screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
+    device: Page | AdbDevice | ShiftPosition = Field(..., description="The device")
 
     async def __save_images(self, image_type: str, screenshot: np.ndarray) -> None:
         log_dir = Path(f"./logs/{image_type}")

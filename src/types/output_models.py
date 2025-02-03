@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional
 from pathlib import Path
 
 from PIL import Image
@@ -85,8 +85,8 @@ class Screenshot(BaseModel):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    screenshot: Union[bytes, Image.Image]
-    device: Union[AdbDevice, Page, APage, ShiftPosition]
+    screenshot: bytes | Image.Image
+    device: AdbDevice | Page | APage | ShiftPosition
 
     async def save(self, save_path: str) -> str:
         """Asynchronously saves the screenshot to the specified path.
