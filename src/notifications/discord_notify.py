@@ -1,5 +1,5 @@
 import io
-from typing import Union, Optional
+from typing import Optional
 from pathlib import Path
 import datetime
 
@@ -24,7 +24,7 @@ class DiscordNotify(BaseNotify):
         frozen=True,
         deprecated=False,
     )
-    target_image: Optional[Union[Image.Image, str]] = Field(
+    target_image: Optional[Image.Image | str] = Field(
         default=None,
         title="Image Object",
         description="The image object to send.",
@@ -65,7 +65,7 @@ class DiscordNotify(BaseNotify):
         }
 
         # 處理圖片
-        files: dict[str, tuple[str, Union[bytes, io.BytesIO], str]] = {}
+        files: dict[str, tuple[str, bytes | io.BytesIO, str]] = {}
         if isinstance(self.target_image, Image.Image):
             image_bytes = io.BytesIO()
             self.target_image.save(image_bytes, format=self.target_image.format or "PNG")
