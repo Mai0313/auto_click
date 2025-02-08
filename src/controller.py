@@ -77,11 +77,11 @@ class RemoteController(ConfigModel):
                 button_name_cn=self.found_result.found_button_name_cn,
             )
 
-    async def switch_game(self, device_details: Screenshot) -> None:
+    async def switch_game(self, device_details: Screenshot) -> bool:
         total_games = self.win + self.lose
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
         if (22 <= current_hour < 24) or (0 <= current_hour < 1):
-            return
+            return False
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
                 logfire.warn("Switching Game!!")
@@ -113,6 +113,8 @@ class RemoteController(ConfigModel):
                         target_image=device_details.screenshot,
                     )
                     await notify.send_notify()
+            return False
+        return self.notified_count > 10
 
     async def start(self) -> None:
         while True:
@@ -133,7 +135,9 @@ class RemoteController(ConfigModel):
                         await self.click_button(device_details=device_details)
 
                         if self.found_result.found_button_name_en == "confirm":
-                            await self.switch_game(device_details=device_details)
+                            result = await self.switch_game(device_details=device_details)
+                            if result:
+                                break
 
                         await asyncio.sleep(config_dict.delay_after_click)
 
