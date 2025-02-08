@@ -104,17 +104,17 @@ class RemoteController(ConfigModel):
                 )
                 await notify.send_notify()
                 self.notified_count += 1
-            else:
-                if self.notified_count == 1:
-                    logfire.info("Game has been completed.")
-                    notify = DiscordNotify(
-                        title="老闆!! 我已經幫您打完王朝/五對五了",
-                        description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
-                        target_image=device_details.screenshot,
-                    )
-                    await notify.send_notify()
-            return False
-        return self.notified_count > 10
+                return False
+            if self.notified_count == 1:
+                logfire.info("Game has been completed.")
+                notify = DiscordNotify(
+                    title="老闆!! 我已經幫您打完王朝/五對五了",
+                    description=f"五對五已完成\n目前勝場: {self.win}\n目前敗場: {self.lose}\n總場數: {total_games}",
+                    target_image=device_details.screenshot,
+                )
+                await notify.send_notify()
+                return True
+        return False
 
     async def start(self) -> None:
         while True:
