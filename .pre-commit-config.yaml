@@ -101,6 +101,7 @@ repos:
           - "Types-requests"
           - "Types-urllib3"
           - "Types-attrs"
+          - "Types-pytz"
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.5.29
