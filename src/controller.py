@@ -142,16 +142,14 @@ class RemoteController(ConfigModel):
                         await asyncio.sleep(config_dict.delay_after_click)
 
             except Exception as e:
-                _random_interval = secrets.randbelow(self.random_interval)
-                logfire.error(
-                    f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
-                )
                 notify = DiscordNotify(
                     title="尊敬的老闆, 發生錯誤!!",
                     description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
                     target_image=None,
                 )
                 await notify.send_notify()
+                _random_interval = secrets.randbelow(self.random_interval)
+                logfire.error(
+                    f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
+                )
                 await asyncio.sleep(_random_interval)
-            _random_interval = secrets.randbelow(self.random_interval)
-            await asyncio.sleep(_random_interval)
