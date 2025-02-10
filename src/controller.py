@@ -5,7 +5,7 @@ import datetime
 import pytz
 import logfire
 from adbutils import AdbDevice
-from pydantic import Field, model_validator
+from pydantic import Field, computed_field
 import pyautogui
 from playwright.sync_api import Page
 from playwright.async_api import Page as APage
@@ -20,7 +20,6 @@ from .notifications.discord_notify import DiscordNotify
 
 
 class RemoteController(ConfigModel):
-    target_serial: str = Field(default="", description="The serial number of the target device.")
     found_result: FoundPosition = Field(default_factory=FoundPosition)
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
     start_time: datetime.datetime = Field(default_factory=datetime.datetime.now)
@@ -34,12 +33,12 @@ class RemoteController(ConfigModel):
         default=0, title="Notified", description="Whether the notification has been sent"
     )
 
-    @model_validator(mode="after")
-    def _init_serial(self) -> "RemoteController":
+    @computed_field
+    @property
+    def target_serial(self) -> str:
         adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
-        apps = adb_manager.get_correct_serial()
-        self.target_serial = apps.serial
-        return self
+        apps = adb_manager()
+        return apps.serial
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
@@ -77,11 +76,11 @@ class RemoteController(ConfigModel):
                 button_name_cn=self.found_result.found_button_name_cn,
             )
 
-    async def switch_game(self, device_details: Screenshot) -> bool:
+    async def switch_game(self, device_details: Screenshot) -> None:
         total_games = self.win + self.lose
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
         if (22 <= current_hour < 24) or (0 <= current_hour < 1):
-            return False
+            return
         if isinstance(device_details.device, AdbDevice):
             if self.game_switched is False:
                 logfire.warn("Switching Game!!")
@@ -104,7 +103,6 @@ class RemoteController(ConfigModel):
                 )
                 await notify.send_notify()
                 self.notified_count += 1
-                return False
             if self.notified_count == 1:
                 logfire.info("Game has been completed.")
                 notify = DiscordNotify(
@@ -113,43 +111,43 @@ class RemoteController(ConfigModel):
                     target_image=device_details.screenshot,
                 )
                 await notify.send_notify()
-                return True
-        return False
 
-    async def start(self) -> None:
+    async def run_script(self) -> None:
+        try:
+            device_details = await self.get_screenshot()
+            for config_dict in self.image_list:
+                image_compare = ImageComparison(
+                    image_cfg=config_dict,
+                    screenshot=device_details.screenshot,
+                    device=device_details.device,
+                )
+
+                self.found_result = await image_compare.find(
+                    vertical_align=config_dict.vertical, horizontal_align=config_dict.horizontal
+                )
+                if self.auto_click and config_dict.click_this:
+                    await self.click_button(device_details=device_details)
+
+                    if self.found_result.found_button_name_en == "confirm":
+                        if self.notified_count == 1:
+                            exit()
+                        await self.switch_game(device_details=device_details)
+
+                    await asyncio.sleep(config_dict.delay_after_click)
+
+        except Exception as e:
+            notify = DiscordNotify(
+                title="尊敬的老闆, 發生錯誤!!",
+                description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
+                target_image=None,
+            )
+            await notify.send_notify()
+            _random_interval = secrets.randbelow(self.random_interval)
+            logfire.error(
+                f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
+            )
+            await asyncio.sleep(_random_interval)
+
+    async def __call__(self) -> None:
         while True:
-            try:
-                device_details = await self.get_screenshot()
-                for config_dict in self.image_list:
-                    image_compare = ImageComparison(
-                        image_cfg=config_dict,
-                        screenshot=device_details.screenshot,
-                        device=device_details.device,
-                    )
-
-                    self.found_result = await image_compare.find(
-                        vertical_align=config_dict.vertical,
-                        horizontal_align=config_dict.horizontal,
-                    )
-                    if self.auto_click and config_dict.click_this:
-                        await self.click_button(device_details=device_details)
-
-                        if self.found_result.found_button_name_en == "confirm":
-                            result = await self.switch_game(device_details=device_details)
-                            if result:
-                                break
-
-                        await asyncio.sleep(config_dict.delay_after_click)
-
-            except Exception as e:
-                notify = DiscordNotify(
-                    title="尊敬的老闆, 發生錯誤!!",
-                    description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
-                    target_image=None,
-                )
-                await notify.send_notify()
-                _random_interval = secrets.randbelow(self.random_interval)
-                logfire.error(
-                    f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
-                )
-                await asyncio.sleep(_random_interval)
+            await self.run_script()
