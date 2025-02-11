@@ -3,7 +3,7 @@ import os
 import yaml
 import pytest
 
-from src.types.image_models import ImageModel
+from src.types.config import ImageModel
 
 root_path = "./configs/games"
 config_path = [

@@ -24,16 +24,16 @@ RUN git config --global http.sslVerify false && \
 ########################################################################################
 
 FROM builder AS base
-WORKDIR /app
-COPY . .
+WORKDIR /base
+COPY ./pyproject.toml ./pyproject.toml
 # RUN uv sync --frozen --no-dev && uv cache clean
 RUN uv export --no-dev --no-hashes --output-file ./requirements.lock && \
     pip install -r ./requirements.lock && \
     pip cache purge
 
 FROM builder AS dev
-WORKDIR /app
-COPY . .
+WORKDIR /base
+COPY ./pyproject.toml ./pyproject.toml
 # RUN uv sync --frozen && uv cache clean
 RUN uv export --no-hashes --output-file ./requirements-dev.lock && \
     pip install -r ./requirements-dev.lock && \
