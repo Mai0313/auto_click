@@ -21,13 +21,11 @@ class AutoClicker(BaseModel):
         config_dict = yaml.safe_load(config_content)
         return config_dict
 
-    async def main(self) -> None:
-        config = await self.load_yaml()
-        auto_web = RemoteController(**config)
-        await auto_web.start()
-
     async def __call__(self) -> None:
-        await self.main()
+        config = await self.load_yaml()
+        remote_controller = RemoteController(**config)
+        while True:
+            await remote_controller.run()
 
 
 if __name__ == "__main__":

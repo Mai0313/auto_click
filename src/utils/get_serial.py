@@ -64,9 +64,6 @@ class ADBDeviceManager(BaseModel):
             raise ValueError("No devices running the target app were found.")
         raise ValueError("Multiple devices running the target app were found.")
 
-    def __call__(self) -> AppInfo:
-        return self.get_correct_serial()
-
 
 if __name__ == "__main__":
     target = "com.longe.allstarhmt"
