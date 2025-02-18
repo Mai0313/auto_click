@@ -26,6 +26,9 @@ class AutoClicker(BaseModel):
         remote_controller = RemoteController(**config)
         while True:
             await remote_controller.run()
+            if remote_controller.task_done:
+                logfire.info("The task has been completed.")
+                break
 
 
 if __name__ == "__main__":

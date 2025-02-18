@@ -23,7 +23,18 @@ class RemoteController(ConfigModel):
     found_result: FoundPosition = Field(default_factory=FoundPosition)
     screenshot_manager: ScreenshotManager = Field(default_factory=ScreenshotManager)
     notified_count: int = Field(
-        default=0, title="Notified", description="Whether the notification has been sent"
+        default=0,
+        title="Notified",
+        description="Whether the notification has been sent",
+        frozen=False,
+        deprecated=False,
+    )
+    task_done: bool = Field(
+        default=False,
+        title="Task Done",
+        description="Whether the task has been completed",
+        frozen=False,
+        deprecated=False,
     )
 
     @computed_field
@@ -107,6 +118,7 @@ class RemoteController(ConfigModel):
                 description="五對五已完成",
                 target_image=device_details.screenshot,
             )
+            self.task_done = True
         await notify.send_notify()
 
     async def run(self) -> None:
@@ -126,8 +138,6 @@ class RemoteController(ConfigModel):
                     await self.click_button(device_details=device_details)
 
                     if self.found_result.found_button_name_en == "confirm":
-                        if self.notified_count == 1:
-                            exit()
                         await self.switch_game(device_details=device_details)
 
                     await asyncio.sleep(config_dict.delay_after_click)
