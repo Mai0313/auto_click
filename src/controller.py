@@ -7,6 +7,7 @@ import logfire
 from adbutils import AdbDevice
 from pydantic import Field, computed_field
 import pyautogui
+from adbutils.errors import AdbError
 from playwright.async_api import Page
 
 from .compare import ImageComparison
@@ -33,6 +34,13 @@ class RemoteController(ConfigModel):
         default=False,
         title="Task Done",
         description="Whether the task has been completed",
+        frozen=False,
+        deprecated=False,
+    )
+    error_occurred: bool = Field(
+        default=False,
+        title="Error Occurred",
+        description="Whether an error has occurred",
         frozen=False,
         deprecated=False,
     )
@@ -104,21 +112,21 @@ class RemoteController(ConfigModel):
             # 也可以透過下面方式來 click
             # device_details.device.shell("input tap 1600 630")
 
-            logfire.info("Game has been switched.")
             notify = DiscordNotify(
                 title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
                 description="王朝已完成",
                 target_image=device_details.screenshot,
             )
             self.notified_count += 1
+            logfire.info("Game has been switched.")
         else:
-            logfire.info("Game has been completed.")
             notify = DiscordNotify(
                 title="老闆!! 我已經幫您打完王朝/五對五了",
                 description="五對五已完成",
                 target_image=device_details.screenshot,
             )
             self.task_done = True
+            logfire.info("The task has been completed.")
         await notify.send_notify()
 
     async def run(self) -> None:
@@ -141,6 +149,16 @@ class RemoteController(ConfigModel):
                         await self.switch_game(device_details=device_details)
 
                     await asyncio.sleep(config_dict.delay_after_click)
+
+        except AdbError:
+            notify = DiscordNotify(
+                title="尊敬的老闆, 發生錯誤!!",
+                description="請檢查一下您的模擬器是否有開啟",
+                target_image=None,
+            )
+            await notify.send_notify()
+            logfire.error("Error Occurred, Please check your emulator", _exc_info=True)
+            self.error_occurred = True
 
         except Exception as e:
             notify = DiscordNotify(

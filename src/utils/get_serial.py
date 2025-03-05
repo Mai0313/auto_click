@@ -1,5 +1,6 @@
 from adbutils import adb
 from pydantic import Field, BaseModel, model_validator
+from adbutils.errors import AdbError
 
 
 class AppInfo(BaseModel):
@@ -61,8 +62,8 @@ class ADBDeviceManager(BaseModel):
         if len(apps) == 1:
             return apps[0]
         if len(apps) == 0:
-            raise ValueError("No devices running the target app were found.")
-        raise ValueError("Multiple devices running the target app were found.")
+            raise AdbError("No devices running the target app were found.")
+        raise AdbError("Multiple devices running the target app were found.")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,8 @@ class AutoClicker(BaseModel):
         while True:
             await remote_controller.run()
             if remote_controller.task_done:
-                logfire.info("The task has been completed.")
+                break
+            if remote_controller.error_occurred:
                 break
 
 
