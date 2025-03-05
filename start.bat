@@ -3,8 +3,6 @@
 chcp 65001
 setlocal enabledelayedexpansion
 
-@REM uv sync --no-dev
+uv sync --no-dev
 @REM rye run main
-@REM start powershell -NoExit -Command "uv run python main.py --no-dev"
-
-uv run python main.py --no-dev
+start powershell -NoExit -Command "uv run python main.py --no-dev"
