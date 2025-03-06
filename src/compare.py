@@ -172,7 +172,7 @@ class ImageComparison(BaseModel):
             logfire.info(
                 "Found Position from Current Screen",
                 max_val=max_val,
-                **self.image_cfg.model_dump(),
+                **self.image_cfg.model_dump(exclude_none=True),
             )
             width = button_image.shape[1]
             height = button_image.shape[0]
