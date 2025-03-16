@@ -16,17 +16,22 @@
 
 </center>
 
-A clean template to kickstart your deep learning project 🚀⚡🔥
-Click on [<kbd>Use this template</kbd>](https://github.com/Mai0313/auto_click/generate) to initialize new repository.
+Welcome to the Auto Click project.
 
-_Suggestions are always welcome!_
+## Overview
+This project provides an automated clicking development environment. It includes features for configuring and running automated click sequences.
 
-## Description
+## Installation
+1. Clone the repository.
+2. Navigate to the project directory.
+3. Follow the setup instructions in the documentation.
 
-This is a information grabber for pictures. It can be used to extract information from pictures and store them in a database.
+## Usage
+- Run the main application following the provided instructions.
+- Configure settings as needed.
 
-## For More info, check the [Docs](https://mai0313.github.io/auto_click/)
+## Contributing
+Contributions are welcome! Please open a pull request or issue for improvements or bug fixes.
 
-> [!IMPORTANT]
->
-> - Some actions may not work if you don't give the correct secrets or environment variables.
+## License
+This project is licensed under the MIT License.

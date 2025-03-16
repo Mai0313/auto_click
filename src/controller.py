@@ -56,7 +56,7 @@ class RemoteController(ConfigModel):
     @property
     def determine_if_change_needed(self) -> bool:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
-        return (22 <= current_hour < 24) or (0 <= current_hour < 1)
+        return (21 <= current_hour < 24) or (0 <= current_hour < 1)
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
