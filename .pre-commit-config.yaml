@@ -16,7 +16,7 @@ default_stages:
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.9.9
+    rev: v0.10.0
     hooks:
       - id: ruff
         types_or: [ python, pyi, jupyter ]
@@ -96,20 +96,31 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          - "pydantic>=2.8.2"
+          - "Pydantic"
           - "Types-PyYAML"
           - "Types-requests"
           - "Types-urllib3"
+          - "Types-redis"
           - "Types-attrs"
-          - "Types-pytz"
+
+  # - repo: local
+  #   hooks:
+  #     - id: update-version
+  #       name: Update project version in pyproject.toml
+  #       entry: bash -c 'VERSION=$(uvx dunamai from git --bump --no-metadata --style pep440) && uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION'
+  #       language: system
+  #       pass_filenames: false
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.4
+    rev: 0.6.6
     hooks:
       - id: uv-sync
       - id: uv-lock
       # - id: uv-export
       #   args: ["--no-dev", "--no-hashes", "--frozen", "--output-file", "./requirements.txt"]
+      # - id: pip-compile
+      #   args: [pyproject.toml]
+      #   files: ^pyproject\.(toml|ini)$
 
   # - repo: https://github.com/RobertCraigie/pyright-python
   #   rev: v1.1.374
