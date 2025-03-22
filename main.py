@@ -1,7 +1,10 @@
 from typing import Any
+import asyncio
 import logging
 from pathlib import Path
+import datetime
 
+import pytz
 import yaml
 import logfire
 from pydantic import Field, BaseModel
@@ -24,6 +27,13 @@ class AutoClicker(BaseModel):
     async def __call__(self) -> None:
         config = await self.load_yaml()
         remote_controller = RemoteController(**config)
+        # 等到凌晨兩點到晚上十一點才開始
+        while True:
+            current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
+            should_start = 2 <= current_hour <= 23
+            if should_start:
+                break
+            await asyncio.sleep(60)  # 每分鐘檢查一次
         while True:
             await remote_controller.run()
             if remote_controller.task_done:
