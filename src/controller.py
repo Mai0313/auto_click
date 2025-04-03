@@ -51,12 +51,6 @@ class RemoteController(ConfigModel):
         apps = adb_manager.get_correct_serial()
         return apps.serial
 
-    @computed_field
-    @property
-    def determine_if_change_needed(self) -> bool:
-        current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
-        return (21 <= current_hour < 24) or (0 <= current_hour < 1)
-
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
             screenshot = await self.screenshot_manager.from_browser(url=self.target)
@@ -95,7 +89,8 @@ class RemoteController(ConfigModel):
             )
 
     async def switch_game(self, device_details: Screenshot) -> None:
-        if self.determine_if_change_needed:
+        current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
+        if (21 <= current_hour < 24) or (0 <= current_hour < 1):
             return
         if not isinstance(device_details.device, AdbDevice):
             return
