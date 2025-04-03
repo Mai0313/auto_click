@@ -128,9 +128,3 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    # switch_conditions: Optional[list[ImageModel]] = Field(
-    #     default=None,
-    #     description="The list of image to switch game in some conditions.",
-    #     frozen=True,
-    #     deprecated=False,
-    # )
