@@ -1,6 +1,7 @@
 import asyncio
 import secrets
 import datetime
+from functools import cached_property
 
 import pytz
 import logfire
@@ -46,7 +47,7 @@ class RemoteController(ConfigModel):
     )
 
     @computed_field
-    @property
+    @cached_property
     def target_serial(self) -> str:
         adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
         apps = adb_manager.get_correct_serial()
