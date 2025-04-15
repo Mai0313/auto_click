@@ -5,7 +5,7 @@ import datetime
 import pytz
 import logfire
 from adbutils import AdbDevice, adb
-from pydantic import Field, model_validator
+from pydantic import Field, BaseModel, model_validator
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
@@ -15,7 +15,7 @@ from .utils.config import ImageModel
 from .utils.discord import DiscordNotify
 
 
-class RemoteController(ImageModel):
+class RemoteController(BaseModel):
     target: str = Field(
         ...,
         description="This field can be either a window title or a URL or cdp url.",
