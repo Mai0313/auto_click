@@ -138,7 +138,7 @@ class RemoteController(ConfigModel):
             logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
             await asyncio.sleep(interval)
 
-    async def start(self):
+    async def start(self) -> None:
         while True:
             await self.run()
             if self.notified_count > 1:

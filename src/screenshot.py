@@ -1,5 +1,4 @@
 import asyncio
-from pathlib import Path
 
 from PIL import Image, ImageGrab
 from adbutils import adb
@@ -32,36 +31,11 @@ class Screenshot(BaseModel):
         screenshot (Union[bytes, Image.Image]): The screenshot image data.
         device (Union[AdbDevice, Page, APage, ShiftPosition]): The device from which the screenshot was captured.
 
-    Methods:
-        save: Save the screenshot to a specified path.
-        calibrate: Adjust the button center coordinates based on the device
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot: bytes | Image.Image
     device: AdbDevice | Page | APage | ShiftPosition
-
-    async def save(self, save_path: str) -> str:
-        """Asynchronously saves the screenshot to the specified path.
-
-        Args:
-            save_path (str): The path where the screenshot will be saved. If the path does not end with ".png", it will be automatically appended.
-
-        Raises:
-            TypeError: If the screenshot type is not supported.
-
-        Returns:
-            str: The full path where the screenshot was saved.
-        """
-        output_path = Path(f"{save_path}")
-        output_path = output_path.with_suffix(".png")
-        if isinstance(self.screenshot, bytes):
-            output_path.write_bytes(self.screenshot)
-        elif isinstance(self.screenshot, Image.Image):
-            self.screenshot.save(output_path)
-        else:
-            raise TypeError(f"The screenshot type {type(self.screenshot)} is not supported.")
-        return output_path.absolute().as_posix()
 
 
 class ScreenshotManager(BaseModel):

@@ -41,14 +41,3 @@ class FoundPosition(BaseModel):
         frozen=True,
         deprecated=False,
     )
-
-    async def calibrate(self, shift_x: int, shift_y: int) -> None:
-        """Adjusts the button center coordinates based on the device type.
-
-        Args:
-            shift_x (int): The amount to shift the button center along the x-axis.
-            shift_y (int): The amount to shift the button center along the y-axis.
-        """
-        if self.button_x and self.button_y:
-            self.button_x += shift_x
-            self.button_y += shift_y

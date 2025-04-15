@@ -26,6 +26,7 @@ class AutoClicker(BaseModel):
         remote_controller = RemoteController(**config)
         await remote_controller.start()
 
+
 if __name__ == "__main__":
     import fire
 
