@@ -16,7 +16,7 @@ from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
 from .types.config import ConfigModel
 from .utils.get_serial import ADBDeviceManager
 from .types.output_models import FoundPosition
-from .notifications.discord_notify import DiscordNotify
+from .utils.discord_notify import DiscordNotify
 
 
 class RemoteController(ConfigModel):
