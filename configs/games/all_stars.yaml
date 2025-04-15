@@ -1,9 +1,6 @@
 target: com.longe.allstarhmt
-save2db: True
 auto_click: True
-serials:
-  - "16416"
-random_interval: 5
+serial: 127.0.0.1:16416
 
 image_list:
   - image_name: 開始配對

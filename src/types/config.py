@@ -1,8 +1,5 @@
-import json
-from typing import Any, Literal, Optional
+from typing import Literal, Optional
 
-import yaml
-import pandas as pd
 from pydantic import Field, BaseModel
 
 
@@ -70,40 +67,11 @@ class ImageModel(BaseModel):
         deprecated=True,
     )
 
-    def export_json(self, output: str) -> dict[str, Any]:
-        if not output.endswith(".json"):
-            raise ValueError("Output file must be a JSON file")
-        data_dict = self.model_dump()
-        with open(output, "w", encoding="utf-8") as file:
-            json.dump(data_dict, file, indent=4, ensure_ascii=False)
-        return data_dict
-
-    def export_yaml(self, output: str) -> dict[str, Any]:
-        if not output.endswith(".yaml"):
-            raise ValueError("Output file must be a JSON file")
-        data_dict = self.model_dump()
-        with open(output, "w", encoding="utf-8") as yaml_file:
-            yaml.dump(data_dict, yaml_file, allow_unicode=True)
-        return data_dict
-
-    def export_csv(self, output: str) -> pd.DataFrame:
-        if not output.endswith(".csv"):
-            raise ValueError("Output file must be a CSV file")
-        data = pd.DataFrame([self.model_dump()]).astype(str)
-        data.to_csv(output, index=False)
-        return data
-
 
 class ConfigModel(BaseModel):
     target: str = Field(
         ...,
         description="This field can be either a window title or a URL or cdp url.",
-        frozen=True,
-        deprecated=False,
-    )
-    save2db: bool = Field(
-        ...,
-        description="Indicates whether to save the results to the database or not.",
         frozen=True,
         deprecated=False,
     )
@@ -113,12 +81,10 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    serials: list[str] = Field(
-        default=["16384", "16416"], description="The serial number of the device."
-    )
-    random_interval: int = Field(
-        ...,
-        description="The interval between each click in seconds.",
+    serial: str = Field(
+        default="127.0.0.1:16384",
+        description="The serial number of the device.",
+        examples=["127.0.0.1:16384", "127.0.0.1:16416"],
         frozen=True,
         deprecated=False,
     )

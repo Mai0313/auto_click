@@ -1,9 +1,6 @@
-target: 雀魂麻将  # "http://localhost:9222"
-save2db: False
+target: 雀魂麻将  # "http://localhost:9222
 auto_click: True
-serials:
-  - ""
-random_interval: 5
+serial: 127.0.0.1:9222
 
 image_list:
   - image_name: "開始段位"

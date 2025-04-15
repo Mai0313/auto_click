@@ -1,12 +1,11 @@
 import asyncio
 import secrets
 import datetime
-from functools import cached_property
 
 import pytz
 import logfire
-from adbutils import AdbDevice
-from pydantic import Field, computed_field
+from adbutils import AdbDevice, adb
+from pydantic import Field, model_validator
 import pyautogui
 from adbutils.errors import AdbError
 from playwright.async_api import Page
@@ -14,7 +13,6 @@ from playwright.async_api import Page
 from .compare import ImageComparison
 from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
 from .types.config import ConfigModel
-from .utils.get_serial import ADBDeviceManager
 from .types.output_models import FoundPosition
 from .utils.discord_notify import DiscordNotify
 
@@ -44,24 +42,24 @@ class RemoteController(ConfigModel):
         deprecated=False,
     )
 
-    @computed_field
-    @cached_property
-    def target_serial(self) -> str:
-        adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
-        apps = adb_manager.get_correct_serial()
-        return apps.serial
+    @model_validator(mode="after")
+    def _connect2adb(self) -> "RemoteController":
+        adb.connect(addr=self.serial, timeout=3.0)
+        device = adb.device(serial=self.serial)
+        running_app = device.app_current()
+        if running_app.package != self.target:
+            raise AdbError("No devices running the target app were found.")
+        return self
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
             screenshot = await self.screenshot_manager.from_browser(url=self.target)
-            return screenshot
-        if self.target.startswith("com"):
+        elif self.target.startswith("com"):
             screenshot = await self.screenshot_manager.from_adb(
-                url=self.target, serial=self.target_serial
+                url=self.target, serial=self.serial
             )
-            return screenshot
-        # 返回 screenshot 和 shift_position，而不是 device
-        screenshot = await self.screenshot_manager.from_window(window_title=self.target)
+        else:
+            screenshot = await self.screenshot_manager.from_window(window_title=self.target)
         return screenshot
 
     async def click_button(self, device_details: Screenshot) -> None:
@@ -75,18 +73,11 @@ class RemoteController(ConfigModel):
                     x=self.found_result.button_x, y=self.found_result.button_y
                 )
             elif isinstance(device_details.device, ShiftPosition):
-                await self.found_result.calibrate(
-                    shift_x=device_details.device.shift_x, shift_y=device_details.device.shift_y
+                pyautogui.moveTo(
+                    x=self.found_result.button_x + device_details.device.shift_x,
+                    y=self.found_result.button_y + device_details.device.shift_y,
                 )
-                pyautogui.moveTo(x=self.found_result.button_x, y=self.found_result.button_y)
                 pyautogui.click()
-            logfire.info(
-                f"Found {self.found_result.found_button_name_cn}",
-                button_x=self.found_result.button_x,
-                button_y=self.found_result.button_y,
-                button_name_en=self.found_result.found_button_name_en,
-                button_name_cn=self.found_result.found_button_name_cn,
-            )
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
@@ -161,8 +152,6 @@ class RemoteController(ConfigModel):
                 target_image=None,
             )
             await notify.send_notify()
-            _random_interval = secrets.randbelow(self.random_interval)
-            logfire.error(
-                f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
-            )
-            await asyncio.sleep(_random_interval)
+            interval = secrets.randbelow(5)
+            logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
+            await asyncio.sleep(interval)
