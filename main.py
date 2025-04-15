@@ -24,13 +24,7 @@ class AutoClicker(BaseModel):
     async def __call__(self) -> None:
         config = await self.load_yaml()
         remote_controller = RemoteController(**config)
-        while True:
-            await remote_controller.run()
-            if remote_controller.task_done:
-                break
-            if remote_controller.error_occurred:
-                break
-
+        await remote_controller.start()
 
 if __name__ == "__main__":
     import fire

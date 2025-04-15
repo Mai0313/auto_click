@@ -27,20 +27,6 @@ class RemoteController(ConfigModel):
         frozen=False,
         deprecated=False,
     )
-    task_done: bool = Field(
-        default=False,
-        title="Task Done",
-        description="Whether the task has been completed",
-        frozen=False,
-        deprecated=False,
-    )
-    error_occurred: bool = Field(
-        default=False,
-        title="Error Occurred",
-        description="Whether an error has occurred",
-        frozen=False,
-        deprecated=False,
-    )
 
     @model_validator(mode="after")
     def _connect2adb(self) -> "RemoteController":
@@ -94,9 +80,6 @@ class RemoteController(ConfigModel):
             device_details.device.click(x=1600, y=930)
             await asyncio.sleep(5)
 
-            # 也可以透過下面方式來 click
-            # device_details.device.shell("input tap 1600 630")
-
             notify = DiscordNotify(
                 title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
                 description="王朝已完成",
@@ -110,7 +93,7 @@ class RemoteController(ConfigModel):
                 description="五對五已完成",
                 target_image=device_details.screenshot,
             )
-            self.task_done = True
+            self.notified_count += 1
             logfire.info("The task has been completed.")
         await notify.send_notify()
 
@@ -143,7 +126,6 @@ class RemoteController(ConfigModel):
             )
             await notify.send_notify()
             logfire.error("Error Occurred, Please check your emulator", _exc_info=True)
-            self.error_occurred = True
 
         except Exception as e:
             notify = DiscordNotify(
@@ -155,3 +137,9 @@ class RemoteController(ConfigModel):
             interval = secrets.randbelow(5)
             logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
             await asyncio.sleep(interval)
+
+    async def start(self):
+        while True:
+            await self.run()
+            if self.notified_count > 1:
+                break
