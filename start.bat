@@ -3,5 +3,10 @@
 chcp 65001
 setlocal enabledelayedexpansion
 
+set /p port="Enter the port number (default is 8000): "
+if "%port%"=="" (
+    set port=8000
+)
+
 @REM rye run main
 start powershell -NoExit -Command "uv run python main.py"
