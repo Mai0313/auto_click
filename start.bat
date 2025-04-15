@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 
 set /p port="Enter the port number (default is 8000): "
 if "%port%"=="" (
-    set port=8000
+    set port=16416
 )
 
 @REM rye run main
