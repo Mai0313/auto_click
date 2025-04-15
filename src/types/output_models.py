@@ -9,8 +9,8 @@ class FoundPosition(BaseModel):
     Attributes:
         button_x (Optional[int]): The x-coordinate of the button center.
         button_y (Optional[int]): The y-coordinate of the button center.
-        found_button_name_en (Optional[str]): The name of the found button in English.
-        found_button_name_cn (Optional[str]): The name of the found button in Chinese.
+        name_en (Optional[str]): The name of the found button in English.
+        name_cn (Optional[str]): The name of the found button in Chinese.
         color_screenshot (Optional[np.ndarray]): The screenshot of the button in color.
         blackout_screenshot (Optional[np.ndarray]): The screenshot of the button with a blackout effect.
     """
@@ -29,13 +29,13 @@ class FoundPosition(BaseModel):
         frozen=False,
         deprecated=False,
     )
-    found_button_name_cn: str = Field(
+    name_cn: str = Field(
         default="",
         description="The name of the found button in Chinese.",
         frozen=True,
         deprecated=False,
     )
-    found_button_name_en: str = Field(
+    name_en: str = Field(
         default="",
         description="The name of the found button in English.",
         frozen=True,

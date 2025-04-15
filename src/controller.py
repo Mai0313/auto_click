@@ -102,7 +102,7 @@ class RemoteController(ConfigModel):
                 if self.auto_click and config_dict.click_this:
                     await self.click_button(device_details=device_details)
 
-                    if self.found_result.found_button_name_en == "confirm":
+                    if self.found_result.name_en == "confirm":
                         await self.switch_game(device_details=device_details)
 
                     await asyncio.sleep(config_dict.delay_after_click)

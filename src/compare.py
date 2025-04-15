@@ -103,7 +103,7 @@ class ImageComparison(BaseModel):
             return FoundPosition(
                 button_x=click_x,
                 button_y=click_y,
-                found_button_name_en=Path(self.image_cfg.image_path).stem,
-                found_button_name_cn=self.image_cfg.image_name,
+                name_en=Path(self.image_cfg.image_path).stem,
+                name_cn=self.image_cfg.image_name,
             )
         return FoundPosition()
