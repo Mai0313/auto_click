@@ -10,7 +10,7 @@ from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
 from .types.config import ImageModel
-from .types.output_models import FoundPosition
+from .types.output import FoundPosition
 
 
 class ImageComparison(BaseModel):
