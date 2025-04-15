@@ -29,15 +29,15 @@ class FoundPosition(BaseModel):
         frozen=False,
         deprecated=False,
     )
-    found_button_name_en: Optional[str] = Field(
-        default=None,
-        description="The name of the found button in English.",
+    found_button_name_cn: str = Field(
+        default="",
+        description="The name of the found button in Chinese.",
         frozen=True,
         deprecated=False,
     )
-    found_button_name_cn: Optional[str] = Field(
-        default=None,
-        description="The name of the found button in Chinese.",
+    found_button_name_en: str = Field(
+        default="",
+        description="The name of the found button in English.",
         frozen=True,
         deprecated=False,
     )
