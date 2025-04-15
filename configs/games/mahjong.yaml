@@ -1,5 +1,4 @@
 target: 雀魂麻将  # "http://localhost:9222
-auto_click: True
 serial: 127.0.0.1:9222
 
 image_list:

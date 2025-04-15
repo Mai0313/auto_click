@@ -1,5 +1,4 @@
 target: com.longe.allstarhmt
-auto_click: True
 serial: 127.0.0.1:16416
 
 image_list:

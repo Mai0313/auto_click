@@ -19,7 +19,7 @@ class ImageComparison(BaseModel):
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
     device: Page | AdbDevice = Field(..., description="The device")
 
-    async def find(self) -> FoundPosition:
+    async def find(self) -> FoundPosition | None:
         """Finds the position of a button image within a screenshot.
 
         Raises:
@@ -65,4 +65,4 @@ class ImageComparison(BaseModel):
                 name_en=Path(self.image_cfg.image_path).stem,
                 name_cn=self.image_cfg.image_name,
             )
-        return FoundPosition()
+        return None

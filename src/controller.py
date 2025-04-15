@@ -12,7 +12,6 @@ from playwright.async_api import Page
 from .compare import ImageComparison
 from .screenshot import Screenshot, ScreenshotManager
 from .types.config import ImageModel
-from .types.output import FoundPosition
 from .utils.discord_notify import DiscordNotify
 
 
@@ -20,12 +19,6 @@ class RemoteController(ImageModel):
     target: str = Field(
         ...,
         description="This field can be either a window title or a URL or cdp url.",
-        frozen=True,
-        deprecated=False,
-    )
-    auto_click: bool = Field(
-        ...,
-        description="Indicates whether auto click is enabled or not.",
         frozen=True,
         deprecated=False,
     )
@@ -42,7 +35,6 @@ class RemoteController(ImageModel):
         frozen=True,
         deprecated=False,
     )
-    found_result: FoundPosition = Field(default_factory=FoundPosition)
     screenshot_manager: ScreenshotManager = Field(default_factory=ScreenshotManager)
     notified_count: int = Field(
         default=0,
@@ -68,16 +60,12 @@ class RemoteController(ImageModel):
             screenshot = await self.screenshot_manager.from_adb(serial=self.serial)
         return screenshot
 
-    async def click_button(self, device_details: Screenshot) -> None:
-        if self.found_result.button_x and self.found_result.button_y:
+    async def click_button(self, button_x: int, button_y: int, device_details: Screenshot) -> None:
+        if button_x and button_y:
             if isinstance(device_details.device, Page):
-                await device_details.device.mouse.click(
-                    x=self.found_result.button_x, y=self.found_result.button_y
-                )
+                await device_details.device.mouse.click(x=button_x, y=button_y)
             else:
-                device_details.device.click(
-                    x=self.found_result.button_x, y=self.found_result.button_y
-                )
+                device_details.device.click(x=button_x, y=button_y)
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
@@ -121,11 +109,15 @@ class RemoteController(ImageModel):
                     device=device_details.device,
                 )
 
-                self.found_result = await image_compare.find()
-                if self.auto_click and config_dict.click_this:
-                    await self.click_button(device_details=device_details)
+                found_result = await image_compare.find()
+                if found_result is not None and config_dict.click_this:
+                    await self.click_button(
+                        button_x=found_result.button_x,
+                        button_y=found_result.button_y,
+                        device_details=device_details,
+                    )
 
-                    if self.found_result.name_en == "confirm":
+                    if found_result.name_en == "confirm":
                         await self.switch_game(device_details=device_details)
 
                     await asyncio.sleep(config_dict.delay_after_click)
