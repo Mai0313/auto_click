@@ -5,10 +5,18 @@ from pydantic import Field, BaseModel
 
 class ImageModel(BaseModel):
     image_name: str = Field(
-        ..., title="Image Name", description="The name of the image", frozen=True, deprecated=False
+        ...,
+        title="Image Name",
+        description="The name of the image from `./data`",
+        frozen=True,
+        deprecated=False,
     )
     image_path: str = Field(
-        ..., title="Image Path", description="The path to the image", frozen=True, deprecated=False
+        ...,
+        title="Image Path",
+        description="The path to the image from `./data`",
+        frozen=True,
+        deprecated=False,
     )
     delay_after_click: int = Field(
         ...,
