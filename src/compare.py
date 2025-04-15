@@ -100,44 +100,6 @@ class ImageComparison(BaseModel):
             else:
                 raise ValueError(f"Invalid vertical_align value: {vertical_align}")
 
-            # if self.image_cfg.screenshot_option:
-            #     # Calculate the bottom-right corner of the matched template
-            #     button_x = int(max_loc[0] + width)
-            #     button_y = int(max_loc[1] + height)
-
-            #     await self.record_position()
-            #     await self.__save_images(image_type="color", screenshot=color_screenshot)
-            #     tasks = [
-            #         self.__draw_red_rectangle(
-            #             screenshot=color_screenshot.copy(),
-            #             button_x=button_x,
-            #             button_y=button_y,
-            #             max_loc=max_loc,
-            #         ),
-            #         self.__draw_green_square(
-            #             screenshot=color_screenshot.copy(),
-            #             button_x=button_x,
-            #             button_y=button_y,
-            #             max_loc=max_loc,
-            #             click_x=click_x,
-            #             click_y=click_y,
-            #         ),
-            #         self.__blackout_region(
-            #             screenshot=color_screenshot.copy(),
-            #             button_x=button_x,
-            #             button_y=button_y,
-            #             max_loc=max_loc,
-            #         ),
-            #         self.__crop_and_save(
-            #             screenshot=color_screenshot.copy(),
-            #             button_x=button_x,
-            #             button_y=button_y,
-            #             max_loc=max_loc,
-            #         ),
-            #     ]
-
-            #     await asyncio.gather(*tasks)
-
             return FoundPosition(
                 button_x=click_x,
                 button_y=click_y,
