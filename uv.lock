@@ -187,6 +187,7 @@ ai = [
     { name = "ultralytics" },
 ]
 dev = [
+    { name = "anyio" },
     { name = "ipykernel" },
     { name = "ipywidgets" },
     { name = "notebook" },
@@ -240,6 +241,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 ai = [{ name = "ultralytics", specifier = ">=8.3.76" }]
 dev = [
+    { name = "anyio", specifier = ">=4.9.0" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "ipywidgets", specifier = ">=8.1.5" },
     { name = "notebook", specifier = ">=7.3.2" },
