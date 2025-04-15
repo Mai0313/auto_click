@@ -11,7 +11,7 @@ from playwright.async_api import Page
 
 from .compare import ImageComparison
 from .screenshot import Screenshot, ScreenshotManager
-from .types.config import ImageModel
+from .utils.config import ImageModel
 from .utils.discord import DiscordNotify
 
 

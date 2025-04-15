@@ -5,7 +5,7 @@ import yaml
 import pandas as pd
 import pytest
 
-from src.types.config import ImageModel
+from src.utils.config import ImageModel
 
 
 @pytest.fixture(scope="module")
