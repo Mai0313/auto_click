@@ -26,7 +26,7 @@ class RemoteController(BaseModel):
         default="127.0.0.1:16384",
         description="The serial number of the device.",
         examples=["127.0.0.1:16384", "127.0.0.1:16416", "127.0.0.1:16448"],
-        frozen=True,
+        frozen=False,
         deprecated=False,
     )
     image_list: list[ImageModel] = Field(
