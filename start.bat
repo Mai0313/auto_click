@@ -9,4 +9,4 @@ if "%port%"=="" (
 )
 
 @REM rye run main
-start powershell -NoExit -Command "uv run python main.py"
+start powershell -NoExit -Command "uv run python main.py --port=%port%"
