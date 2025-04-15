@@ -4,17 +4,6 @@ from pydantic import Field, BaseModel, ConfigDict
 
 
 class FoundPosition(BaseModel):
-    """Represents the position of a found button on the screen.
-
-    Attributes:
-        button_x (Optional[int]): The x-coordinate of the button center.
-        button_y (Optional[int]): The y-coordinate of the button center.
-        name_en (Optional[str]): The name of the found button in English.
-        name_cn (Optional[str]): The name of the found button in Chinese.
-        color_screenshot (Optional[np.ndarray]): The screenshot of the button in color.
-        blackout_screenshot (Optional[np.ndarray]): The screenshot of the button with a blackout effect.
-    """
-
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     button_x: Optional[int] = Field(

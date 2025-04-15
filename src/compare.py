@@ -13,21 +13,6 @@ from .types.output import FoundPosition
 
 
 class ImageComparison(BaseModel):
-    """Represents an image comparison object.
-
-    This class provides methods to compare an image with a screenshot and find the position of a button image within the screenshot.
-
-    Attributes:
-        image_cfg (ImageModel): The image configuration.
-        screenshot (Union[Image.Image, bytes]): The screenshot image.
-        device (Union[Page, AdbDevice]): The device.
-
-    Methods:
-        __save_images: Saves the images to the logs directory.
-        __draw_rectangle: Draws a rectangle on the image and saves the resulting image.
-        find: Finds the position of a button image within a screenshot.
-    """
-
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
