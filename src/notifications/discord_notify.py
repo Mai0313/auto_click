@@ -5,18 +5,36 @@ import datetime
 
 from PIL import Image
 import httpx
-from dotenv import load_dotenv
 import orjson
+import logfire
 from pydantic import Field, ConfigDict, AliasChoices
-
-from src.notifications.base_notify import BaseNotify
-
-load_dotenv()
+from pydantic_settings import BaseSettings
 
 
-class DiscordNotify(BaseNotify):
+class DiscordNotify(BaseSettings):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    title: str = Field(
+        ...,
+        title="Title",
+        description="The title of the notification message.",
+        frozen=True,
+        deprecated=False,
+    )
+    content: str = Field(
+        default="",
+        title="Content",
+        description="The content of the notification message.",
+        frozen=True,
+        deprecated=False,
+    )
+    description: str = Field(
+        ...,
+        title="Description",
+        description="The description of the notification message.",
+        frozen=True,
+        deprecated=False,
+    )
     avatar_url: str = Field(
         default="https://i.imgur.com/QoOwyXJ.png",
         title="Avatar URL",
@@ -92,6 +110,12 @@ class DiscordNotify(BaseNotify):
             else:
                 response = await client.post(url=self.discord_webhook_url, json=payload)
             response.raise_for_status()  # 確保請求成功
+
+    async def send_notify(self) -> None:
+        try:
+            await self._send_notify()
+        except Exception:
+            logfire.error("Failed to send Discord notification.")
 
 
 if __name__ == "__main__":
