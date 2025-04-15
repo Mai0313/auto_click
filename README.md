@@ -19,19 +19,24 @@
 Welcome to the Auto Click project.
 
 ## Overview
+
 This project provides an automated clicking development environment. It includes features for configuring and running automated click sequences.
 
 ## Installation
+
 1. Clone the repository.
 2. Navigate to the project directory.
 3. Follow the setup instructions in the documentation.
 
 ## Usage
+
 - Run the main application following the provided instructions.
 - Configure settings as needed.
 
 ## Contributing
+
 Contributions are welcome! Please open a pull request or issue for improvements or bug fixes.
 
 ## License
+
 This project is licensed under the MIT License.
