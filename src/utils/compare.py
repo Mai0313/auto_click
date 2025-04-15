@@ -8,7 +8,7 @@ import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
-from .utils.config import ImageModel
+from .config import ImageModel
 
 
 class FoundPosition(BaseModel):

@@ -9,10 +9,10 @@ from pydantic import Field, BaseModel, model_validator
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
-from .compare import ImageComparison
-from .screenshot import Screenshot, ScreenshotManager
 from .utils.config import ImageModel
+from .utils.compare import ImageComparison
 from .utils.discord import DiscordNotify
+from .utils.screenshot import Screenshot, ScreenshotManager
 
 
 class RemoteController(BaseModel):
