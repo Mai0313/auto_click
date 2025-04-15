@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from pydantic import Field, BaseModel
 
@@ -24,31 +24,10 @@ class ImageModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    screenshot_option: bool = Field(
-        ...,
-        title="Screenshot Option",
-        description="Indicates whether to take a screenshot or not",
-        frozen=True,
-        deprecated=False,
-    )
     confidence: float = Field(
         ...,
         title="Confidence",
         description="The confidence level for image matching",
-        frozen=True,
-        deprecated=False,
-    )
-    vertical: Literal["top", "center", "bottom"] = Field(
-        default="center",
-        title="Vertical",
-        description="The vertical alignment within the matched template",
-        frozen=True,
-        deprecated=False,
-    )
-    horizontal: Literal["left", "center", "right"] = Field(
-        default="center",
-        title="Horizontal",
-        description="The horizontal alignment within the matched template",
         frozen=True,
         deprecated=False,
     )
