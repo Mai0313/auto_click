@@ -45,31 +45,3 @@ class ImageModel(BaseModel):
         frozen=True,
         deprecated=True,
     )
-
-
-class ConfigModel(BaseModel):
-    target: str = Field(
-        ...,
-        description="This field can be either a window title or a URL or cdp url.",
-        frozen=True,
-        deprecated=False,
-    )
-    auto_click: bool = Field(
-        ...,
-        description="Indicates whether auto click is enabled or not.",
-        frozen=True,
-        deprecated=False,
-    )
-    serial: str = Field(
-        default="127.0.0.1:16384",
-        description="The serial number of the device.",
-        examples=["127.0.0.1:16384", "127.0.0.1:16416"],
-        frozen=True,
-        deprecated=False,
-    )
-    image_list: list[ImageModel] = Field(
-        ...,
-        description="The list of images to compare, it should contain path and name.",
-        frozen=True,
-        deprecated=False,
-    )
