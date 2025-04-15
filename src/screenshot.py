@@ -1,91 +1,40 @@
-import asyncio
+import io
 
-from PIL import Image, ImageGrab
+from PIL import Image
 from adbutils import adb
 from pydantic import BaseModel, ConfigDict
-from pygetwindow import Win32Window, getWindowsWithTitle
 from adbutils._device import AdbDevice
 from playwright_stealth import stealth_sync
-from playwright.sync_api import Page
 from playwright.async_api import Page as APage
 from playwright.async_api import async_playwright
-
-
-class ShiftPosition(BaseModel):
-    """Represents a shift in position.
-
-    Attributes:
-        shift_x (int): The amount to shift in the x-axis.
-        shift_y (int): The amount to shift in the y-axis.
-    """
-
-    shift_x: int
-    shift_y: int
 
 
 class Screenshot(BaseModel):
     """Represents a screenshot captured from a device.
 
     Attributes:
-        model_config (ConfigDict): The configuration dictionary for the model.
-        screenshot (Union[bytes, Image.Image]): The screenshot image data.
-        device (Union[AdbDevice, Page, APage, ShiftPosition]): The device from which the screenshot was captured.
+        screenshot (Image.Image): The screenshot image data.
+        device (AdbDevice | APage): The device from which the screenshot was captured.
 
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    screenshot: bytes | Image.Image
-    device: AdbDevice | Page | APage | ShiftPosition
+    screenshot: Image.Image
+    device: AdbDevice | APage
 
 
 class ScreenshotManager(BaseModel):
-    async def from_window(self, window_title: str) -> Screenshot:
-        """Captures a screenshot of the specified window.
-
-        Args:
-            window_title (str): The title of the window to capture.
-
-        Returns:
-            Screenshot: An object containing the screenshot image and the shift position.
-
-        Raises:
-            IndexError: If no window with the specified title is found.
-
-        Notes:
-            This method will restore and activate the window if it is minimized.
-            It waits for 1 second after activating the window to ensure it is ready for capture.
-        """
-        window: Win32Window = getWindowsWithTitle(window_title)[0]
-        if window.isMinimized:
-            window.restore()
-        window.activate()
-        await asyncio.sleep(1)
-        shift_x, shift_y = window.topleft
-        width, height = window.size
-        bbox = (shift_x, shift_y, shift_x + width, shift_y + height)
-        screenshot = ImageGrab.grab(bbox=bbox)
-        # For this method, there is always a shift position
-        shift_position = ShiftPosition(shift_x=shift_x, shift_y=shift_y)
-        return Screenshot(screenshot=screenshot, device=shift_position)
-
-    async def from_adb(self, url: str, serial: str) -> Screenshot:
+    async def from_adb(self, serial: str) -> Screenshot:
         """Capture a screenshot from an Android device using ADB.
 
         Args:
-            url (str): The package name of the app to verify.
             serial (str): The serial number of the Android device.
 
         Returns:
             Screenshot: An instance of the Screenshot class containing the screenshot and device information.
 
-        Raises:
-            Exception: If the current app on the device is not the specified URL.
         """
-        adb.connect(serial)
         device = adb.device(serial=serial)
-        running_app = device.app_current()
-        if running_app.package != url:
-            raise Exception("The current app is not the specified URL")
         screenshot = device.screenshot()
         return Screenshot(screenshot=screenshot, device=device)
 
@@ -136,5 +85,6 @@ class ScreenshotManager(BaseModel):
             stealth_sync(context)
             page = await context.new_page()
             await page.goto(url)
-            screenshot = await page.screenshot()
+            screenshot_bytes = await page.screenshot()
+            screenshot = Image.open(io.BytesIO(screenshot_bytes))
             return Screenshot(screenshot=screenshot, device=page)

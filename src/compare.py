@@ -3,14 +3,12 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import pandas as pd
 import logfire
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
-from .screenshot import ShiftPosition
 from .types.config import ImageModel
 from .types.output_models import FoundPosition
 
@@ -23,7 +21,7 @@ class ImageComparison(BaseModel):
     Attributes:
         image_cfg (ImageModel): The image configuration.
         screenshot (Union[Image.Image, bytes]): The screenshot image.
-        device (Union[Page, AdbDevice, ShiftPosition]): The device.
+        device (Union[Page, AdbDevice]): The device.
 
     Methods:
         __save_images: Saves the images to the logs directory.
@@ -35,101 +33,7 @@ class ImageComparison(BaseModel):
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
-    device: Page | AdbDevice | ShiftPosition = Field(..., description="The device")
-
-    async def __save_images(self, image_type: str, screenshot: np.ndarray) -> None:
-        log_dir = Path(f"./logs/{image_type}")
-        log_dir.mkdir(exist_ok=True, parents=True)
-        screenshot_path = log_dir / Path(self.image_cfg.image_path).with_suffix(".png").name
-        if not screenshot_path.exists():
-            cv2.imwrite(str(screenshot_path.absolute()), screenshot)
-
-    async def __draw_red_rectangle(
-        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
-    ) -> np.ndarray:
-        matched_image_position = (button_x, button_y)
-        cv2.rectangle(screenshot, max_loc, matched_image_position, (0, 0, 255), 2)
-        await self.__save_images(image_type="detected", screenshot=screenshot)
-        return screenshot
-
-    async def __draw_green_square(
-        self,
-        screenshot: np.ndarray,
-        button_x: int,
-        button_y: int,
-        max_loc: cv2.typing.Point,
-        click_x: int,
-        click_y: int,
-    ) -> np.ndarray:
-        square_size = 10  # Adjust as needed
-        half_square = square_size // 2
-
-        top_left_square_x = max(click_x - half_square, max_loc[0])
-        top_left_square_y = max(click_y - half_square, max_loc[1])
-        bottom_right_square_x = min(click_x + half_square, button_x)
-        bottom_right_square_y = min(click_y + half_square, button_y)
-        top_left_square = (top_left_square_x, top_left_square_y)
-        bottom_right_square = (bottom_right_square_x, bottom_right_square_y)
-
-        cv2.rectangle(screenshot, top_left_square, bottom_right_square, (61, 145, 64), 2)
-        await self.__save_images(image_type="point", screenshot=screenshot)
-        return screenshot
-
-    async def __blackout_region(
-        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
-    ) -> np.ndarray:
-        matched_image_position = (button_x, button_y)
-        masked_screenshot = np.zeros_like(screenshot)
-        cv2.rectangle(masked_screenshot, max_loc, matched_image_position, (255, 255, 255), -1)
-        black_img = np.zeros_like(screenshot)
-        screenshot = cv2.bitwise_and(screenshot, masked_screenshot) + cv2.bitwise_and(
-            black_img, cv2.bitwise_not(masked_screenshot)
-        )
-        await self.__save_images(image_type="blackout", screenshot=screenshot)
-        return screenshot
-
-    async def __crop_and_save(
-        self, screenshot: np.ndarray, button_x: int, button_y: int, max_loc: cv2.typing.Point
-    ) -> np.ndarray:
-        top_left = max_loc
-        bottom_right = (button_x, button_y)
-        cropped_region = screenshot[top_left[1] : bottom_right[1], top_left[0] : bottom_right[0]]
-        await self.__save_images(image_type="cropped", screenshot=cropped_region)
-        return cropped_region
-
-    async def record_position(self) -> None:
-        position_data = pd.DataFrame()
-        position_log_path = Path("./logs/positions.csv")
-        if position_log_path.exists():
-            position_data = pd.read_csv(position_log_path)
-
-        data_dict_list = [self.image_cfg.model_dump()]
-        new_position_data = pd.DataFrame(data_dict_list).astype(str)
-        merged_data = pd.concat([position_data, new_position_data], ignore_index=True)
-        merged_data = merged_data.drop_duplicates(subset=["image_name", "image_path"], keep="last")
-        merged_data = merged_data.reset_index(drop=True)
-        merged_data.to_csv(position_log_path.as_posix(), index=False)
-
-    async def get_position(
-        self,
-        vertical_align: Literal["top", "center", "bottom"],
-        horizontal_align: Literal["left", "center", "right"],
-    ) -> FoundPosition:
-        position_log_path = Path("./data/positions.csv")
-        position_data = pd.read_csv(position_log_path)
-        found_position = position_data[
-            (position_data["image_name"] == self.image_cfg.image_name)
-            & (position_data["image_path"] == self.image_cfg.image_path)
-        ]
-        if not found_position.empty:
-            logfire.info("Found Position from Existing Data", **self.image_cfg.model_dump())
-            return FoundPosition(
-                button_x=int(found_position["x"].to_numpy()[0]),
-                button_y=int(found_position["y"].to_numpy()[0]),
-                found_button_name_en=found_position["image_path"].to_numpy()[0],
-                found_button_name_cn=found_position["image_name"].to_numpy()[0],
-            )
-        return await self.find(vertical_align=vertical_align, horizontal_align=horizontal_align)
+    device: Page | AdbDevice = Field(..., description="The device")
 
     async def find(
         self,

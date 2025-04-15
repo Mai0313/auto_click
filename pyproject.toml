@@ -83,7 +83,6 @@ dependencies = [
     "pyautogui>=0.9.54",
     "pydantic>=2.10.5",
     "pydantic-settings>=2.7.1",
-    "pygetwindow>=0.0.9",
     "pytz>=2024.2",
     "pyyaml>=6.0.2",
     "rich>=13.9.4",

@@ -6,12 +6,11 @@ import pytz
 import logfire
 from adbutils import AdbDevice, adb
 from pydantic import Field, model_validator
-import pyautogui
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
 from .compare import ImageComparison
-from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
+from .screenshot import Screenshot, ScreenshotManager
 from .types.config import ConfigModel
 from .types.output_models import FoundPosition
 from .utils.discord_notify import DiscordNotify
@@ -40,12 +39,8 @@ class RemoteController(ConfigModel):
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
             screenshot = await self.screenshot_manager.from_browser(url=self.target)
-        elif self.target.startswith("com"):
-            screenshot = await self.screenshot_manager.from_adb(
-                url=self.target, serial=self.serial
-            )
         else:
-            screenshot = await self.screenshot_manager.from_window(window_title=self.target)
+            screenshot = await self.screenshot_manager.from_adb(serial=self.serial)
         return screenshot
 
     async def click_button(self, device_details: Screenshot) -> None:
@@ -54,16 +49,10 @@ class RemoteController(ConfigModel):
                 await device_details.device.mouse.click(
                     x=self.found_result.button_x, y=self.found_result.button_y
                 )
-            elif isinstance(device_details.device, AdbDevice):
+            else:
                 device_details.device.click(
                     x=self.found_result.button_x, y=self.found_result.button_y
                 )
-            elif isinstance(device_details.device, ShiftPosition):
-                pyautogui.moveTo(
-                    x=self.found_result.button_x + device_details.device.shift_x,
-                    y=self.found_result.button_y + device_details.device.shift_y,
-                )
-                pyautogui.click()
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
