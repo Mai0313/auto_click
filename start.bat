@@ -11,4 +11,3 @@ setlocal enabledelayedexpansion
 @REM rye run main
 @REM start powershell -NoExit -Command "uv run python main.py --port=%port%"
 start powershell -NoExit -Command "uv run python main.py --port=16416"
-start powershell -NoExit -Command "uv run python main.py --port=16448"

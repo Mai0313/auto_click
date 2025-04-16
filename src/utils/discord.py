@@ -42,7 +42,7 @@ class DiscordNotify(BaseSettings):
         frozen=True,
         deprecated=False,
     )
-    target_image: Optional[Image.Image | str] = Field(
+    target_image: Image.Image | str | None = Field(
         default=None,
         title="Image Object",
         description="The image object to send.",
@@ -51,9 +51,9 @@ class DiscordNotify(BaseSettings):
     )
     discord_webhook_url: str = Field(
         ...,
-        validation_alias=AliasChoices("DISCORD_WEBHOOK_URL"),
         title="Discord Webhook URL",
         description="The URL of the Discord webhook to send notifications to.",
+        validation_alias=AliasChoices("DISCORD_WEBHOOK_URL", "discord_webhook_url"),
         frozen=True,
         deprecated=False,
     )
