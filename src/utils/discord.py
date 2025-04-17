@@ -1,14 +1,16 @@
 import io
-from typing import Optional
 from pathlib import Path
 import datetime
 
 from PIL import Image
 import httpx
+import dotenv
 import orjson
 import logfire
 from pydantic import Field, ConfigDict, AliasChoices
 from pydantic_settings import BaseSettings
+
+dotenv.load_dotenv()
 
 
 class DiscordNotify(BaseSettings):
