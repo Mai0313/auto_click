@@ -129,7 +129,9 @@ class RemoteController(BaseModel):
                 target_image=None,
             )
             await notify.send_notify()
+            interval = secrets.randbelow(5)
             logfire.error("Error Occurred, Please check your emulator", _exc_info=True)
+            await asyncio.sleep(interval)
 
         except Exception as e:
             notify = DiscordNotify(
