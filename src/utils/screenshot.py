@@ -34,9 +34,17 @@ class ScreenshotManager(BaseModel):
             Screenshot: An instance of the Screenshot class containing the screenshot and device information.
 
         """
-        device = adb.device(serial=serial)
-        screenshot = device.screenshot()
-        return Screenshot(screenshot=screenshot, device=device)
+        # Reuse existing connection if possible
+        try:
+            device = adb.device(serial=serial)
+            screenshot = device.screenshot()
+            return Screenshot(screenshot=screenshot, device=device)
+        except Exception:
+            # If we fail to get the device directly, try to connect first
+            adb.connect(addr=serial, timeout=3.0)
+            device = adb.device(serial=serial)
+            screenshot = device.screenshot()
+            return Screenshot(screenshot=screenshot, device=device)
 
     async def from_browser(self, url: str) -> Screenshot:
         """Takes a screenshot of a webpage from a given URL using an automated browser.

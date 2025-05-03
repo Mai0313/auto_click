@@ -53,6 +53,14 @@ class RemoteController(BaseModel):
             raise AdbError("No devices running the target app were found.")
         return self
 
+    def _disconnect_adb(self) -> None:
+        """Disconnect from the ADB device to free up the port."""
+        try:
+            adb.disconnect(self.serial)
+            logfire.info(f"Disconnected from ADB device: {self.serial}")
+        except Exception:
+            logfire.error(f"Failed to disconnect from ADB device: {self.serial}", _exc_info=True)
+
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
             screenshot = await self.screenshot_manager.from_browser(url=self.target)
@@ -145,7 +153,11 @@ class RemoteController(BaseModel):
             await asyncio.sleep(interval)
 
     async def start(self) -> None:
-        while True:
-            await self.run()
-            if self.notified_count > 1:
-                break
+        try:
+            while True:
+                await self.run()
+                if self.notified_count > 1:
+                    break
+        finally:
+            # Clean up ADB connection when done
+            self._disconnect_adb()

@@ -1,3 +1,5 @@
+import contextlib
+
 from adbutils import adb
 from pydantic import Field, BaseModel
 
@@ -8,11 +10,18 @@ class Screenshot(BaseModel):
 
     async def screenshots(self) -> None:
         serial = f"127.0.0.1:{self.port}"
-        adb.connect(addr=serial)
-        device = adb.device(serial=serial)
-        # running_app = device.app_current()
-        current_screent = device.screenshot()
-        current_screent.save(self.output_path)
+        try:
+            # Try to connect to the device
+            adb.connect(addr=serial)
+            device = adb.device(serial=serial)
+
+            # Take the screenshot
+            current_screent = device.screenshot()
+            current_screent.save(self.output_path)
+        finally:
+            # Always disconnect to free the port
+            with contextlib.suppress(Exception):
+                adb.disconnect(serial)
 
     async def __call__(self) -> None:
         await self.screenshots()
