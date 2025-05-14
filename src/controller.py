@@ -147,6 +147,7 @@ class RemoteController(BaseModel):
                 description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
                 target_image=None,
             )
+            self._disconnect_adb()
             await notify.send_notify()
             interval = secrets.randbelow(5)
             logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
