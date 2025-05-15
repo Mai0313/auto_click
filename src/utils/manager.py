@@ -2,7 +2,7 @@ from adbutils import adb
 from pydantic import Field, BaseModel, model_validator
 from adbutils.errors import AdbError
 
-from src.types.config import DeviceModel
+from src.utils.config import DeviceModel
 
 
 class AppInfo(BaseModel):
