@@ -35,10 +35,10 @@ class RemoteController(BaseModel):
         deprecated=False,
     )
     screenshot_manager: ScreenshotManager = Field(default_factory=ScreenshotManager)
-    notified_count: int = Field(
+    switch_count: int = Field(
         default=0,
-        title="Notified",
-        description="Whether the notification has been sent",
+        title="Switch Count",
+        description="Whether the game mode has been switched.",
         frozen=False,
         deprecated=False,
     )
@@ -80,7 +80,7 @@ class RemoteController(BaseModel):
             return
         if not isinstance(device_details.device, AdbDevice):
             return
-        if self.notified_count == 0:
+        if self.switch_count == 0:
             logfire.warn("Switching Game!!")
             device_details.device.click(x=1600, y=630)
             await asyncio.sleep(5)
@@ -88,10 +88,10 @@ class RemoteController(BaseModel):
             await asyncio.sleep(5)
             device_details.device.click(x=1600, y=930)
             await asyncio.sleep(5)
-            self.notified_count += 1
+            self.switch_count += 1
             logfire.info("Game has been switched.")
         else:
-            self.notified_count += 1
+            self.switch_count += 1
             logfire.info("The task has been completed.")
 
     async def run(self) -> None:
@@ -131,7 +131,7 @@ class RemoteController(BaseModel):
         try:
             while True:
                 await self.run()
-                if self.notified_count > 1:
+                if self.switch_count > 1:
                     break
         finally:
             # Clean up ADB connection when done
