@@ -11,12 +11,11 @@ import pyautogui
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
-from .compare import ImageComparison
+from .compare import FoundPosition, ImageComparison
 from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
 from .types.config import ConfigModel
-from .utils.get_serial import ADBDeviceManager
-from .types.output_models import FoundPosition
-from .utils.discord_notify import DiscordNotify
+from .utils.notify import DiscordNotify
+from .utils.manager import ADBDeviceManager
 
 
 class RemoteController(ConfigModel):
@@ -133,10 +132,8 @@ class RemoteController(ConfigModel):
                     device=device_details.device,
                 )
 
-                self.found_result = await image_compare.find(
-                    vertical_align=config_dict.vertical, horizontal_align=config_dict.horizontal
-                )
-                if self.auto_click and config_dict.click_this:
+                self.found_result = await image_compare.find()
+                if self.enable and config_dict.enable_click:
                     await self.click_button(device_details=device_details)
 
                     if self.found_result.found_button_name_en == "confirm":
@@ -161,7 +158,7 @@ class RemoteController(ConfigModel):
                 target_image=None,
             )
             await notify.send_notify()
-            _random_interval = secrets.randbelow(self.random_interval)
+            _random_interval = secrets.randbelow(5)
             logfire.error(
                 f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
             )
