@@ -133,10 +133,8 @@ class RemoteController(ConfigModel):
                     device=device_details.device,
                 )
 
-                self.found_result = await image_compare.find(
-                    vertical_align=config_dict.vertical, horizontal_align=config_dict.horizontal
-                )
-                if self.auto_click and config_dict.click_this:
+                self.found_result = await image_compare.find()
+                if self.auto_click and config_dict.enable_click:
                     await self.click_button(device_details=device_details)
 
                     if self.found_result.found_button_name_en == "confirm":
@@ -161,7 +159,7 @@ class RemoteController(ConfigModel):
                 target_image=None,
             )
             await notify.send_notify()
-            _random_interval = secrets.randbelow(self.random_interval)
+            _random_interval = secrets.randbelow(5)
             logfire.error(
                 f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
             )

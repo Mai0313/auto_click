@@ -1,4 +1,3 @@
-from typing import Literal
 from pathlib import Path
 
 import cv2
@@ -110,37 +109,8 @@ class ImageComparison(BaseModel):
         merged_data = merged_data.reset_index(drop=True)
         merged_data.to_csv(position_log_path.as_posix(), index=False)
 
-    async def get_position(
-        self,
-        vertical_align: Literal["top", "center", "bottom"],
-        horizontal_align: Literal["left", "center", "right"],
-    ) -> FoundPosition:
-        position_log_path = Path("./data/positions.csv")
-        position_data = pd.read_csv(position_log_path)
-        found_position = position_data[
-            (position_data["image_name"] == self.image_cfg.image_name)
-            & (position_data["image_path"] == self.image_cfg.image_path)
-        ]
-        if not found_position.empty:
-            logfire.info("Found Position from Existing Data", **self.image_cfg.model_dump())
-            return FoundPosition(
-                button_x=int(found_position["x"].to_numpy()[0]),
-                button_y=int(found_position["y"].to_numpy()[0]),
-                found_button_name_en=found_position["image_path"].to_numpy()[0],
-                found_button_name_cn=found_position["image_name"].to_numpy()[0],
-            )
-        return await self.find(vertical_align=vertical_align, horizontal_align=horizontal_align)
-
-    async def find(
-        self,
-        vertical_align: Literal["top", "center", "bottom"],
-        horizontal_align: Literal["left", "center", "right"],
-    ) -> FoundPosition:
+    async def find(self) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
-
-        Args:
-            vertical_align (Literal["top", "center", "bottom"]): The vertical alignment within the matched template. Defaults to "center".
-            horizontal_align (Literal["left", "center", "right"]): The horizontal alignment within the matched template. Defaults to "center".
 
         Raises:
             ValueError: If an invalid alignment value is provided.
@@ -177,26 +147,12 @@ class ImageComparison(BaseModel):
             height = button_image.shape[0]
 
             # Calculate click_x based on horizontal alignment
-            if horizontal_align == "left":
-                click_x = int(max_loc[0])
-            elif horizontal_align == "center":
-                click_x = int(max_loc[0] + width // 2)
-            elif horizontal_align == "right":
-                click_x = int(max_loc[0] + width)
-            else:
-                raise ValueError(f"Invalid horizontal_align value: {horizontal_align}")
+            click_x = int(max_loc[0] + width // 2)
 
-            # Calculate click_y based on vertical alignment
-            if vertical_align == "top":
-                click_y = int(max_loc[1])
-            elif vertical_align == "center":
-                click_y = int(max_loc[1] + height // 2)
-            elif vertical_align == "bottom":
-                click_y = int(max_loc[1] + height)
-            else:
-                raise ValueError(f"Invalid vertical_align value: {vertical_align}")
+            # Calculate click_y
+            click_y = int(max_loc[1] + height // 2)
 
-            # if self.image_cfg.screenshot_option:
+            # if self.image_cfg.enable_screenshot:
             #     # Calculate the bottom-right corner of the matched template
             #     button_x = int(max_loc[0] + width)
             #     button_y = int(max_loc[1] + height)

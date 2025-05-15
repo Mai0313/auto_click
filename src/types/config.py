@@ -1,5 +1,5 @@
 import json
-from typing import Any, Literal, Optional
+from typing import Any, Optional
 
 import yaml
 import pandas as pd
@@ -20,14 +20,14 @@ class ImageModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    click_this: bool = Field(
+    enable_click: bool = Field(
         ...,
         title="Click This",
         description="Indicates whether to click the image or not",
         frozen=True,
         deprecated=False,
     )
-    screenshot_option: bool = Field(
+    enable_screenshot: bool = Field(
         ...,
         title="Screenshot Option",
         description="Indicates whether to take a screenshot or not",
@@ -38,20 +38,6 @@ class ImageModel(BaseModel):
         ...,
         title="Confidence",
         description="The confidence level for image matching",
-        frozen=True,
-        deprecated=False,
-    )
-    vertical: Literal["top", "center", "bottom"] = Field(
-        default="center",
-        title="Vertical",
-        description="The vertical alignment within the matched template",
-        frozen=True,
-        deprecated=False,
-    )
-    horizontal: Literal["left", "center", "right"] = Field(
-        default="center",
-        title="Horizontal",
-        description="The horizontal alignment within the matched template",
         frozen=True,
         deprecated=False,
     )
@@ -101,12 +87,6 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    save2db: bool = Field(
-        ...,
-        description="Indicates whether to save the results to the database or not.",
-        frozen=True,
-        deprecated=False,
-    )
     auto_click: bool = Field(
         ...,
         description="Indicates whether auto click is enabled or not.",
@@ -115,12 +95,6 @@ class ConfigModel(BaseModel):
     )
     serials: list[str] = Field(
         default=["16384", "16416"], description="The serial number of the device."
-    )
-    random_interval: int = Field(
-        ...,
-        description="The interval between each click in seconds.",
-        frozen=True,
-        deprecated=False,
     )
     image_list: list[ImageModel] = Field(
         ...,
