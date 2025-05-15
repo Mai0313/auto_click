@@ -10,8 +10,8 @@ import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
-from .screenshot import ShiftPosition
 from .utils.config import ImageModel
+from .utils.position import ShiftPosition
 
 
 class FoundPosition(BaseModel):

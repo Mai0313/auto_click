@@ -1,5 +1,4 @@
 import asyncio
-from pathlib import Path
 
 from PIL import Image, ImageGrab
 from adbutils import adb
@@ -7,21 +6,9 @@ from pydantic import BaseModel, ConfigDict
 from pygetwindow import Win32Window, getWindowsWithTitle
 from adbutils._device import AdbDevice
 from playwright_stealth import stealth_sync
-from playwright.sync_api import Page
-from playwright.async_api import Page as APage
-from playwright.async_api import async_playwright
+from playwright.async_api import Page, async_playwright
 
-
-class ShiftPosition(BaseModel):
-    """Represents a shift in position.
-
-    Attributes:
-        shift_x (int): The amount to shift in the x-axis.
-        shift_y (int): The amount to shift in the y-axis.
-    """
-
-    shift_x: int
-    shift_y: int
+from .utils.position import ShiftPosition
 
 
 class Screenshot(BaseModel):
@@ -30,7 +17,7 @@ class Screenshot(BaseModel):
     Attributes:
         model_config (ConfigDict): The configuration dictionary for the model.
         screenshot (Union[bytes, Image.Image]): The screenshot image data.
-        device (Union[AdbDevice, Page, APage, ShiftPosition]): The device from which the screenshot was captured.
+        device (Union[AdbDevice, Page, ShiftPosition]): The device from which the screenshot was captured.
 
     Methods:
         save: Save the screenshot to a specified path.
@@ -39,29 +26,7 @@ class Screenshot(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     screenshot: bytes | Image.Image
-    device: AdbDevice | Page | APage | ShiftPosition
-
-    async def save(self, save_path: str) -> str:
-        """Asynchronously saves the screenshot to the specified path.
-
-        Args:
-            save_path (str): The path where the screenshot will be saved. If the path does not end with ".png", it will be automatically appended.
-
-        Raises:
-            TypeError: If the screenshot type is not supported.
-
-        Returns:
-            str: The full path where the screenshot was saved.
-        """
-        output_path = Path(f"{save_path}")
-        output_path = output_path.with_suffix(".png")
-        if isinstance(self.screenshot, bytes):
-            output_path.write_bytes(self.screenshot)
-        elif isinstance(self.screenshot, Image.Image):
-            self.screenshot.save(output_path)
-        else:
-            raise TypeError(f"The screenshot type {type(self.screenshot)} is not supported.")
-        return output_path.absolute().as_posix()
+    device: AdbDevice | Page | ShiftPosition
 
 
 class ScreenshotManager(BaseModel):
