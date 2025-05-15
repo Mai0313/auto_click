@@ -11,7 +11,6 @@ from playwright.async_api import Page
 
 from .utils.config import ImageModel
 from .utils.compare import ImageComparison
-from .utils.discord import DiscordNotify
 from .utils.screenshot import Screenshot, ScreenshotManager
 
 
@@ -89,23 +88,11 @@ class RemoteController(BaseModel):
             await asyncio.sleep(5)
             device_details.device.click(x=1600, y=930)
             await asyncio.sleep(5)
-
-            notify = DiscordNotify(
-                title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
-                description="王朝已完成",
-                target_image=device_details.screenshot,
-            )
             self.notified_count += 1
             logfire.info("Game has been switched.")
         else:
-            notify = DiscordNotify(
-                title="老闆!! 我已經幫您打完王朝/五對五了",
-                description="五對五已完成",
-                target_image=device_details.screenshot,
-            )
             self.notified_count += 1
             logfire.info("The task has been completed.")
-        await notify.send_notify()
 
     async def run(self) -> None:
         try:
@@ -131,26 +118,13 @@ class RemoteController(BaseModel):
                     await asyncio.sleep(config_dict.delay_after_click)
 
         except AdbError:
-            notify = DiscordNotify(
-                title="尊敬的老闆, 發生錯誤!!",
-                description="請檢查一下您的模擬器是否有開啟",
-                target_image=None,
-            )
-            await notify.send_notify()
-            interval = secrets.randbelow(5)
             logfire.error("Error Occurred, Please check your emulator", _exc_info=True)
+            interval = secrets.randbelow(5)
             await asyncio.sleep(interval)
 
-        except Exception as e:
-            notify = DiscordNotify(
-                title="尊敬的老闆, 發生錯誤!!",
-                description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
-                target_image=None,
-            )
-            self._disconnect_adb()
-            await notify.send_notify()
-            interval = secrets.randbelow(5)
+        except Exception:
             logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
+            interval = secrets.randbelow(5)
             await asyncio.sleep(interval)
 
     async def start(self) -> None:
