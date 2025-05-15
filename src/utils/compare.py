@@ -10,8 +10,8 @@ import PIL.Image as Image
 from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
+from .config import ImageModel
 from .screenshot import ShiftPosition
-from .types.config import ImageModel
 
 
 class FoundPosition(BaseModel):
@@ -195,7 +195,7 @@ class ImageComparison(BaseModel):
             width = button_image.shape[1]
             height = button_image.shape[0]
 
-            # Calculate click_x based on horizontal alignment
+            # Calculate click_x
             click_x = int(max_loc[0] + width // 2)
 
             # Calculate click_y
