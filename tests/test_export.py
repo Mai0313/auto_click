@@ -2,10 +2,9 @@ from pathlib import Path
 import tempfile
 
 import yaml
-import pandas as pd
 import pytest
 
-from src.types.config import ImageModel
+from src.utils.config import ImageModel
 
 
 @pytest.fixture(scope="module")
@@ -24,23 +23,3 @@ def get_temp_file(suffix: str, prefix: str) -> str:
     temp_folder.mkdir(exist_ok=True, parents=True)
     _, temp_file = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=temp_folder)
     return temp_file
-
-
-def test_export_json(image_model: ImageModel) -> None:
-    output_path = get_temp_file(".json", "sync_")
-    result = image_model.export_json(output_path)
-    assert isinstance(result, dict)
-    assert result == image_model.model_dump()
-
-
-def test_export_yaml(image_model: ImageModel) -> None:
-    output_path = get_temp_file(".yaml", "sync_")
-    result = image_model.export_yaml(output_path)
-    assert isinstance(result, dict)
-    assert result == image_model.model_dump()
-
-
-def test_export_csv(image_model: ImageModel) -> None:
-    output_path = get_temp_file(".csv", "sync_")
-    result = image_model.export_csv(output_path)
-    assert isinstance(result, pd.DataFrame)

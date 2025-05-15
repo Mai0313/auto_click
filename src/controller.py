@@ -1,92 +1,78 @@
 import asyncio
 import secrets
 import datetime
-from functools import cached_property
 
 import pytz
 import logfire
-from adbutils import AdbDevice
-from pydantic import Field, computed_field
-import pyautogui
+from adbutils import AdbDevice, adb
+from pydantic import Field, BaseModel, model_validator
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
-from .compare import ImageComparison
-from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
-from .types.config import ConfigModel
-from .utils.get_serial import ADBDeviceManager
-from .types.output_models import FoundPosition
-from .utils.discord_notify import DiscordNotify
+from .utils.config import ImageModel
+from .utils.compare import ImageComparison
+from .utils.screenshot import Screenshot, ScreenshotManager
 
 
-class RemoteController(ConfigModel):
-    found_result: FoundPosition = Field(default_factory=FoundPosition)
+class RemoteController(BaseModel):
+    target: str = Field(
+        ...,
+        description="This field can be either a window title or a URL or cdp url.",
+        frozen=True,
+        deprecated=False,
+    )
+    serial: str = Field(
+        default="127.0.0.1:16384",
+        description="The serial number of the device.",
+        examples=["127.0.0.1:16384", "127.0.0.1:16416", "127.0.0.1:16448"],
+        frozen=False,
+        deprecated=False,
+    )
+    image_list: list[ImageModel] = Field(
+        ...,
+        description="The list of images to compare, it should contain path and name.",
+        frozen=True,
+        deprecated=False,
+    )
     screenshot_manager: ScreenshotManager = Field(default_factory=ScreenshotManager)
-    notified_count: int = Field(
+    switch_count: int = Field(
         default=0,
-        title="Notified",
-        description="Whether the notification has been sent",
-        frozen=False,
-        deprecated=False,
-    )
-    task_done: bool = Field(
-        default=False,
-        title="Task Done",
-        description="Whether the task has been completed",
-        frozen=False,
-        deprecated=False,
-    )
-    error_occurred: bool = Field(
-        default=False,
-        title="Error Occurred",
-        description="Whether an error has occurred",
+        title="Switch Count",
+        description="Whether the game mode has been switched.",
         frozen=False,
         deprecated=False,
     )
 
-    @computed_field
-    @cached_property
-    def target_serial(self) -> str:
-        adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
-        apps = adb_manager.get_correct_serial()
-        return apps.serial
+    @model_validator(mode="after")
+    def _connect2adb(self) -> "RemoteController":
+        adb.connect(addr=self.serial, timeout=3.0)
+        device = adb.device(serial=self.serial)
+        running_app = device.app_current()
+        if running_app.package != self.target:
+            raise AdbError("No devices running the target app were found.")
+        return self
+
+    def _disconnect_adb(self) -> None:
+        """Disconnect from the ADB device to free up the port."""
+        try:
+            adb.disconnect(self.serial)
+            logfire.info(f"Disconnected from ADB device: {self.serial}")
+        except Exception:
+            logfire.error(f"Failed to disconnect from ADB device: {self.serial}", _exc_info=True)
 
     async def get_screenshot(self) -> Screenshot:
         if self.target.startswith("http"):
             screenshot = await self.screenshot_manager.from_browser(url=self.target)
-            return screenshot
-        if self.target.startswith("com"):
-            screenshot = await self.screenshot_manager.from_adb(
-                url=self.target, serial=self.target_serial
-            )
-            return screenshot
-        # 返回 screenshot 和 shift_position，而不是 device
-        screenshot = await self.screenshot_manager.from_window(window_title=self.target)
+        else:
+            screenshot = await self.screenshot_manager.from_adb(serial=self.serial)
         return screenshot
 
-    async def click_button(self, device_details: Screenshot) -> None:
-        if self.found_result.button_x and self.found_result.button_y:
+    async def click_button(self, button_x: int, button_y: int, device_details: Screenshot) -> None:
+        if button_x and button_y:
             if isinstance(device_details.device, Page):
-                await device_details.device.mouse.click(
-                    x=self.found_result.button_x, y=self.found_result.button_y
-                )
-            elif isinstance(device_details.device, AdbDevice):
-                device_details.device.click(
-                    x=self.found_result.button_x, y=self.found_result.button_y
-                )
-            elif isinstance(device_details.device, ShiftPosition):
-                await self.found_result.calibrate(
-                    shift_x=device_details.device.shift_x, shift_y=device_details.device.shift_y
-                )
-                pyautogui.moveTo(x=self.found_result.button_x, y=self.found_result.button_y)
-                pyautogui.click()
-            logfire.info(
-                f"Found {self.found_result.found_button_name_cn}",
-                button_x=self.found_result.button_x,
-                button_y=self.found_result.button_y,
-                button_name_en=self.found_result.found_button_name_en,
-                button_name_cn=self.found_result.found_button_name_cn,
-            )
+                await device_details.device.mouse.click(x=button_x, y=button_y)
+            else:
+                device_details.device.click(x=button_x, y=button_y)
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
@@ -94,7 +80,7 @@ class RemoteController(ConfigModel):
             return
         if not isinstance(device_details.device, AdbDevice):
             return
-        if self.notified_count == 0:
+        if self.switch_count == 0:
             logfire.warn("Switching Game!!")
             device_details.device.click(x=1600, y=630)
             await asyncio.sleep(5)
@@ -102,26 +88,11 @@ class RemoteController(ConfigModel):
             await asyncio.sleep(5)
             device_details.device.click(x=1600, y=930)
             await asyncio.sleep(5)
-
-            # 也可以透過下面方式來 click
-            # device_details.device.shell("input tap 1600 630")
-
-            notify = DiscordNotify(
-                title="老闆!! 我已經幫您打完王朝了 目前已切換至五對五",
-                description="王朝已完成",
-                target_image=device_details.screenshot,
-            )
-            self.notified_count += 1
+            self.switch_count += 1
             logfire.info("Game has been switched.")
         else:
-            notify = DiscordNotify(
-                title="老闆!! 我已經幫您打完王朝/五對五了",
-                description="五對五已完成",
-                target_image=device_details.screenshot,
-            )
-            self.task_done = True
+            self.switch_count += 1
             logfire.info("The task has been completed.")
-        await notify.send_notify()
 
     async def run(self) -> None:
         try:
@@ -133,36 +104,35 @@ class RemoteController(ConfigModel):
                     device=device_details.device,
                 )
 
-                self.found_result = await image_compare.find(
-                    vertical_align=config_dict.vertical, horizontal_align=config_dict.horizontal
-                )
-                if self.auto_click and config_dict.click_this:
-                    await self.click_button(device_details=device_details)
+                found_result = await image_compare.find()
+                if found_result is not None and config_dict.click_this:
+                    await self.click_button(
+                        button_x=found_result.button_x,
+                        button_y=found_result.button_y,
+                        device_details=device_details,
+                    )
 
-                    if self.found_result.found_button_name_en == "confirm":
+                    if found_result.name_en == "confirm":
                         await self.switch_game(device_details=device_details)
 
                     await asyncio.sleep(config_dict.delay_after_click)
 
         except AdbError:
-            notify = DiscordNotify(
-                title="尊敬的老闆, 發生錯誤!!",
-                description="請檢查一下您的模擬器是否有開啟",
-                target_image=None,
-            )
-            await notify.send_notify()
             logfire.error("Error Occurred, Please check your emulator", _exc_info=True)
-            self.error_occurred = True
+            interval = secrets.randbelow(5)
+            await asyncio.sleep(interval)
 
-        except Exception as e:
-            notify = DiscordNotify(
-                title="尊敬的老闆, 發生錯誤!!",
-                description=f"採棉花的過程中發生錯誤，請您檢查一下 {e!s}",
-                target_image=None,
-            )
-            await notify.send_notify()
-            _random_interval = secrets.randbelow(self.random_interval)
-            logfire.error(
-                f"Error Occurred, Retrying in {_random_interval} seconds", _exc_info=True
-            )
-            await asyncio.sleep(_random_interval)
+        except Exception:
+            logfire.error(f"Error Occurred, Retrying in {interval} seconds", _exc_info=True)
+            interval = secrets.randbelow(5)
+            await asyncio.sleep(interval)
+
+    async def start(self) -> None:
+        try:
+            while True:
+                await self.run()
+                if self.switch_count > 1:
+                    break
+        finally:
+            # Clean up ADB connection when done
+            self._disconnect_adb()

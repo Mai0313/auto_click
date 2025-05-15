@@ -21,15 +21,12 @@ class AutoClicker(BaseModel):
         config_dict = yaml.safe_load(config_content)
         return config_dict
 
-    async def __call__(self) -> None:
+    async def __call__(self, port: int | None = None) -> None:
         config = await self.load_yaml()
+        if port and "serial" in config:
+            config["serial"] = f"127.0.0.1:{port}"
         remote_controller = RemoteController(**config)
-        while True:
-            await remote_controller.run()
-            if remote_controller.task_done:
-                break
-            if remote_controller.error_occurred:
-                break
+        await remote_controller.start()
 
 
 if __name__ == "__main__":
