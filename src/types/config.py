@@ -87,7 +87,7 @@ class ConfigModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    auto_click: bool = Field(
+    enable: bool = Field(
         ...,
         description="Indicates whether auto click is enabled or not.",
         frozen=True,
