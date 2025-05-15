@@ -12,9 +12,15 @@ class ADBDeviceManager(BaseModel):
     host: str = Field(default="127.0.0.1")
     ports: list[str] = Field(
         ...,
+        title="ADB Ports",
         description="The list of ports to connect to; defaults to ['16384', '16416'], 16384 and 16416 are for MuMu Player, 5555 and 5557 are for LD Player.",
     )
-    target: str = Field(default="com.longe.allstarhmt", description="The game you wanna afk.")
+    target: str = Field(
+        ...,
+        title="Running App Name",
+        description="The game you wanna afk.",
+        examples=["com.longe.allstarhmt"],
+    )
 
     serials: list[str] = Field(
         default=[], description="The list of serial numbers for connected devices."

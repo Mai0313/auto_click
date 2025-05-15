@@ -11,12 +11,11 @@ import pyautogui
 from adbutils.errors import AdbError
 from playwright.async_api import Page
 
-from .compare import ImageComparison
-from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
-from .types.config import ConfigModel
+from .utils.config import ConfigModel
+from .utils.notify import DiscordNotify
+from .utils.compare import FoundPosition, ImageComparison
 from .utils.get_serial import ADBDeviceManager
-from .types.output_models import FoundPosition
-from .utils.discord_notify import DiscordNotify
+from .utils.screenshot import Screenshot, ShiftPosition, ScreenshotManager
 
 
 class RemoteController(ConfigModel):
