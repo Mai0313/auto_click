@@ -195,7 +195,7 @@ class ImageComparison(BaseModel):
             width = button_image.shape[1]
             height = button_image.shape[0]
 
-            # Calculate click_x based on horizontal alignment
+            # Calculate click_x
             click_x = int(max_loc[0] + width // 2)
 
             # Calculate click_y
