@@ -13,7 +13,7 @@ from playwright.async_api import Page
 
 from .compare import ImageComparison
 from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
-from .types.config import ConfigModel
+from .utils.config import ConfigModel
 from .utils.get_serial import ADBDeviceManager
 from .types.output_models import FoundPosition
 from .utils.discord_notify import DiscordNotify

@@ -11,7 +11,7 @@ from adbutils._device import AdbDevice
 from playwright.sync_api import Page
 
 from .screenshot import ShiftPosition
-from .types.config import ImageModel
+from .utils.config import ImageModel
 from .types.output_models import FoundPosition
 
 
