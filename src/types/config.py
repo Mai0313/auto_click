@@ -1,4 +1,4 @@
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, model_validator
 
 
 class ImageModel(BaseModel):
@@ -38,21 +38,45 @@ class ImageModel(BaseModel):
     )
 
 
-class ConfigModel(BaseModel):
-    enable: bool = Field(
-        ...,
-        description="Indicates whether auto click is enabled or not.",
-        frozen=True,
-        deprecated=False,
-    )
+class DeviceModel(BaseModel):
     target: str = Field(
         ...,
+        title="The Application Name",
         description="This field can be either a window title or a URL or cdp url.",
         frozen=True,
         deprecated=False,
     )
-    serials: list[str] = Field(
-        default=["16384", "16416"], description="The serial number of the device."
+    host: str = Field(
+        ...,
+        title="The ADB host",
+        description="The host address of the device.",
+        frozen=True,
+        deprecated=False,
+    )
+    serial: str = Field(
+        ...,
+        title="The ADB serial",
+        description="The serial number of the device.",
+        frozen=True,
+        deprecated=False,
+    )
+
+    @model_validator(mode="after")
+    def _setup(self) -> "DeviceModel":
+        if self.host and not self.serial:
+            raise ValueError("Serial number is required when host is provided.")
+        if not self.host and self.serial:
+            raise ValueError("Host is required when serial number is provided.")
+        return self
+
+
+class ConfigModel(DeviceModel):
+    enable: bool = Field(
+        ...,
+        title="Enable Auto Click",
+        description="Indicates whether auto click is enabled or not.",
+        frozen=True,
+        deprecated=False,
     )
     image_list: list[ImageModel] = Field(
         ...,
