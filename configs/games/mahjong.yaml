@@ -1,5 +1,5 @@
-target: 雀魂麻将  # "http://localhost:9222"
 enable: True
+target: 雀魂麻将  # "http://localhost:9222"
 serials:
   - ""
 

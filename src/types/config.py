@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import Field, BaseModel
 
 
@@ -38,32 +36,18 @@ class ImageModel(BaseModel):
         frozen=True,
         deprecated=False,
     )
-    force_x: Optional[int] = Field(
-        default=None,
-        title="Force X",
-        description="The x-coordinate of the force click",
-        frozen=True,
-        deprecated=True,
-    )
-    force_y: Optional[int] = Field(
-        default=None,
-        title="Force Y",
-        description="The y-coordinate of the force click",
-        frozen=True,
-        deprecated=True,
-    )
 
 
 class ConfigModel(BaseModel):
-    target: str = Field(
-        ...,
-        description="This field can be either a window title or a URL or cdp url.",
-        frozen=True,
-        deprecated=False,
-    )
     enable: bool = Field(
         ...,
         description="Indicates whether auto click is enabled or not.",
+        frozen=True,
+        deprecated=False,
+    )
+    target: str = Field(
+        ...,
+        description="This field can be either a window title or a URL or cdp url.",
         frozen=True,
         deprecated=False,
     )
