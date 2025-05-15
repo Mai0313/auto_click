@@ -8,7 +8,7 @@ from adbutils._device import AdbDevice
 from playwright_stealth import stealth_async
 from playwright.async_api import Page, async_playwright
 
-from .utils.position import ShiftPosition
+from .position import ShiftPosition
 
 
 class Screenshot(BaseModel):
