@@ -1,9 +1,11 @@
+<center>
+
 # Auto Click
 
 [![python](https://img.shields.io/badge/-Python_3.8_%7C_3.9_%7C_3.10%7C_3.11-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![pytorch](https://img.shields.io/badge/PyTorch_2.0+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
-[![lightning](https://img.shields.io/badge/-Lightning_2.0+-792ee5?logo=pytorchlightning&logoColor=white)](https://pytorchlightning.ai/)
-[![hydra](https://img.shields.io/badge/Config-Hydra_1.3-89b8cd)](https://hydra.cc/)
+[![React](https://img.shields.io/badge/-React_19.1-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/-TypeScript_5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![tests](https://github.com/Mai0313/auto_click/actions/workflows/test.yml/badge.svg)](https://github.com/Mai0313/auto_click/actions/workflows/test.yml)
 [![code-quality](https://github.com/Mai0313/auto_click/actions/workflows/code-quality-check.yml/badge.svg)](https://github.com/Mai0313/auto_click/actions/workflows/code-quality-check.yml)
@@ -12,17 +14,29 @@
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mai0313/auto_click/pulls)
 [![contributors](https://img.shields.io/github/contributors/Mai0313/auto_click.svg)](https://github.com/Mai0313/auto_click/graphs/contributors)
 
-A clean template to kickstart your deep learning project 🚀⚡🔥
-Click on [<kbd>Use this template</kbd>](https://github.com/Mai0313/auto_click/generate) to initialize new repository.
+</center>
 
-_Suggestions are always welcome!_
+Welcome to the Auto Click project.
 
-## Description
+## Overview
 
-This is a information grabber for pictures. It can be used to extract information from pictures and store them in a database.
+This project provides an automated clicking development environment. It includes features for configuring and running automated click sequences.
 
-## For More info, check the [Docs](https://mai0313.github.io/auto_click/)
+## Installation
 
-> [!IMPORTANT]
->
-> - Some actions may not work if you don't give the correct secrets or environment variables.
+1. Clone the repository.
+2. Navigate to the project directory.
+3. Follow the setup instructions in the documentation.
+
+## Usage
+
+- Run the main application following the provided instructions.
+- Configure settings as needed.
+
+## Contributing
+
+Contributions are welcome! Please open a pull request or issue for improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License.

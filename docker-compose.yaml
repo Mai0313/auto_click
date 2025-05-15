@@ -1,33 +1,34 @@
 services:
   redis:
-    image: redis:7.2.5-alpine
+    image: redis:alpine
+    healthcheck:
+      test: redis-cli ping
+      interval: 5s
+      timeout: 1s
+      retries: 5
     ports:
       - ${REDIS_PORT:-6379}:6379
-    environment:
-      - PUID=0
-      - PGID=0
-      - UMASK=022
-    command:
-      - redis-server
     volumes:
-      - ./data/redis:/var/lib/redis
+      - redis-data:/var/lib/redis
     restart: always
     pull_policy: always
 
   postgresql:
-    image: postgres:16.3-alpine
-    ports:
-      - ${POSTGRES_PORT:-5432}:5432
+    image: postgres:alpine
     environment:
-      PUID: 0
-      PGID: 0
-      UMASK: 022
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      PGDATA: /var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      start_period: 10s
+      timeout: 1s
+      retries: 5
+      interval: 5s
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
+      - postgresql-data:/var/lib/postgresql/data
     restart: always
     pull_policy: always
 
@@ -35,12 +36,8 @@ services:
     image: mongo:latest
     ports:
       - ${MONGO_PORT:-27017}:${MONGO_PORT:-27017}
-    environment:
-      PUID: 0
-      PGID: 0
-      UMASK: 022
     volumes:
-      - ./data/mongodb:/data/db
+      - mongo-data:/data/db
     restart: always
     pull_policy: always
 
@@ -49,14 +46,17 @@ services:
     ports:
       - ${MYSQL_PORT:-3306}:3306
     environment:
-      PUID: 0
-      PGID: 0
-      UMASK: 022
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-mysql}
       MYSQL_USER: ${MYSQL_USER:-mysql}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     restart: always
     pull_policy: always
+
+volumes:
+  redis-data: {}
+  mysql-data: {}
+  mongo-data: {}
+  postgresql-data: {}
