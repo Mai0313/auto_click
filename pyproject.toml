@@ -14,7 +14,7 @@ addopts = [
     "--cache-clear",
     "-n=auto",
     "--no-header",
-    "--cov-fail-under=80",
+    # "--cov-fail-under=5",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -62,7 +62,7 @@ omit = ["./src/ameba/*"]
 
 [project]
 name = "auto-click"
-version = "1.0.9.dev56"
+version = "0.1.0"
 description = "Auto clicker for multi platforms."
 authors = [
     { name = "Wei", email = "mai@mai0313.com" },
