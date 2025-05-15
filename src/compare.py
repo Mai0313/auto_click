@@ -22,8 +22,6 @@ class FoundPosition(BaseModel):
         button_y (Optional[int]): The y-coordinate of the button center.
         found_button_name_en (Optional[str]): The name of the found button in English.
         found_button_name_cn (Optional[str]): The name of the found button in Chinese.
-        color_screenshot (Optional[np.ndarray]): The screenshot of the button in color.
-        blackout_screenshot (Optional[np.ndarray]): The screenshot of the button with a blackout effect.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
