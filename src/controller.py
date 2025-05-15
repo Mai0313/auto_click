@@ -14,9 +14,9 @@ from playwright.async_api import Page
 from .compare import ImageComparison
 from .screenshot import Screenshot, ShiftPosition, ScreenshotManager
 from .types.config import ConfigModel
+from .utils.notify import DiscordNotify
 from .utils.get_serial import ADBDeviceManager
 from .types.output_models import FoundPosition
-from .utils.discord_notify import DiscordNotify
 
 
 class RemoteController(ConfigModel):
