@@ -3,12 +3,10 @@ import logging
 from pathlib import Path
 
 import yaml
-import logfire
 from pydantic import Field, BaseModel
 
 from src.controller import RemoteController
 
-logfire.configure(send_to_logfire=False)
 logging.getLogger("sqlalchemy.engine.Engine").disabled = True
 
 

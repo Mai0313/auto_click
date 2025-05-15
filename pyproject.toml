@@ -14,7 +14,7 @@ addopts = [
     "--cache-clear",
     "-n=auto",
     "--no-header",
-    # "--cov-fail-under=5",
+    # "--cov-fail-under=80",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -61,14 +61,14 @@ omit = ["./src/ameba/*"]
 # ================== #
 
 [project]
-name = "auto-click"
+name = "auto_click"
 version = "0.1.0"
-description = "Auto clicker for multi platforms."
+description = "Repository template for Python projects"
 authors = [
     { name = "Wei", email = "mai@mai0313.com" },
 ]
 dependencies = [
-    "adbutils>=2.8.0",
+    "adbutils>=2.8.2",
     "anyio>=4.8.0",
     "fire>=0.7.0",
     "httpx>=0.28.1",
@@ -79,19 +79,16 @@ dependencies = [
     "pillow>=11.1.0",
     "playwright>=1.49.1",
     "playwright-stealth>=1.0.6",
-    "psycopg2-binary>=2.9.10",
     "pyautogui>=0.9.54",
     "pydantic>=2.10.5",
     "pydantic-settings>=2.7.1",
     "pygetwindow>=0.0.9",
     "pytz>=2024.2",
     "pyyaml>=6.0.2",
-    "rich>=13.9.4",
-    "sqlalchemy>=2.0.37",
     "tomli>=2.2.1",
 ]
 readme = "README.md"
-requires-python = ">= 3.10"
+requires-python = ">= 3.10, < 3.13"
 license = { text = "MIT" }
 
 [project.urls]
@@ -123,6 +120,7 @@ docs = [
     "griffe-typingdoc>=0.2.7",
     "markdown-exec[ansi]>=1.10.0",
     "mkdocs-autorefs>=1.3.1",
+    "mkdocs-coverage>=1.1.0",
     "mkdocs-material>=9.6.4",
     "mkdocstrings[python]>=0.28.1",
     "rich>=13.9.4",
@@ -185,22 +183,6 @@ content-type = "text/markdown"
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
 
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
-# replace relative links with absolute links
-pattern = '\[(.+?)\]\(((?!https?://)\S+?)\)'
-replacement = '[\1](https://github.com/openai/openai-python/tree/main/\g<2>)'
-
-[tool.rye.scripts]
-api = { cmd = "python ./api.py" }
-main = { cmd = "python ./main.py" }
-
-# Documentation
-"docs:gen" = "make gen-docs"
-"docs:deploy" = "mkdocs gh-deploy --force --clean"
-"docs:run" = "mkdocs serve"
-gen = { chain = ["docs:gen", "docs:deploy"] }
-docs = { chain = ["docs:gen", "docs:run"] }
-
 [tool.poe.tasks]
 api = "python ./api.py"
 main = "python ./main.py"
@@ -234,13 +216,11 @@ preview = true
 [[tool.uv.index]]
 name = "default"
 url = "https://pypi.org/simple"
+default = true
 
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu118"
-# If you set it to `true`, it will be moved to the end of the prioritized list.
-# In other words, it will search pypi first, then here.
-default = true
 
 [tool.uv.pip]
 annotation-style = "line"
@@ -319,6 +299,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 # Ref: https://beta.ruff.rs/docs/rules/#ruff-specific-rules-ruf
 fixable = ["ALL"]
+unfixable = ["T201", "F841"]
 
 # Allow minus-sign (U+2212), greek-small-letter-rho (U+03C1), and the asterisk-operator (U+2217),
 # which could be confused for "-", "p", and "*", respectively.
@@ -524,7 +505,7 @@ fast_shutdown=true
 # ================== #
 
 [tool.codespell]
-skip = "pyproject.toml,poetry.lock,notebook/.*"
+skip = "pyproject.toml,poetry.lock,notebook/.*,uv.lock"
 count = false
 quiet-level = 3
 # the correct one is Amoeba, but we use pronunciation in Chinese to name it.

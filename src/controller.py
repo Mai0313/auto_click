@@ -46,7 +46,7 @@ class RemoteController(ConfigModel):
     @computed_field
     @cached_property
     def target_serial(self) -> str:
-        adb_manager = ADBDeviceManager(host="127.0.0.1", ports=self.serials, target=self.target)
+        adb_manager = ADBDeviceManager(target=self.target, host=self.host, serial=self.serial)
         apps = adb_manager.get_correct_serial()
         return apps.serial
 

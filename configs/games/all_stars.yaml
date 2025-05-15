@@ -1,7 +1,7 @@
 enable: True
 target: com.longe.allstarhmt
-serials:
-  - "16416"
+host: "127.0.0.1"
+serial: "16416"
 
 image_list:
   - image_name: 開始配對
