@@ -1,8 +1,5 @@
-import json
-from typing import Any, Optional
+from typing import Optional
 
-import yaml
-import pandas as pd
 from pydantic import Field, BaseModel
 
 
@@ -55,29 +52,6 @@ class ImageModel(BaseModel):
         frozen=True,
         deprecated=True,
     )
-
-    def export_json(self, output: str) -> dict[str, Any]:
-        if not output.endswith(".json"):
-            raise ValueError("Output file must be a JSON file")
-        data_dict = self.model_dump()
-        with open(output, "w", encoding="utf-8") as file:
-            json.dump(data_dict, file, indent=4, ensure_ascii=False)
-        return data_dict
-
-    def export_yaml(self, output: str) -> dict[str, Any]:
-        if not output.endswith(".yaml"):
-            raise ValueError("Output file must be a JSON file")
-        data_dict = self.model_dump()
-        with open(output, "w", encoding="utf-8") as yaml_file:
-            yaml.dump(data_dict, yaml_file, allow_unicode=True)
-        return data_dict
-
-    def export_csv(self, output: str) -> pd.DataFrame:
-        if not output.endswith(".csv"):
-            raise ValueError("Output file must be a CSV file")
-        data = pd.DataFrame([self.model_dump()]).astype(str)
-        data.to_csv(output, index=False)
-        return data
 
 
 class ConfigModel(BaseModel):
