@@ -5,7 +5,7 @@ from adbutils import adb
 from pydantic import BaseModel, ConfigDict
 from pygetwindow import Win32Window, getWindowsWithTitle
 from adbutils._device import AdbDevice
-from playwright_stealth import stealth_sync
+from playwright_stealth import stealth_async
 from playwright.async_api import Page, async_playwright
 
 from .utils.position import ShiftPosition
@@ -124,7 +124,7 @@ class ScreenshotManager(BaseModel):
                 viewport={"width": 800, "height": 800},
             )
             # 反反爬蟲
-            stealth_sync(context)
+            stealth_async(context)
             page = await context.new_page()
             await page.goto(url)
             screenshot = await page.screenshot()
