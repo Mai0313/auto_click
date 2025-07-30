@@ -114,6 +114,9 @@ class DiscordNotify(BaseSettings):
             response.raise_for_status()  # 確保請求成功
 
     async def send_notify(self) -> None:
+        if not self.discord_webhook_url:
+            logfire.warn("Discord Webhook Url is not set, skipping.")
+            return
         try:
             await self._send_notify()
         except Exception:
