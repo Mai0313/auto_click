@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from auto_click.core.config import ConfigModel
+from auto_click.cores.config import ConfigModel
 
 config_path = Path("./configs/games").rglob("*.yaml")
 config_contents = [f.read_text(encoding="utf-8") for f in config_path]
