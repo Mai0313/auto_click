@@ -168,4 +168,3 @@ docker-compose.override.yaml
 # Generated Docs
 /docs/Reference
 /docs/Scripts
-requirements.txt

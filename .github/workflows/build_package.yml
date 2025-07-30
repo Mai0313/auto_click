@@ -9,22 +9,16 @@ permissions: write-all
 
 jobs:
   build_package:
-    name: Build Package by uv
+    name: Build Package
     runs-on: ubuntu-latest
     # container: catthehacker/ubuntu:act-20.04  # Uncomment it if you use it on Gitea
 
     strategy:
-      fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
         python-version:
-          # - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
-
-    timeout-minutes: 20
 
     steps:
       - name: Disable SSL Verify
@@ -52,24 +46,43 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           version: "latest"
           python-version: ${{ matrix.python-version }}
-          pyproject-file: "pyproject.toml"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Version
+        id: version
         shell: bash
         run: |
           VERSION=$(uvx dunamai from git --bump --no-metadata --style pep440)
           uv version $VERSION
-          echo "Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # - name: Set tags
+      #   id: version
+      #   run: |
+      #     if [[ $GITHUB_REF == refs/tags/* ]]; then
+      #       VERSION=${GITHUB_REF#refs/tags/}
+      #       echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      #       echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "VERSION=latest" >> $GITHUB_ENV
+      #       echo "version=latest" >> $GITHUB_OUTPUT
+      #     fi
 
       - name: Build Package
         run: |
           uv build
+
+      # - name: Publish Package
+      #   continue-on-error: true
+      #   env:
+      #     UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
+      #   run: |
+      #     uv publish
 
       - name: Generate a changelog
         uses: orhun/git-cliff-action@v4
@@ -78,14 +91,14 @@ jobs:
           OUTPUT: CHANGELOG.md
         with:
           config: pyproject.toml
-          args: --unreleased --tag ${{ env.VERSION }}
+          args: --unreleased --tag ${{ steps.version.outputs.version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4.6.2
         with:
           path: ./dist/*
-          name: ${{ github.event.repository.name }}-packages
+          name: ${{ github.event.repository.name }}-py${{ matrix.python-version }}
           if-no-files-found: ignore
           retention-days: 7
           compression-level: 6

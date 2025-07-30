@@ -14,27 +14,27 @@
 
 </center>
 
-Welcome to the Auto Click project.
+歡迎來到 Auto Click 專案。
 
-## Overview
+## 概述
 
-This project provides an automated clicking development environment. It includes features for configuring and running automated click sequences.
+本專案提供自動點擊開發環境。包含配置和執行自動點擊序列的功能。
 
-## Installation
+## 安裝
 
-1. Clone the repository.
-2. Navigate to the project directory.
-3. Follow the setup instructions in the documentation.
+1. 複製儲存庫。
+2. 導航至專案目錄。
+3. 按照文件中的設置說明進行操作。
 
-## Usage
+## 使用方法
 
-- Run the main application following the provided instructions.
-- Configure settings as needed.
+- 按照提供的說明執行主應用程式。
+- 根據需要配置設定。
 
-## Contributing
+## 貢獻
 
-Contributions are welcome! Please open a pull request or issue for improvements or bug fixes.
+歡迎貢獻！請針對改進或錯誤修復開啟拉取請求或問題。
 
-## License
+## 授權
 
-This project is licensed under the MIT License.
+本專案採用 MIT 授權條款。

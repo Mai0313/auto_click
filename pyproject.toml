@@ -88,8 +88,12 @@ dependencies = [
     "tomli>=2.2.1",
 ]
 readme = "README.md"
-requires-python = ">= 3.10, < 3.13"
+requires-python = ">= 3.10"
 license = { text = "MIT" }
+
+[project.scripts]
+cli = "auto_click.cli:main"
+auto_click = "auto_click.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/Mai0313/auto_click"
@@ -101,34 +105,31 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "ipykernel>=6.29.5",
-    "ipywidgets>=8.1.5",
-    "notebook>=7.3.2",
-    "poethepoet>=0.32.2",
-    "pre-commit>=4.0.1",
+    "ipykernel",
+    "ipywidgets",
+    "notebook",
+    "poethepoet",
+    "pre-commit",
 ]
 test = [
-    "genbadge[all]>=1.1.1",
-    "pytest>=8.3.4",
-    "pytest-asyncio>=0.25.3",
-    "pytest-cov>=6.0.0",
-    "pytest-xdist[psutil]>=3.6.1",
+    "genbadge[all]",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-xdist[psutil]",
 ]
 docs = [
-    "anyio>=4.8.0",
-    "fire>=0.7.0",
-    "griffe-typingdoc>=0.2.7",
-    "markdown-exec[ansi]>=1.10.0",
-    "mkdocs-autorefs>=1.3.1",
-    "mkdocs-coverage>=1.1.0",
-    "mkdocs-material>=9.6.4",
-    "mkdocstrings[python]>=0.28.1",
-    "rich>=13.9.4",
-    "ruff>=0.9.6",
-    "tabulate>=0.9.0",
-]
-ai = [
-    "ultralytics>=8.3.76",
+    "anyio",
+    "fire",
+    "griffe-typingdoc",
+    "markdown-exec[ansi]",
+    "mkdocs-autorefs",
+    "mkdocs-coverage",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "rich",
+    "ruff",
+    "tabulate",
 ]
 
 [tool.hatch.metadata]
@@ -136,11 +137,11 @@ allow-direct-references = true
 
 [tool.hatch.build]
 include = [
-    "src/*"
+    "src/auto_click"
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/template"]
+packages = ["src/auto_click"]
 
 [tool.hatch.build.targets.sdist]
 # Basically everything except hidden files/directories (such as .github, .devcontainers, .python-version, etc)
@@ -184,8 +185,8 @@ content-type = "text/markdown"
 path = "README.md"
 
 [tool.poe.tasks]
-api = "python ./api.py"
-main = "python ./main.py"
+api = "python ./src/auto_click/cli.py"
+main = "python ./src/auto_click/cli.py"
 
 # Documentation
 docs_gen = "make gen-docs"
@@ -197,9 +198,10 @@ docs = ["docs_gen", "docs_run"]
 # https://docs.astral.sh/uv/reference/settings
 [tool.uv]
 managed = true
-package = false
-check-url = "https://test.pypi.org/simple"
-publish-url = "https://test.pypi.org/legacy/"
+# If you don't want to use the `uv` CLI, you can set this to false.
+package = true
+check-url = "https://pypi.org/simple"
+publish-url = "https://upload.pypi.org/legacy/"
 compile-bytecode = true
 # concurrent-builds = 4
 # concurrent-downloads = 4
@@ -218,11 +220,12 @@ name = "default"
 url = "https://pypi.org/simple"
 default = true
 
-[[tool.uv.index]]
-name = "pytorch"
-url = "https://download.pytorch.org/whl/cu118"
+# [[tool.uv.index]]
+# name = "pytorch"
+# url = "https://download.pytorch.org/whl/cu118"
 
 [tool.uv.pip]
+universal = true
 annotation-style = "line"
 output-file = "requirements.txt"
 
@@ -284,7 +287,7 @@ line-length = 99
 # Enable preview features.
 preview = true
 detect-string-imports = true
-direction = "Dependencies"
+direction = "dependencies"
 
 
 [tool.ruff.lint]
@@ -436,7 +439,7 @@ force-to-top = []
 force-wrap-aliases = false
 forced-separate = []
 from-first = false
-known-first-party = ["src"]
+known-first-party = ["src", "tests"]
 known-local-folder = []
 known-third-party = []
 length-sort = true
@@ -509,7 +512,7 @@ skip = "pyproject.toml,poetry.lock,notebook/.*,uv.lock"
 count = false
 quiet-level = 3
 # the correct one is Amoeba, but we use pronunciation in Chinese to name it.
-ignore-words-list = ["longe"]
+ignore-words-list = ["ameba", "mke"]
 
 
 # ================== #

@@ -22,7 +22,6 @@ jobs:
         os:
           - ubuntu-latest
         python-version:
-          # - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
@@ -55,21 +54,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           version: "latest"
           python-version: ${{ matrix.python-version }}
-          pyproject-file: "pyproject.toml"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
           uv python pin ${{ matrix.python-version }}
           uv sync --group test
-
-      - name: List dependencies
-        run: |
-          uv pip list
 
       - name: Check for tests
         id: check_tests
