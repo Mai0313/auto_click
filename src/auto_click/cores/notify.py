@@ -52,7 +52,7 @@ class DiscordNotify(BaseSettings):
         deprecated=False,
     )
     discord_webhook_url: str = Field(
-        ...,
+        default="",
         validation_alias=AliasChoices("DISCORD_WEBHOOK_URL"),
         title="Discord Webhook URL",
         description="The URL of the Discord webhook to send notifications to.",
