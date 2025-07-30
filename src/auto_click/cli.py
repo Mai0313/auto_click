@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from pydantic import Field, BaseModel
 
-from src.controller import RemoteController
+from auto_click.controller import RemoteController
 
 logging.getLogger("sqlalchemy.engine.Engine").disabled = True
 
@@ -30,7 +30,11 @@ class AutoClicker(BaseModel):
                 break
 
 
-if __name__ == "__main__":
+def main() -> None:
     import fire
 
     fire.Fire(AutoClicker)
+
+
+if __name__ == "__main__":
+    main()

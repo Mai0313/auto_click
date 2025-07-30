@@ -1,4 +1,3 @@
-from typing import Optional
 from pathlib import Path
 
 import cv2
@@ -26,25 +25,25 @@ class FoundPosition(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    button_x: Optional[int] = Field(
+    button_x: int | None = Field(
         default=None,
         description="The x-coordinate of the button center.",
         frozen=False,
         deprecated=False,
     )
-    button_y: Optional[int] = Field(
+    button_y: int | None = Field(
         default=None,
         description="The y-coordinate of the button center.",
         frozen=False,
         deprecated=False,
     )
-    found_button_name_en: Optional[str] = Field(
+    found_button_name_en: str | None = Field(
         default=None,
         description="The name of the found button in English.",
         frozen=True,
         deprecated=False,
     )
-    found_button_name_cn: Optional[str] = Field(
+    found_button_name_cn: str | None = Field(
         default=None,
         description="The name of the found button in Chinese.",
         frozen=True,
