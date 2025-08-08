@@ -4,4 +4,4 @@ chcp 65001
 setlocal enabledelayedexpansion
 
 @REM rye run main
-start powershell -NoExit -Command "uv run cli --no-dev"
+start powershell -NoExit -Command "uv run --no-dev --frozen cli"
