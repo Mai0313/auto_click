@@ -1,51 +1,68 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+⚠️ IMPORTANT: Keep this file aligned with the actual project. Update it whenever behavior, APIs, or workflows change.
 
-⚠️ **IMPORTANT**: You MUST modify `.github/copilot-instructions.md` every time you make changes to the project.
+### Project Overview
 
-# Project Background
+- Auto Click is a YAML-driven UI auto-clicker. It captures screenshots from one of three targets and detects UI elements via OpenCV template matching. If configured, it clicks the matched point and sleeps for a delay. It can send Discord notifications on completion or error.
 
-This is a pre-configured Python project template designed to streamline the development process. It includes essential tools and configurations for modern Python development, such as dependency management, code formatting, linting, testing, and documentation.
-Everything in this file SHOULD BE MODIFIED to reflect the current state of the project.
+### Runtime Architecture
 
-# Core Infrastructure
+- Entry points: `auto_click.cli:main` (also exposed as `auto_click` and `cli`).
+- Orchestration: `AutoClicker` loads YAML → builds `RemoteController` → loops `RemoteController.run()` until `task_done` or `error_occurred`.
+- Targets (in `auto_click.cores.screenshot.ScreenshotManager`):
+  - Window: `from_window(window_title)` uses `pygetwindow` + `PIL.ImageGrab`; clicking via `pyautogui` with window-origin calibration.
+  - Android: `from_adb(url=package, serial)` uses `adbutils`; clicking via `AdbDevice.click`.
+  - Browser: `from_browser(url)` uses Playwright (Chromium, `channel="chrome"`, headless + stealth) and clicks via `Page.mouse.click`.
+- Device selection (ADB): `auto_click.cores.manager.ADBDeviceManager` connects to `host:serial`, enumerates devices, and picks the one whose current package equals `target`.
+- Matching: `auto_click.cores.compare.ImageComparison.find()` converts screenshot and template to grayscale and uses `cv2.matchTemplate(..., TM_CCOEFF_NORMED)`. If `max_val > confidence`, returns center point as `FoundPosition`.
+- Notifications: `auto_click.cores.notify.DiscordNotify` posts an embed (with optional image) to `DISCORD_WEBHOOK_URL`.
 
-- **Modern Python**: Supports Python 3.10, 3.11, and 3.12
-- **Dependency Management**: Uses `uv` for fast and reliable dependency management
-- **Project Structure**: src/ layout following Python packaging best practices
-- **Docker Support**: Multi-stage Dockerfile for development and production
-- **VS Code Dev Container**: Fully configured development environment with zsh, oh-my-zsh, and powerlevel10k
+### Configuration Schema (YAML → `ConfigModel`)
 
-# CI/CD Pipeline
+- `enable: bool` — master switch.
+- `target: str` — window title, Android package, or a URL.
+- `host: str`, `serial: str` — both required together for ADB mode; otherwise both empty.
+- `image_list: list[ImageModel]` — ordered operations:
+  - `image_name: str`
+  - `image_path: str`
+  - `delay_after_click: int` — seconds to sleep after clicking.
+  - `enable_click: bool` — whether to click on match.
+  - `enable_screenshot: bool` — reserved (not used by runtime today).
+  - `confidence: float` — template-match threshold (0.0–1.0).
 
-- **Pre-commit Hooks**: You can run `pre-commit run -a` to apply all hooks.
-- **Github Action**: All actions you may need are defined in `.github/workflows/` directory.
+### CLI Usage
 
-# Coding Style
+- Run with a config:
+  - `uv run python src/auto_click/cli.py --config_path=./configs/games/mahjong.yaml`
+  - or `uv run auto_click --config_path=./configs/games/all_stars.yaml`
 
-- All rules are pre-defined by using `pre-commit run -a` command.
-- Follow PEP 8 naming conventions:
-    - snake_case for functions and variables
-    - PascalCase for classes
-    - UPPER_CASE for constants
-- Use pydantic model, and all pydantic models should include `Field`, and `description` should be included.
-- Use `pytest` for testing, and all tests should be placed in the `tests/` directory
+### Developer Guidelines
 
-# Type Hints / Documentation
+- Style: PEP 8; Ruff configured in `pyproject.toml` (auto-fix enabled). Use descriptive names; keep functions small.
+- Pydantic v2: prefer `Field` with `description`; use `@model_validator` for invariants.
+- Async: IO paths (Playwright, HTTP) are async; avoid blocking calls in async flows.
+- Assets: images under `data/*`; tests ensure files referenced by YAML exist.
+- Logging: use `logfire` structured logs; avoid `print`.
 
-- Use type hints for all function parameters and returns
-- Use `TypeVar` for generic types
-- Use `Protocol` for duck typing
-- Use Google-style docstrings
-- All documentation should be in English
-- Use proper inline comments for better mkdocs support
+### Dependency Management
 
-# Dependencies
+- Use `uv`:
+  - Production: `uv add <pkg>`, `uv remove <pkg>`
+  - Development: `uv add <pkg> --dev`, `uv remove <pkg> --dev`
 
-- Use `uv` for dependency management
-- Separate dev dependencies by adding `--dev` flag when adding dependencies
-    - Production:
-        - Add Dependencies: `uv add <package>`
-        - Remove Dependencies: `uv remove <package>`
-    - Development:
-        - Add Dependencies: `uv add <package> --dev`
-        - Remove Dependencies: `uv remove <package> --dev`
+### CI / QA
+
+- Tests: `uv run pytest -q` (async mode auto; coverage to `.github/reports`).
+- Lint/format: `uv run ruff check --fix .` or via pre-commit hooks.
+
+### Common Tasks
+
+- Run app: `uv run auto_click --config_path=./configs/games/mahjong.yaml`
+- Serve docs: `uv run poe docs`
+- Generate docs: `uv run poe docs_gen`
+
+### Notes / Limitations
+
+- `enable_screenshot` is currently not used by runtime; screenshot logging helpers exist but are commented.
+- Window mode requires Windows.
+- Browser mode launches Chrome; change `channel` in `auto_click.cores.screenshot.from_browser` if needed.
+- ADB mode requires `host` and `serial` both set and the `target` package running.
