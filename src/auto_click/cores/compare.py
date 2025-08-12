@@ -130,14 +130,17 @@ class ImageComparison(BaseModel):
                 max_val=max_val,
                 **self.image_cfg.model_dump(exclude_none=True),
             )
-            width = button_image.shape[1]
-            height = button_image.shape[0]
 
-            # Calculate click_x
-            click_x = int(max_loc[0] + width // 2)
-
-            # Calculate click_y
-            click_y = int(max_loc[1] + height // 2)
+            # Calculate X and Y coordinates of the button center
+            click_x = int(max_loc[0] + button_image.shape[1] // 2)
+            click_y = int(max_loc[1] + button_image.shape[0] // 2)
+            logfire.info(
+                "Found Image",
+                button_x=click_x,
+                button_y=click_y,
+                button_name_en=Path(self.image_cfg.image_path).stem,
+                button_name_cn=self.image_cfg.image_name,
+            )
 
             return FoundPosition(
                 button_x=click_x,

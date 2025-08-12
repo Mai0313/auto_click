@@ -79,13 +79,6 @@ class RemoteController(ConfigModel):
                 )
                 pyautogui.moveTo(x=self.found_result.button_x, y=self.found_result.button_y)
                 pyautogui.click()
-            logfire.info(
-                f"Found {self.found_result.found_button_name_cn}",
-                button_x=self.found_result.button_x,
-                button_y=self.found_result.button_y,
-                button_name_en=self.found_result.found_button_name_en,
-                button_name_cn=self.found_result.found_button_name_cn,
-            )
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
