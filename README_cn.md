@@ -17,7 +17,7 @@ Auto Click 是一個小型自動化工具，透過比對螢幕截圖中的按鈕
   - **視窗標題（Windows）**：擷取指定視窗並用 `pyautogui` 點擊。
   - **Android（ADB）**：對在裝置上執行的指定套件擷取與點擊。
   - **瀏覽器（Playwright）**：開啟網址並在頁面上點擊。
-- **樣板比對**：以 OpenCV `matchTemplate`（灰階）偵測；每張圖可調整 `confidence`。
+- **樣板比對**：以 OpenCV `matchTemplate`（灰階）偵測；每張圖可調整 `confidence`。比對僅依賴擷取到的截圖與樣板圖片；底層的裝置物件只在執行點擊時使用。
 - **YAML 流程**：每張圖可設定 `enable_click` 與 `delay_after_click`。
 - **Discord 通知**：完成與錯誤時可透過 Webhook 發送訊息。
 

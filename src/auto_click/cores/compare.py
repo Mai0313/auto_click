@@ -7,11 +7,8 @@ import pandas as pd
 import logfire
 from pydantic import Field, BaseModel, ConfigDict
 import PIL.Image as Image
-from adbutils._device import AdbDevice
-from playwright.sync_api import Page
 
 from .config import ImageModel
-from .screenshot import ShiftPosition
 
 if TYPE_CHECKING:
     from cv2.typing import MatLike
@@ -74,7 +71,6 @@ class ImageComparison(BaseModel):
     Attributes:
         image_cfg (ImageModel): The image configuration.
         screenshot (Union[Image.Image, bytes]): The screenshot image.
-        device (Union[Page, AdbDevice, ShiftPosition]): The device.
 
     Methods:
         __save_images: Saves the images to the logs directory.
@@ -86,7 +82,6 @@ class ImageComparison(BaseModel):
 
     image_cfg: ImageModel = Field(..., description="The image configuration")
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
-    device: Page | AdbDevice | ShiftPosition = Field(..., description="The device")
 
     async def record_position(self) -> None:
         position_data = pd.DataFrame()

@@ -89,7 +89,7 @@ class RemoteController(ConfigModel):
 
     async def switch_game(self, device_details: Screenshot) -> None:
         current_hour = datetime.datetime.now(pytz.timezone("Asia/Taipei")).hour
-        if (21 <= current_hour < 24) or (0 <= current_hour < 1):
+        if (20 <= current_hour < 24) or (0 <= current_hour < 1):
             return
         if not isinstance(device_details.device, AdbDevice):
             return
@@ -127,9 +127,7 @@ class RemoteController(ConfigModel):
             device_details = await self.get_screenshot()
             for config_dict in self.image_list:
                 image_compare = ImageComparison(
-                    image_cfg=config_dict,
-                    screenshot=device_details.screenshot,
-                    device=device_details.device,
+                    image_cfg=config_dict, screenshot=device_details.screenshot
                 )
 
                 self.found_result = await image_compare.find()

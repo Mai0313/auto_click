@@ -13,7 +13,7 @@
   - Android: `from_adb(url=package, serial)` uses `adbutils`; clicking via `AdbDevice.click`.
   - Browser: `from_browser(url)` uses Playwright (Chromium, `channel="chrome"`, headless + stealth) and clicks via `Page.mouse.click`.
 - Device selection (ADB): `auto_click.cores.manager.ADBDeviceManager` connects to `host:serial`, enumerates devices, and picks the one whose current package equals `target`.
-- Matching: `auto_click.cores.compare.ImageComparison.find()` converts screenshot and template to grayscale and uses `cv2.matchTemplate(..., TM_CCOEFF_NORMED)`. If `max_val > confidence`, returns center point as `FoundPosition`.
+- Matching: `auto_click.cores.compare.ImageComparison.find()` converts screenshot and template to grayscale and uses `cv2.matchTemplate(..., TM_CCOEFF_NORMED)`. If `max_val > confidence`, returns center point as `FoundPosition`. `ImageComparison` now accepts only `image_cfg` and `screenshot` (no device parameter).
 - Notifications: `auto_click.cores.notify.DiscordNotify` posts an embed (with optional image) to `DISCORD_WEBHOOK_URL`.
 
 ### Configuration Schema (YAML → `ConfigModel`)

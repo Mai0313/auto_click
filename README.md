@@ -17,7 +17,7 @@ Auto Click is a small automation tool that detects UI elements from screenshots 
   - **Window title (Windows only)**: capture a specific window and click using `pyautogui`.
   - **Android (ADB)**: capture and click on a device running a specific package.
   - **Browser (Playwright)**: navigate to a URL and click on the page.
-- **Template matching**: OpenCV `matchTemplate` on grayscale; configurable `confidence` per image.
+- **Template matching**: OpenCV `matchTemplate` on grayscale; configurable `confidence` per image. Matching uses only the captured screenshot and the template image; the underlying device handle is used only for performing clicks.
 - **YAML-driven flows**: per-image `enable_click` and `delay_after_click`.
 - **Discord notifications**: optional webhook updates on completion and errors.
 
