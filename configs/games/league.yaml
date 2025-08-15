@@ -1,0 +1,47 @@
+enable: True
+target: com.longe.allstarhmt
+host: "127.0.0.1"
+serial: "16416"
+
+image_list:
+  - image_name: 進入超級聯賽
+    image_path: ./data/league/enter.png
+    delay_after_click: 20
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.75
+
+  - image_name: 點擊訓練
+    image_path: ./data/league/train.png
+    delay_after_click: 3
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.8
+
+  - image_name: 快速訓練
+    image_path: ./data/league/quick_train.png
+    delay_after_click: 3
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.8
+
+  - image_name: 開始訓練
+    image_path: ./data/league/start_train.png
+    delay_after_click: 3
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.8
+
+  - image_name: 結束訓練
+    image_path: ./data/league/done_train.png
+    delay_after_click: 3
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.8
+
+  - image_name: 離開超級聯賽
+    image_path: ./data/league/exit.png
+    delay_after_click: 3
+    enable_click: True
+    enable_screenshot: True
+    confidence: 0.8
