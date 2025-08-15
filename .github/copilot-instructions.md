@@ -2,7 +2,7 @@
 
 ### Project Overview
 
-- Auto Click is a YAML-driven UI auto-clicker. It captures screenshots from one of three targets and detects UI elements via OpenCV template matching. If configured, it clicks the matched point and sleeps for a delay. It can send Discord notifications on completion or error.
+- Auto Click is a YAML-driven UI automation tool. It captures screenshots from one of three targets (Windows apps, Android devices via ADB, or web browsers via Playwright) and detects UI elements via OpenCV template matching. If configured, it clicks the matched point and sleeps for a delay. It can send Discord notifications on completion or error.
 
 ### Runtime Architecture
 
@@ -37,11 +37,13 @@
 
 ### Developer Guidelines
 
-- Style: PEP 8; Ruff configured in `pyproject.toml` (auto-fix enabled). Use descriptive names; keep functions small.
-- Pydantic v2: prefer `Field` with `description`; use `@model_validator` for invariants.
-- Async: IO paths (Playwright, HTTP) are async; avoid blocking calls in async flows.
-- Assets: images under `data/*`; tests ensure files referenced by YAML exist.
-- Logging: use `logfire` structured logs; avoid `print`.
+- **Code Style**: PEP 8; Ruff configured in `pyproject.toml` (auto-fix enabled). Use descriptive names; keep functions small.
+- **Pydantic v2**: prefer `Field` with `description`; use `@model_validator` for invariants and validation.
+- **Async/Await**: IO paths (Playwright, HTTP, ADB operations) are async; avoid blocking calls in async flows.
+- **Assets Management**: template images under `data/*`; tests ensure files referenced by YAML exist.
+- **Logging**: use `logfire` structured logs with contextual information; avoid `print` statements.
+- **Error Handling**: implement graceful error recovery with retry mechanisms; use specific exception types.
+- **Configuration**: use Pydantic models for all configuration; validate at startup.
 
 ### Dependency Management
 
@@ -63,6 +65,28 @@
 ### Notes / Limitations
 
 - `enable_screenshot` is currently not used by runtime; screenshot logging helpers exist but are commented.
-- Window mode requires Windows.
-- Browser mode launches Chrome; change `channel` in `auto_click.cores.screenshot.from_browser` if needed.
-- ADB mode requires `host` and `serial` both set and the `target` package running.
+- Window mode requires Windows OS and uses `pygetwindow` + `pyautogui`.
+- Browser mode launches Chrome by default; change `channel` in `auto_click.cores.screenshot.from_browser` if needed.
+- ADB mode requires `host` and `serial` both set and the `target` package running on the device.
+- Template matching works best with high-contrast, clear images; avoid blurry or low-resolution templates.
+- Confidence thresholds typically range from 0.7-0.95; higher values require more exact matches.
+
+### Architecture Components
+
+- **CLI Layer**: `auto_click.cli` - Entry point and command-line interface using Fire
+- **Controller Layer**: `auto_click.controller.RemoteController` - Main orchestration and business logic
+- **Core Services**:
+  - `auto_click.cores.screenshot` - Multi-platform screenshot capture
+  - `auto_click.cores.compare` - OpenCV-based image matching
+  - `auto_click.cores.manager` - ADB device management
+  - `auto_click.cores.notify` - Discord webhook notifications
+  - `auto_click.cores.config` - Pydantic configuration models
+
+### Development Best Practices
+
+- Use type hints for all function parameters and return values
+- Implement comprehensive error handling with specific exception types
+- Write unit tests for core functionality (especially image comparison logic)
+- Use async/await for all I/O operations (file reads, network calls, ADB commands)
+- Validate all external inputs using Pydantic models
+- Use structured logging with contextual information for debugging
