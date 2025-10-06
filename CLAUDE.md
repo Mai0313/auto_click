@@ -38,6 +38,15 @@ uv run python src/auto_click/cli.py --config_path=./configs/games/all_stars.yaml
 pytest
 # Or: make test
 
+# Run a single test file
+pytest tests/test_file.py
+
+# Run a specific test function
+pytest tests/test_file.py::test_function_name
+
+# Run tests without parallelization (useful for debugging)
+pytest -n0
+
 # Run linting and formatting
 pre-commit run -a
 # Or: make format
