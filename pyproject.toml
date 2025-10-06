@@ -8,13 +8,12 @@ addopts = [
     "--quiet",
     "--cov=src",
     "--cov-report=term-missing:skip-covered",
-    "--junitxml=./.github/reports/pytest.xml",
     "--cov-report=xml:./.github/reports/coverage.xml",
-    "--cov-report=html:./.github/coverage_html_report",
+    "--junitxml=./.github/reports/.coverage.pytest.xml",
     "--cache-clear",
     "-n=auto",
     "--no-header",
-    # "--cov-fail-under=80",
+    "--cov-fail-under=80",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -91,17 +90,13 @@ readme = "README.md"
 requires-python = ">= 3.10"
 license = { text = "MIT" }
 
+[project.urls]
+Homepage = "https://mai0313.github.io/auto_click"
+Repository = "https://github.com/Mai0313/auto_click"
+
 [project.scripts]
 cli = "auto_click.cli:main"
 auto_click = "auto_click.cli:main"
-
-[project.urls]
-Homepage = "https://github.com/Mai0313/auto_click"
-Repository = "https://github.com/Mai0313/auto_click"
-
-[build-system]
-requires = ["hatchling", "hatch-fancy-pypi-readme"]
-build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
@@ -131,6 +126,10 @@ docs = [
     "ruff",
     "tabulate",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -177,12 +176,6 @@ exclude = [
     "/.docker-compose",
     "/.cache",
 ]
-
-[tool.hatch.metadata.hooks.fancy-pypi-readme]
-content-type = "text/markdown"
-
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-path = "README.md"
 
 [tool.poe.tasks]
 api = "python ./src/auto_click/cli.py"
@@ -249,18 +242,11 @@ show-fixes = true
 
 # In addition to the standard set of exclusions, omit all tests, plus a specific file.
 extend-exclude = [
-    ".venv",
     "logs",
     "data",
-    ".git",
     "*.svg",
     "*.sql",
-    ".cache",
     "__init__.py",
-    "__pycache__",
-    ".mypy_cache",
-    ".ruff_cache",
-    "__pypackages__",
 ]
 
 # In addition to the standard set of inclusions, include `.pyw` files.
@@ -268,9 +254,6 @@ extend-include = ["**/*.ipynb", "*.sh"]
 
 # Allow imports relative to the "src" and "test" directories.
 src = ["src", "tests"]
-
-# Assume Python 3.10.*
-target-version = "py310"
 
 # Set the cache directory to `logs/ruff_cache`.
 cache-dir = "./.cache/ruff"  # default: ".ruff_cache", now it is not allowed to create cache dir in logs
@@ -394,7 +377,7 @@ ignore = [
     "PERF401",
     # Use `list` or `list.copy` to create a copy of a list
     "PERF402",
-    ]
+]
 
 [tool.ruff.lint.pycodestyle]
 # Ignore long comments for TODO, FIXME, XXX
@@ -421,7 +404,7 @@ keep-runtime-typing = true
 # Ignore `E402` (import violations) in all `__init__.py` files, and in `path/to/file.py`.
 "__init__.py" = ["E402", "F401"]
 "*.ipynb" = ["T201", "F401", "S105", "F811", "ANN", "PERF", "SLF"]
-"tests/*" = ["S101", "ANN"]
+"tests/*" = ["S101", "ANN", "SLF001"]
 "notebooks/*.ipynb" = ["UP", "DOC", "RUF", "D", "C", "F401", "T201"]
 "examples/*.py" = ["UP", "DOC", "RUF", "D", "C", "F401", "T201"]
 
@@ -437,7 +420,7 @@ force-single-line = false
 force-sort-within-sections = true
 force-to-top = []
 force-wrap-aliases = false
-forced-separate = []
+forced-separate = ["tests"]
 from-first = false
 known-first-party = ["src", "tests"]
 known-local-folder = []
@@ -446,7 +429,7 @@ length-sort = true
 length-sort-straight = true
 lines-after-imports = -1
 lines-between-types = 0
-no-lines-before = ["future", "standard-library"]
+no-lines-before = ["future"]
 no-sections = false
 order-by-type = true
 relative-imports-order = "furthest-to-closest"
@@ -472,7 +455,7 @@ preview = true
 # Enable reformatting of code snippets in docstrings.
 docstring-code-format = true
 # Format all docstring code snippets with a line length of 60.
-docstring-code-line-length = 99
+docstring-code-line-length = "dynamic"
 exclude = ["generated"]
 indent-style = "space"
 line-ending = "auto"
@@ -500,7 +483,7 @@ data_dir = "./.cache/.logfire"
 # base_url = ""
 collect_system_metrics = false
 id_generator = true
-fast_shutdown=true
+fast_shutdown = true
 
 
 # ================== #
@@ -522,25 +505,18 @@ ignore-words-list = ["longe"]
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 # strict = true
-python_version = "3.10"
 explicit_package_bases = true
 cache_dir = "./.cache/.mypy_cache"
 exclude = ["^tests/"]
 ignore_missing_imports = true
-# install_types = true
-# non_interactive = true
-
 warn_unused_configs = true
 warn_return_any = false
 warn_redundant_casts = true
 warn_unused_ignores = true
 disable_error_code = ["attr-defined", "prop-decorator"]
-
-# remove after all files in the repo are fixed
 follow_imports = "silent"
 
 # from https://blog.wolt.com/engineering/2021/09/30/professional-grade-mypy-configuration/
-
 # no_implicit_reexport = true
 # no_implicit_optional = true
 # check_untyped_defs = true

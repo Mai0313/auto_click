@@ -12,6 +12,7 @@ name: Publish Docker image
 on:
   push:
     branches:
+      - main
       - master
     tags:
       - v*
@@ -31,11 +32,6 @@ jobs:
             target_step: prod
             tag: ghcr.io/${{ github.repository }}
 
-    env:
-      BUILDKIT_NO_CLIENT_TOKEN: 1 # docker buildkit env
-      # gitea action download node.js skip certificate !https
-      NODE_TLS_REJECT_UNAUTHORIZED: 0
-
     steps:
       - name: Disable SSL Verify
         run: git config --global http.sslVerify false
@@ -43,26 +39,14 @@ jobs:
       # - name: Setup MTK Certification
       #   uses: https://gitea.mediatek.inc/actions/mtk-cert-action@v1.2.0
 
-      # - name: Setup SSH Key
-      #   uses: shimataro/ssh-key-action@v2.7.0
-      #   with:
-      #     key: ${{ secrets.SSH_KEY }}
-      #     name: id_rsa
-      #     known_hosts: unnecessary
-      #     config: |
-      #       Host *
-      #         StrictHostKeyChecking no
-      #         UserKnownHostsFile=/dev/null
-      #     if_key_exists: replace
-
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v6.6.1
         with:
           version: "latest"
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,21 +56,9 @@ jobs:
         shell: bash
         run: |
           VERSION=$(uvx dunamai from git --bump --no-metadata --style pep440)
-          uv version $VERSION
+          uv version $VERSION --frozen
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      # - name: Set tags
-      #   id: version
-      #   run: |
-      #     if [[ $GITHUB_REF == refs/tags/* ]]; then
-      #       VERSION=${GITHUB_REF#refs/tags/}
-      #       echo "VERSION=${VERSION}" >> $GITHUB_ENV
-      #       echo "version=${VERSION}" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "VERSION=latest" >> $GITHUB_ENV
-      #       echo "version=latest" >> $GITHUB_OUTPUT
-      #     fi
 
       - name: Login to the Container registry
         uses: docker/login-action@v3.4.0
@@ -100,7 +72,7 @@ jobs:
           docker context create builders || docker context use builders
 
       - name: Set up Docker BuildX
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.11.1
         # with:
         #   endpoint: builders
         #   config-inline: |
@@ -124,7 +96,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v5.8.0
         with:
           images: ${{ matrix.target.tag }}
           tags: |
@@ -138,7 +110,7 @@ jobs:
           echo "name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
       - name: ${{ matrix.target.name }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v6.18.0
         with:
           push: true
           context: .
