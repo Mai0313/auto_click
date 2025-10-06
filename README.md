@@ -44,30 +44,35 @@ Auto Click is a powerful automation tool that detects UI elements from screensho
 
 ## Installation
 
-1) **Install uv** (if not already installed):
+1. **Install uv** (if not already installed):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2) **Clone the repository and sync dependencies**:
+2. **Clone the repository and sync dependencies**:
+
    ```bash
    git clone <repository-url>
    cd auto_click_dev
    uv sync
    ```
 
-3) **Install Playwright browsers** (optional, for browser automation):
+3. **Install Playwright browsers** (optional, for browser automation):
+
    ```bash
    uv run playwright install chromium
    ```
 
-4) **Set up Discord notifications** (optional):
+4. **Set up Discord notifications** (optional):
    Create a `.env` file in the project root:
+
    ```bash
    echo DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/your-webhook-url" > .env
    ```
 
-5) **Verify ADB setup** (for Android automation):
+5. **Verify ADB setup** (for Android automation):
+
    ```bash
    adb devices
    ```
@@ -77,16 +82,17 @@ Auto Click is a powerful automation tool that detects UI elements from screensho
 Auto Click uses YAML configuration files to define automation workflows. Each config file specifies target applications and image sequences to detect and interact with.
 
 ### Windows Application Example
+
 For automating Windows desktop applications (e.g., Mahjong Soul):
 
 ```yaml
 enable: true
-target: "雀魂麻将"        # Exact window title
-host: ""                 # Empty for Windows mode
-serial: ""               # Empty for Windows mode
+target: 雀魂麻将          # Exact window title
+host: ''                 # Empty for Windows mode
+serial: ''               # Empty for Windows mode
 image_list:
-  - image_name: "開始段位"
-    image_path: "./data/mahjong/ranking.png"
+  - image_name: 開始段位
+    image_path: ./data/mahjong/ranking.png
     delay_after_click: 1
     enable_click: true
     enable_screenshot: false
@@ -94,16 +100,17 @@ image_list:
 ```
 
 ### Android Application Example
+
 For automating Android apps via ADB (package must be running):
 
 ```yaml
 enable: true
 target: com.longe.allstarhmt    # Android package name
-host: "127.0.0.1"              # ADB host
-serial: "16416"                 # ADB port (forms 127.0.0.1:16416)
+host: 127.0.0.1                # ADB host
+serial: '16416'                 # ADB port (forms 127.0.0.1:16416)
 image_list:
-  - image_name: "開始配對"
-    image_path: "./data/allstars/start.png"
+  - image_name: 開始配對
+    image_path: ./data/allstars/start.png
     delay_after_click: 20
     enable_click: true
     enable_screenshot: true
@@ -111,16 +118,17 @@ image_list:
 ```
 
 ### Browser Automation Example
+
 For web automation using Playwright:
 
 ```yaml
 enable: true
-target: "https://example.com"   # Target URL
-host: ""                        # Empty for browser mode
-serial: ""                      # Empty for browser mode
+target: https://example.com     # Target URL
+host: ''                        # Empty for browser mode
+serial: ''                      # Empty for browser mode
 image_list:
-  - image_name: "Login Button"
-    image_path: "./data/browser/login.png"
+  - image_name: Login Button
+    image_path: ./data/browser/login.png
     delay_after_click: 3
     enable_click: true
     enable_screenshot: false
@@ -129,20 +137,21 @@ image_list:
 
 ### Configuration Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `enable` | bool | Master switch for automation |
-| `target` | string | Window title, package name, or URL |
-| `host` | string | ADB host (required with serial for Android) |
-| `serial` | string | ADB port (required with host for Android) |
-| `image_name` | string | Descriptive name for the image |
-| `image_path` | string | Path to template image file |
-| `delay_after_click` | int | Seconds to wait after clicking |
-| `enable_click` | bool | Whether to click when image is found |
-| `enable_screenshot` | bool | Reserved for future use |
-| `confidence` | float | Match threshold (0.0-1.0, higher = stricter) |
+| Parameter           | Type   | Description                                  |
+| ------------------- | ------ | -------------------------------------------- |
+| `enable`            | bool   | Master switch for automation                 |
+| `target`            | string | Window title, package name, or URL           |
+| `host`              | string | ADB host (required with serial for Android)  |
+| `serial`            | string | ADB port (required with host for Android)    |
+| `image_name`        | string | Descriptive name for the image               |
+| `image_path`        | string | Path to template image file                  |
+| `delay_after_click` | int    | Seconds to wait after clicking               |
+| `enable_click`      | bool   | Whether to click when image is found         |
+| `enable_screenshot` | bool   | Reserved for future use                      |
+| `confidence`        | float  | Match threshold (0.0-1.0, higher = stricter) |
 
 ### Important Notes
+
 - For Android mode: `host` and `serial` must both be provided or both empty
 - Window titles must match exactly (case-sensitive)
 - Template images should be clear, high-contrast screenshots
@@ -188,24 +197,28 @@ The project includes several pre-configured automation examples:
 ### Common Issues
 
 **Window Mode Issues**:
+
 - Ensure the target window is restored (not minimized) and visible
 - Window title must match exactly (case-sensitive)
 - Window should be the active/focused window
 - Check if window title changes during app lifecycle
 
 **Android Mode Issues**:
+
 - Verify ADB connection: `adb devices`
 - Ensure target package is currently running on the device
 - Check device is properly connected and accessible
 - Confirm host:port combination is correct (e.g., "127.0.0.1:16416")
 
 **Browser Mode Issues**:
+
 - Install Google Chrome (required for Playwright)
 - Check if target URL is accessible
 - Verify network connectivity
 - For custom browsers, modify `channel` parameter in `cores/screenshot.py`
 
 **Image Detection Issues**:
+
 - Adjust `confidence` threshold (try values between 0.7-0.95)
 - Update template images in `./data/*` directories
 - Ensure template images match current UI appearance
@@ -213,6 +226,7 @@ The project includes several pre-configured automation examples:
 - Template images should be clear and high-contrast
 
 **Discord Notification Issues**:
+
 - Verify `DISCORD_WEBHOOK_URL` is set correctly in `.env`
 - Test webhook URL manually to ensure it's active
 - Check Discord server permissions for the webhook
