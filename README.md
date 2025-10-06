@@ -53,8 +53,8 @@ Auto Click is a powerful automation tool that detects UI elements from screensho
 2. **Clone the repository and sync dependencies**:
 
    ```bash
-   git clone <repository-url>
-   cd auto_click_dev
+   git clone https://github.com/Mai0313/auto_click.git
+   cd auto_click
    uv sync
    ```
 
