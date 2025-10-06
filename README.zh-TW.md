@@ -139,16 +139,16 @@ image_list:
 
 | 參數                | 類型   | 說明                                      |
 | ------------------- | ------ | ----------------------------------------- |
-| `enable`            | bool   | 自動化的主開關                             |
-| `target`            | string | 視窗標題、套件名稱或 URL                    |
-| `host`              | string | ADB 主機 (Android 模式需配合 serial 使用)  |
-| `serial`            | string | ADB 連接埠 (Android 模式需配合 host 使用)  |
-| `image_name`        | string | 圖像的描述名稱                             |
-| `image_path`        | string | 範本圖像檔案的路徑                         |
-| `delay_after_click` | int    | 點擊後等待的秒數                           |
-| `enable_click`      | bool   | 找到圖像時是否點擊                         |
-| `enable_screenshot` | bool   | 保留供未來使用                             |
-| `confidence`        | float  | 匹配閾值 (0.0-1.0，值越高越嚴格)           |
+| `enable`            | bool   | 自動化的主開關                            |
+| `target`            | string | 視窗標題、套件名稱或 URL                  |
+| `host`              | string | ADB 主機 (Android 模式需配合 serial 使用) |
+| `serial`            | string | ADB 連接埠 (Android 模式需配合 host 使用) |
+| `image_name`        | string | 圖像的描述名稱                            |
+| `image_path`        | string | 範本圖像檔案的路徑                        |
+| `delay_after_click` | int    | 點擊後等待的秒數                          |
+| `enable_click`      | bool   | 找到圖像時是否點擊                        |
+| `enable_screenshot` | bool   | 保留供未來使用                            |
+| `confidence`        | float  | 匹配閾值 (0.0-1.0，值越高越嚴格)          |
 
 ### 重要注意事項
 
