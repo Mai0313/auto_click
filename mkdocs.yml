@@ -1,10 +1,10 @@
 site_name: AutoClick
-site_url: https://mai0313.github.io/auto_click/
+site_url: https://mai0313.github.io/auto_click
 site_author: Wei Lee
 
 repo_name: Mai0313/auto_click
 repo_url: https://github.com/Mai0313/auto_click
-edit_uri: edit/master/docs/
+edit_uri: edit/main/docs/
 
 docs_dir: docs
 site_dir: site

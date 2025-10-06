@@ -1,16 +1,19 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-      target: prod
-    env_file:
-      - .env
-    command:
-      - python
-      - src/auto_click/cli.py
-    restart: always
-    pull_policy: always
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/Dockerfile
+  #     target: prod
+  #   env_file:
+  #     - .env
+  #   command:
+  #     - uv
+  #     - run
+  #     - --no-dev
+  #     - --frozen
+  #     - auto_click
+  #   restart: always
+  #   pull_policy: always
 
   redis:
     image: redis:alpine
@@ -20,7 +23,7 @@ services:
       timeout: 1s
       retries: 5
     ports:
-      - ${REDIS_PORT:-6379}:6379
+      - 127.0.0.1:${REDIS_PORT:-6379}:6379
     volumes:
       - redis-data:/var/lib/redis
     restart: always
@@ -39,7 +42,7 @@ services:
       retries: 5
       interval: 5s
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - 127.0.0.1:${POSTGRES_PORT:-5432}:5432
     volumes:
       - postgresql-data:/var/lib/postgresql/data
     restart: always
@@ -47,8 +50,14 @@ services:
 
   mongodb:
     image: mongo:latest
+    healthcheck:
+      test: mongosh --eval "db.adminCommand('ping')"
+      interval: 5s
+      timeout: 1s
+      retries: 5
+      start_period: 10s
     ports:
-      - ${MONGO_PORT:-27017}:${MONGO_PORT:-27017}
+      - 127.0.0.1:${MONGO_PORT:-27017}:${MONGO_PORT:-27017}
     volumes:
       - mongo-data:/data/db
     restart: always
@@ -56,8 +65,14 @@ services:
 
   mysql:
     image: mysql:latest
+    healthcheck:
+      test: mysqladmin ping -h localhost
+      interval: 5s
+      timeout: 1s
+      retries: 5
+      start_period: 10s
     ports:
-      - ${MYSQL_PORT:-3306}:3306
+      - 127.0.0.1:${MYSQL_PORT:-3306}:3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-mysql}

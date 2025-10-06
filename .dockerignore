@@ -215,9 +215,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-/logs/
+/data/
+docker-compose.override.yaml
 /.github/reports/
-
-# Generated Docs
-/docs/Reference
-/docs/Scripts
