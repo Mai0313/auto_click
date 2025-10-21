@@ -96,16 +96,16 @@ Auto Click 使用 YAML 配置文件定义自动化工作流。每个配置文件
 用于自动化 Windows 桌面应用（例如：雀魂麻将）：
 
 ```yaml
-enable: True              # 总开关（注意：在 YAML 中使用 True/False，而非 true/false）
+enable: true              # 总开关（注意：在 YAML 中使用 True/False，而非 true/false）
 target: 雀魂麻将          # 精确的窗口标题（区分大小写）
-host: ""                 # Windows 模式使用空字符串
-serial: ""               # Windows 模式使用空字符串
+host: ''                 # Windows 模式使用空字符串
+serial: ''               # Windows 模式使用空字符串
 image_list:
   - image_name: 开始段位
     image_path: ./data/mahjong/ranking.png
     delay_after_click: 1
-    enable_click: True
-    enable_screenshot: False
+    enable_click: true
+    enable_screenshot: false
     confidence: 0.9
 ```
 
@@ -114,16 +114,16 @@ image_list:
 用于通过 ADB 自动化 Android 应用（目标进程需已运行）：
 
 ```yaml
-enable: True
+enable: true
 target: com.longe.allstarhmt    # Android 包名（必须正在运行）
-host: "127.0.0.1"              # ADB 主机地址
-serial: "16416"                 # ADB 端口（组合为 127.0.0.1:16416）
+host: 127.0.0.1                # ADB 主机地址
+serial: '16416'                 # ADB 端口（组合为 127.0.0.1:16416）
 image_list:
   - image_name: 开始配对
     image_path: ./data/allstars/start.png
     delay_after_click: 20
-    enable_click: True
-    enable_screenshot: True
+    enable_click: true
+    enable_screenshot: true
     confidence: 0.75
 ```
 
@@ -134,16 +134,16 @@ image_list:
 通过具有隐身模式的 Playwright 实现网页自动化：
 
 ```yaml
-enable: True
+enable: true
 target: https://example.com     # 目标 URL（将在 Chrome 中打开）
-host: ""                        # 浏览器模式使用空字符串
-serial: ""                      # 浏览器模式使用空字符串
+host: ''                        # 浏览器模式使用空字符串
+serial: ''                      # 浏览器模式使用空字符串
 image_list:
   - image_name: Login Button
     image_path: ./data/browser/login.png
     delay_after_click: 3
-    enable_click: True
-    enable_screenshot: False
+    enable_click: true
+    enable_screenshot: false
     confidence: 0.8
 ```
 

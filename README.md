@@ -96,16 +96,16 @@ Auto Click uses YAML configuration files to define automation workflows. Each co
 For automating Windows desktop applications (e.g., Mahjong Soul):
 
 ```yaml
-enable: True              # Master switch (note: use True/False, not true/false in YAML)
+enable: true              # Master switch (note: use True/False, not true/false in YAML)
 target: 雀魂麻将          # Exact window title (case-sensitive)
-host: ""                 # Empty string for Windows mode
-serial: ""               # Empty string for Windows mode
+host: ''                 # Empty string for Windows mode
+serial: ''               # Empty string for Windows mode
 image_list:
   - image_name: 開始段位
     image_path: ./data/mahjong/ranking.png
     delay_after_click: 1
-    enable_click: True
-    enable_screenshot: False
+    enable_click: true
+    enable_screenshot: false
     confidence: 0.9
 ```
 
@@ -114,16 +114,16 @@ image_list:
 For automating Android apps via ADB (package must be running):
 
 ```yaml
-enable: True
+enable: true
 target: com.longe.allstarhmt    # Android package name (must be currently running)
-host: "127.0.0.1"              # ADB host address
-serial: "16416"                 # ADB port (combines to 127.0.0.1:16416)
+host: 127.0.0.1                # ADB host address
+serial: '16416'                 # ADB port (combines to 127.0.0.1:16416)
 image_list:
   - image_name: 開始配對
     image_path: ./data/allstars/start.png
     delay_after_click: 20
-    enable_click: True
-    enable_screenshot: True
+    enable_click: true
+    enable_screenshot: true
     confidence: 0.75
 ```
 
@@ -134,16 +134,16 @@ image_list:
 For web automation using Playwright with stealth mode:
 
 ```yaml
-enable: True
+enable: true
 target: https://example.com     # Target URL (will be opened in Chrome)
-host: ""                        # Empty string for browser mode
-serial: ""                      # Empty string for browser mode
+host: ''                        # Empty string for browser mode
+serial: ''                      # Empty string for browser mode
 image_list:
   - image_name: Login Button
     image_path: ./data/browser/login.png
     delay_after_click: 3
-    enable_click: True
-    enable_screenshot: False
+    enable_click: true
+    enable_screenshot: false
     confidence: 0.8
 ```
 

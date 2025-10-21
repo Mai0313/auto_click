@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Auto Click is a multi-platform UI automation tool that uses OpenCV template matching to detect and interact with UI elements. It supports three target modes:
+
 - **Windows applications**: Uses `pygetwindow` for window detection and `pyautogui` for clicking with automatic position calibration
 - **Android devices**: Uses `adbutils` to connect via ADB and control Android apps
 - **Web browsers**: Uses Playwright with stealth mode for browser automation
@@ -74,11 +75,13 @@ mkdocs gh-deploy --force --clean
 ### Core Components
 
 1. **CLI Entry Point** (`src/auto_click/cli.py`)
+
    - Uses Python Fire for CLI interface
    - Loads YAML configuration and creates `RemoteController` instance
    - Main loop runs until `task_done` or `error_occurred` flags are set
 
 2. **RemoteController** (`src/auto_click/controller.py`)
+
    - Core orchestrator that manages the automation workflow
    - Handles three target modes based on `target` field:
      - URLs starting with "http" → Browser mode
@@ -88,6 +91,7 @@ mkdocs gh-deploy --force --clean
    - Manages click execution with device-specific logic and coordinate calibration
 
 3. **Screenshot Management** (`src/auto_click/cores/screenshot.py`)
+
    - `ScreenshotManager` provides three async methods:
      - `from_window()`: Captures Windows application window, returns `ShiftPosition` for coordinate calibration
      - `from_adb()`: Captures Android screen via ADB
@@ -95,17 +99,20 @@ mkdocs gh-deploy --force --clean
    - Returns `Screenshot` object containing both image data and device reference
 
 4. **Image Comparison** (`src/auto_click/cores/compare.py`)
+
    - `ImageComparison.find()`: Uses OpenCV's `matchTemplate` with grayscale conversion
    - Compares template images against screenshots using `TM_CCOEFF_NORMED` method
    - Returns `FoundPosition` with button center coordinates when confidence threshold is met
    - Click position is calculated as template center: `(max_loc[0] + width // 2, max_loc[1] + height // 2)`
 
 5. **ADB Device Manager** (`src/auto_click/cores/manager.py`)
+
    - Connects to ADB using `host:serial` combination (e.g., "127.0.0.1:16416")
    - Automatically detects which connected device is running the target package
    - Raises `AdbError` if zero or multiple devices run the target app
 
 6. **Configuration Models** (`src/auto_click/cores/config.py`)
+
    - Pydantic models for type-safe configuration:
      - `ImageModel`: Template image settings (path, confidence, delays, click enablement)
      - `DeviceModel`: Target device specification (validates host/serial pairing)
@@ -136,10 +143,12 @@ mkdocs gh-deploy --force --clean
 YAML configs are in `./configs/games/`. Key parameters:
 
 - **Target Identification**:
+
   - `target`: Window title (exact match, case-sensitive), Android package name, or URL
   - `host` + `serial`: For Android only (e.g., "127.0.0.1" + "16416" → connects to 127.0.0.1:16416)
 
 - **Image Matching**:
+
   - `confidence`: Threshold for template matching (0.0-1.0, typically 0.7-0.95)
   - `image_path`: Path to template image relative to project root
   - `delay_after_click`: Seconds to wait after clicking
