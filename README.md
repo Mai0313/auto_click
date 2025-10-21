@@ -66,11 +66,13 @@ Other Languages: [English](README.md) | [繁體中文](README.zh-TW.md) | [简�
    uv sync
    ```
 
-3. **Install Playwright browsers** (optional, for browser automation):
+3. **Install Playwright browsers** (required for browser automation):
 
    ```bash
-   uv run playwright install chromium
+   uv run playwright install chrome
    ```
+
+   **Note**: The tool uses `channel="chrome"` which requires Google Chrome to be installed.
 
 4. **Set up Discord notifications** (optional):
    Create a `.env` file in the project root:
@@ -94,16 +96,16 @@ Auto Click uses YAML configuration files to define automation workflows. Each co
 For automating Windows desktop applications (e.g., Mahjong Soul):
 
 ```yaml
-enable: true
-target: 雀魂麻将          # Exact window title
-host: ''                 # Empty for Windows mode
-serial: ''               # Empty for Windows mode
+enable: True              # Master switch (note: use True/False, not true/false in YAML)
+target: 雀魂麻将          # Exact window title (case-sensitive)
+host: ""                 # Empty string for Windows mode
+serial: ""               # Empty string for Windows mode
 image_list:
   - image_name: 開始段位
     image_path: ./data/mahjong/ranking.png
     delay_after_click: 1
-    enable_click: true
-    enable_screenshot: false
+    enable_click: True
+    enable_screenshot: False
     confidence: 0.9
 ```
 
@@ -112,36 +114,40 @@ image_list:
 For automating Android apps via ADB (package must be running):
 
 ```yaml
-enable: true
-target: com.longe.allstarhmt    # Android package name
-host: 127.0.0.1                # ADB host
-serial: '16416'                 # ADB port (forms 127.0.0.1:16416)
+enable: True
+target: com.longe.allstarhmt    # Android package name (must be currently running)
+host: "127.0.0.1"              # ADB host address
+serial: "16416"                 # ADB port (combines to 127.0.0.1:16416)
 image_list:
   - image_name: 開始配對
     image_path: ./data/allstars/start.png
     delay_after_click: 20
-    enable_click: true
-    enable_screenshot: true
+    enable_click: True
+    enable_screenshot: True
     confidence: 0.75
 ```
 
+**Important**: The tool automatically detects which connected device is running the target package.
+
 ### Browser Automation Example
 
-For web automation using Playwright:
+For web automation using Playwright with stealth mode:
 
 ```yaml
-enable: true
-target: https://example.com     # Target URL
-host: ''                        # Empty for browser mode
-serial: ''                      # Empty for browser mode
+enable: True
+target: https://example.com     # Target URL (will be opened in Chrome)
+host: ""                        # Empty string for browser mode
+serial: ""                      # Empty string for browser mode
 image_list:
   - image_name: Login Button
     image_path: ./data/browser/login.png
     delay_after_click: 3
-    enable_click: true
-    enable_screenshot: false
+    enable_click: True
+    enable_screenshot: False
     confidence: 0.8
 ```
+
+**Note**: Browser runs in headless mode with anti-detection features enabled.
 
 ### Configuration Parameters
 
@@ -173,24 +179,41 @@ image_list:
 Execute automation with a specific configuration file:
 
 ```bash
-# Using the installed script
-uv run auto_click --config_path ./configs/games/mahjong.yaml
+# Using the auto_click command (recommended)
+uv run auto_click --config_path=./configs/games/mahjong.yaml
 
-# Alternative: Using the CLI script name
-uv run cli --config_path ./configs/games/all_stars.yaml
+# Alternative: Using the cli command
+uv run cli --config_path=./configs/games/all_stars.yaml
 
 # Using Python module directly
-uv run python -m auto_click.cli --config_path ./configs/games/league.yaml
+uv run python -m auto_click.cli --config_path=./configs/games/league.yaml
+
+# Using default configuration (./configs/games/all_stars.yaml)
+uv run auto_click
+
+# Using start.bat on Windows
+start.bat
 ```
+
+**Note**: The CLI uses Python Fire, so use `--config_path=<path>` or `--config_path <path>` syntax.
 
 ### How It Works
 
 1. **Initialization**: Loads YAML configuration and establishes target connection
+   - For Android: Connects via ADB and verifies the target app is running
+   - For Windows: Locates the window by exact title and calculates position offsets
+   - For Browser: Launches Chromium with anti-detection stealth mode
 2. **Screenshot Capture**: Takes periodic screenshots based on target mode
-3. **Image Detection**: Uses OpenCV template matching to find UI elements
+   - Windows: Captures specific window area with automatic position calibration
+   - Android: Uses ADB screencap command
+   - Browser: Uses Playwright screenshot API
+3. **Image Detection**: Uses OpenCV template matching with grayscale conversion to find UI elements
 4. **Action Execution**: Clicks detected elements with specified delays
-5. **Notification**: Sends Discord updates on completion or errors
-6. **Loop Continuation**: Repeats until task completion or error
+   - Windows: Uses pyautogui with calibrated coordinates (shift_x, shift_y)
+   - Android: Uses ADB input tap command
+   - Browser: Uses Playwright mouse click API
+5. **Notification**: Sends Discord webhook updates on completion or errors with embedded images
+6. **Loop Continuation**: Repeats until task completion or error occurs
 
 ### Available Configurations
 
@@ -208,22 +231,30 @@ The project includes several pre-configured automation examples:
 
 - Ensure the target window is restored (not minimized) and visible
 - Window title must match exactly (case-sensitive)
-- Window should be the active/focused window
+- The tool will automatically activate and restore minimized windows
+- Click coordinates are automatically calibrated based on window position (shift_x, shift_y)
+- Uses pygetwindow to locate windows and pyautogui for clicking
 - Check if window title changes during app lifecycle
 
 **Android Mode Issues**:
 
 - Verify ADB connection: `adb devices`
-- Ensure target package is currently running on the device
+- Ensure target package is currently running on the device (the tool actively checks this)
 - Check device is properly connected and accessible
 - Confirm host:port combination is correct (e.g., "127.0.0.1:16416")
+- The tool will automatically detect which connected device is running the target app
+- If multiple devices run the same app, an AdbError will be raised
 
 **Browser Mode Issues**:
 
-- Install Google Chrome (required for Playwright)
+- Install Google Chrome (required for Playwright with `channel="chrome"`)
 - Check if target URL is accessible
 - Verify network connectivity
-- For custom browsers, modify `channel` parameter in `cores/screenshot.py`
+- The tool uses headless Chromium with stealth mode and anti-detection features:
+  - Custom user agent
+  - Disabled automation flags
+  - Modified browser fingerprints
+- For custom browsers, modify `channel` parameter in `src/auto_click/cores/screenshot.py`
 
 **Image Detection Issues**:
 

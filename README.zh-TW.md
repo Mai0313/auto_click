@@ -66,11 +66,13 @@ Auto Click 是一個強大的自動化工具，可從螢幕截圖中檢測 UI �
    uv sync
    ```
 
-3. **安裝 Playwright 瀏覽器** (選用，用於瀏覽器自動化):
+3. **安裝 Playwright 瀏覽器** (瀏覽器自動化所需):
 
    ```bash
-   uv run playwright install chromium
+   uv run playwright install chrome
    ```
+
+   **注意**：工具使用 `channel="chrome"` 需要已安裝 Google Chrome。
 
 4. **設定 Discord 通知** (選用):
    在專案根目錄建立 `.env` 檔案:
@@ -94,16 +96,16 @@ Auto Click 使用 YAML 設定檔來定義自動化工作流程。每個設定檔
 用於自動化 Windows 桌面應用程式 (例如：雀魂麻將):
 
 ```yaml
-enable: true
-target: 雀魂麻将          # 精確的視窗標題
-host: ''                 # Windows 模式留空
-serial: ''               # Windows 模式留空
+enable: True              # 主開關（注意：在 YAML 中使用 True/False，而非 true/false）
+target: 雀魂麻将          # 精確的視窗標題（區分大小寫）
+host: ""                 # Windows 模式使用空字串
+serial: ""               # Windows 模式使用空字串
 image_list:
   - image_name: 開始段位
     image_path: ./data/mahjong/ranking.png
     delay_after_click: 1
-    enable_click: true
-    enable_screenshot: false
+    enable_click: True
+    enable_screenshot: False
     confidence: 0.9
 ```
 
@@ -112,36 +114,40 @@ image_list:
 用於透過 ADB 自動化 Android 應用程式 (套件必須正在執行):
 
 ```yaml
-enable: true
-target: com.longe.allstarhmt    # Android 套件名稱
-host: 127.0.0.1                # ADB 主機
-serial: '16416'                 # ADB 連接埠 (組成 127.0.0.1:16416)
+enable: True
+target: com.longe.allstarhmt    # Android 套件名稱（必須正在執行中）
+host: "127.0.0.1"              # ADB 主機地址
+serial: "16416"                 # ADB 連接埠（組合為 127.0.0.1:16416）
 image_list:
   - image_name: 開始配對
     image_path: ./data/allstars/start.png
     delay_after_click: 20
-    enable_click: true
-    enable_screenshot: true
+    enable_click: True
+    enable_screenshot: True
     confidence: 0.75
 ```
 
+**重要**：工具會自動偵測哪個已連接的裝置正在執行目標套件。
+
 ### 瀏覽器自動化範例
 
-使用 Playwright 進行網頁自動化：
+使用具有隱身模式的 Playwright 進行網頁自動化：
 
 ```yaml
-enable: true
-target: https://example.com     # 目標 URL
-host: ''                        # 瀏覽器模式留空
-serial: ''                      # 瀏覽器模式留空
+enable: True
+target: https://example.com     # 目標 URL（將在 Chrome 中開啟）
+host: ""                        # 瀏覽器模式使用空字串
+serial: ""                      # 瀏覽器模式使用空字串
 image_list:
   - image_name: Login Button
     image_path: ./data/browser/login.png
     delay_after_click: 3
-    enable_click: true
-    enable_screenshot: false
+    enable_click: True
+    enable_screenshot: False
     confidence: 0.8
 ```
+
+**注意**：瀏覽器以無頭模式執行，並啟用反偵測功能。
 
 ### 設定參數說明
 
@@ -173,24 +179,41 @@ image_list:
 使用特定設定檔執行自動化:
 
 ```bash
-# 使用已安裝的腳本
-uv run auto_click --config_path ./configs/games/mahjong.yaml
+# 使用 auto_click 指令（推薦）
+uv run auto_click --config_path=./configs/games/mahjong.yaml
 
 # 替代方案：使用 CLI 腳本名稱
-uv run cli --config_path ./configs/games/all_stars.yaml
+uv run cli --config_path=./configs/games/all_stars.yaml
 
 # 直接使用 Python 模組
-uv run python -m auto_click.cli --config_path ./configs/games/league.yaml
+uv run python -m auto_click.cli --config_path=./configs/games/league.yaml
+
+# 使用預設設定檔 (./configs/games/all_stars.yaml)
+uv run auto_click
+
+# 在 Windows 上使用 start.bat
+start.bat
 ```
+
+**注意**: CLI 使用 Python Fire，因此請使用 `--config_path=<路徑>` 或 `--config_path <路徑>` 語法。
 
 ### 運作原理
 
 1. **初始化**: 載入 YAML 設定並建立目標連線
+   - Android 模式：透過 ADB 連接並驗證目標應用程式是否正在執行
+   - Windows 模式：透過精確的標題定位視窗並計算位置偏移
+   - 瀏覽器模式：啟動具有反偵測隱身模式的 Chromium
 2. **螢幕截圖擷取**: 根據目標模式定期擷取螢幕截圖
-3. **圖像偵測**: 使用 OpenCV 範本匹配來尋找 UI 元素
+   - Windows：擷取特定視窗區域並自動校準位置
+   - Android：使用 ADB screencap 指令
+   - 瀏覽器：使用 Playwright 截圖 API
+3. **圖像偵測**: 使用 OpenCV 範本匹配搭配灰階轉換來尋找 UI 元素
 4. **動作執行**: 以指定的延遲時間點擊偵測到的元素
-5. **通知**: 在完成或錯誤時傳送 Discord 更新
-6. **循環繼續**: 重複直到任務完成或發生錯誤
+   - Windows：使用 pyautogui 搭配校準後的座標 (shift_x, shift_y)
+   - Android：使用 ADB input tap 指令
+   - 瀏覽器：使用 Playwright 滑鼠點擊 API
+5. **通知**: 在完成或錯誤時傳送 Discord Webhook 更新並附帶嵌入圖像
+6. **循環繼續**: 重複執行直到任務完成或發生錯誤
 
 ### 可用的設定檔
 
@@ -208,22 +231,30 @@ uv run python -m auto_click.cli --config_path ./configs/games/league.yaml
 
 - 確保目標視窗已還原 (未最小化) 且可見
 - 視窗標題必須完全匹配 (區分大小寫)
-- 視窗應為作用中/焦點視窗
+- 工具會自動啟用並還原最小化的視窗
+- 點擊座標會根據視窗位置自動校準 (shift_x, shift_y)
+- 使用 pygetwindow 定位視窗並使用 pyautogui 進行點擊
 - 檢查視窗標題在應用程式生命週期中是否會變更
 
 **Android 模式問題**:
 
 - 驗證 ADB 連線: `adb devices`
-- 確保目標套件目前正在裝置上執行
+- 確保目標套件目前正在裝置上執行（工具會主動檢查此項目）
 - 檢查裝置是否正確連接且可存取
 - 確認 host:port 組合正確 (例如："127.0.0.1:16416")
+- 工具會自動偵測哪個已連接的裝置正在執行目標應用程式
+- 如果多個裝置執行相同應用程式，將會引發 AdbError
 
 **瀏覽器模式問題**:
 
-- 安裝 Google Chrome (Playwright 所需)
+- 安裝 Google Chrome（使用 `channel="chrome"` 的 Playwright 所需）
 - 檢查目標 URL 是否可存取
 - 驗證網路連線
-- 對於自訂瀏覽器，請修改 `cores/screenshot.py` 中的 `channel` 參數
+- 工具使用具有隱身模式和反偵測功能的無頭 Chromium：
+  - 自訂使用者代理
+  - 停用自動化標記
+  - 修改瀏覽器指紋
+- 對於自訂瀏覽器，請修改 `src/auto_click/cores/screenshot.py` 中的 `channel` 參數
 
 **圖像偵測問題**:
 
