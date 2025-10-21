@@ -44,7 +44,7 @@ Auto Click 是一個強大的自動化工具，可從螢幕截圖中檢測 UI �
 
 ## 系統需求
 
-- **Python 3.10+** (已測試 3.10、3.11、3.12)
+- **Python 3.11+** (已測試 3.11、3.12、3.13)
 - **Windows 10+** 建議使用 (Windows 應用程式自動化所需)
 - **Google Chrome** 用於瀏覽器自動化 (Playwright 使用 `channel="chrome"`)
 - **ADB (Android Debug Bridge)** 用於 Android 裝置自動化
@@ -173,14 +173,14 @@ image_list:
 使用特定設定檔執行自動化:
 
 ```bash
-# 直接使用 CLI 模組
-uv run python src/auto_click/cli.py --config_path=./configs/games/mahjong.yaml
-
 # 使用已安裝的腳本
-uv run auto_click --config_path=./configs/games/all_stars.yaml
+uv run auto_click --config_path ./configs/games/mahjong.yaml
 
-# 用於聯盟自動化
-uv run auto_click --config_path=./configs/games/league.yaml
+# 替代方案：使用 CLI 腳本名稱
+uv run cli --config_path ./configs/games/all_stars.yaml
+
+# 直接使用 Python 模組
+uv run python -m auto_click.cli --config_path ./configs/games/league.yaml
 ```
 
 ### 運作原理

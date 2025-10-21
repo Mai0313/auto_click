@@ -44,7 +44,7 @@ Other Languages: [English](README.md) | [繁體中文](README.zh-TW.md) | [简�
 
 ## Requirements
 
-- **Python 3.10+** (tested with 3.10, 3.11, 3.12)
+- **Python 3.11+** (tested with 3.11, 3.12, 3.13)
 - **Windows 10+** recommended (required for Windows application automation)
 - **Google Chrome** for browser automation (Playwright uses `channel="chrome"`)
 - **ADB (Android Debug Bridge)** for Android device automation
@@ -173,14 +173,14 @@ image_list:
 Execute automation with a specific configuration file:
 
 ```bash
-# Using the CLI module directly
-uv run python src/auto_click/cli.py --config_path=./configs/games/mahjong.yaml
-
 # Using the installed script
-uv run auto_click --config_path=./configs/games/all_stars.yaml
+uv run auto_click --config_path ./configs/games/mahjong.yaml
 
-# For league automation
-uv run auto_click --config_path=./configs/games/league.yaml
+# Alternative: Using the CLI script name
+uv run cli --config_path ./configs/games/all_stars.yaml
+
+# Using Python module directly
+uv run python -m auto_click.cli --config_path ./configs/games/league.yaml
 ```
 
 ### How It Works
