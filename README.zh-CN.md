@@ -145,18 +145,18 @@ image_list:
 
 ### 配置参数
 
-| 参数                | 类型   | 说明                                    |
-| ------------------- | ------ | --------------------------------------- |
-| `enable`            | bool   | 自动化的总开关                          |
-| `target`            | string | 窗口标题、包名或 URL                     |
+| 参数                | 类型   | 说明                                             |
+| ------------------- | ------ | ------------------------------------------------ |
+| `enable`            | bool   | 自动化的总开关                                   |
+| `target`            | string | 窗口标题、包名或 URL                             |
 | `host`              | string | ADB 主机地址（Android 模式需与 serial 一起使用） |
-| `serial`            | string | ADB 端口（Android 模式需与 host 一起使用）     |
-| `image_name`        | string | 图像的描述性名称                        |
-| `image_path`        | string | 模板图像文件路径                        |
-| `delay_after_click` | int    | 点击后的等待秒数                        |
-| `enable_click`      | bool   | 找到图像时是否执行点击                   |
-| `enable_screenshot` | bool   | 预留字段，供后续使用                     |
-| `confidence`        | float  | 匹配阈值（0.0-1.0，值越高越严格）        |
+| `serial`            | string | ADB 端口（Android 模式需与 host 一起使用）       |
+| `image_name`        | string | 图像的描述性名称                                 |
+| `image_path`        | string | 模板图像文件路径                                 |
+| `delay_after_click` | int    | 点击后的等待秒数                                 |
+| `enable_click`      | bool   | 找到图像时是否执行点击                           |
+| `enable_screenshot` | bool   | 预留字段，供后续使用                             |
+| `confidence`        | float  | 匹配阈值（0.0-1.0，值越高越严格）                |
 
 ### 重要说明
 
