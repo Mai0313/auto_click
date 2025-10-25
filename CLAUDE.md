@@ -21,14 +21,22 @@ uv sync
 # Install Playwright browsers (required for browser automation)
 uv run playwright install chrome
 
-# Run with specific config
+# Run with specific config (using Python Fire CLI syntax)
 uv run auto_click --config_path=./configs/games/mahjong.yaml
+# Or with space separator
+uv run auto_click --config_path ./configs/games/mahjong.yaml
 
-# Alternative command
+# Alternative command (both entry points work identically)
 uv run cli --config_path=./configs/games/all_stars.yaml
+
+# Using Python module directly
+uv run python -m auto_click.cli --config_path=./configs/games/league.yaml
 
 # Run with default config (./configs/games/all_stars.yaml)
 uv run auto_click
+
+# Adjust loop delay to prevent CPU overuse (default: 0.1 seconds)
+uv run auto_click --config_path=./configs/games/mahjong.yaml --loop_delay=0.5
 ```
 
 ### Testing
@@ -44,6 +52,8 @@ uv run pytest tests/test_config.py
 # - Coverage minimum: 80%
 # - Parallel execution with pytest-xdist (-n=auto)
 # - Reports: ./.github/reports/coverage.xml and ./.github/reports/.coverage.pytest.xml
+# - Asyncio mode: auto (configured for async test support)
+# - Test logs: ./.github/reports/pytest_logs.log
 ```
 
 ### Code Quality
@@ -93,10 +103,12 @@ mkdocs gh-deploy --force --clean
 3. **Screenshot Management** (`src/auto_click/cores/screenshot.py`)
 
    - `ScreenshotManager` provides three async methods:
-     - `from_window()`: Captures Windows application window, returns `ShiftPosition` for coordinate calibration
-     - `from_adb()`: Captures Android screen via ADB
+     - `from_window()`: Captures Windows application window using `ImageGrab.grab()`, returns `ShiftPosition` for coordinate calibration
+     - `from_adb()`: Captures Android screen via ADB screencap, validates running app matches target package
      - `from_browser()`: Captures browser page using Playwright with anti-detection features
    - Returns `Screenshot` object containing both image data and device reference
+   - **Performance Optimization**: Reuses browser/ADB connections across calls to avoid repeated initialization overhead
+   - Includes `cleanup()` method for proper resource disposal
 
 4. **Image Comparison** (`src/auto_click/cores/compare.py`)
 
@@ -104,6 +116,10 @@ mkdocs gh-deploy --force --clean
    - Compares template images against screenshots using `TM_CCOEFF_NORMED` method
    - Returns `FoundPosition` with button center coordinates when confidence threshold is met
    - Click position is calculated as template center: `(max_loc[0] + width // 2, max_loc[1] + height // 2)`
+   - **Performance Optimizations**:
+     - Template images are cached using `@lru_cache(maxsize=32)` to avoid repeated disk I/O
+     - CPU-intensive template matching runs in thread pool via `asyncio.to_thread()` to prevent blocking
+     - Screenshot conversion optimized for both PIL Image and bytes input
 
 5. **ADB Device Manager** (`src/auto_click/cores/manager.py`)
 
@@ -120,23 +136,34 @@ mkdocs gh-deploy --force --clean
 
 ### Key Design Patterns
 
-- **Coordinate Calibration**: Windows mode uses `ShiftPosition` to adjust click coordinates based on window position (`shift_x`, `shift_y`), since screenshots are captured relative to window, but clicks must be absolute screen coordinates
-- **Device Detection**: For Android, the tool actively verifies the target app is running and automatically selects the correct device from multiple connected devices
-- **Type-Based Routing**: Target string determines mode: "http" prefix → browser, "com" prefix → Android, otherwise → Windows window title
+- **Coordinate Calibration**: Windows mode uses `ShiftPosition` to adjust click coordinates based on window position (`shift_x`, `shift_y`), since screenshots are captured relative to window, but clicks must be absolute screen coordinates. Calibration happens in `FoundPosition.calibrate()` before clicking.
+- **Device Detection**: For Android, the tool actively verifies the target app is running and automatically selects the correct device from multiple connected devices via `ADBDeviceManager.get_correct_serial()`
+- **Type-Based Routing**: Target string determines mode via `get_screenshot()`: "http" prefix → browser, "com" prefix → Android, otherwise → Windows window title
 - **Pydantic Validation**: All configuration uses Pydantic with frozen fields to prevent runtime modification of core settings
+- **Resource Reuse**: Browser and ADB connections are cached in `ScreenshotManager` as `_browser`, `_browser_page`, `_adb_device` to minimize initialization overhead
+- **Async/Thread Hybrid**: I/O operations (screenshots, clicking) use async/await, CPU-intensive operations (template matching) run in thread pool via `asyncio.to_thread()`
 
 ### Automation Flow
 
-1. Load YAML config and validate with Pydantic models
-2. Establish connection based on target type (ADB/window/browser)
-3. Loop:
-   - Capture screenshot via `ScreenshotManager`
+1. **Initialization** (`cli.py`):
+   - `AutoClicker` loads YAML config via `load_yaml()`
+   - Creates `RemoteController` instance with config dict unpacked
+   - Enters main loop with `loop_delay` (default 0.1s) to prevent CPU overuse
+
+2. **Main Execution Loop** (`controller.py`):
+   - `RemoteController.run()` executes each iteration
+   - Capture screenshot via `get_screenshot()` which routes to appropriate method
+   - For Android targets: `target_serial` computed field automatically detects device on first access
    - For each template in `image_list`:
      - Match template using `ImageComparison.find()`
-     - If match found and `enable_click=True`: click at calculated position
-     - Apply device-specific coordinate calibration if needed
+     - If match found and `enable_click=True`: call `click_button()`
+     - Apply device-specific coordinate calibration if needed (Windows only)
      - Wait for `delay_after_click` seconds
-   - Exit on error or task completion
+   - Exit conditions: `task_done=True` or `error_occurred=True` breaks the loop
+
+3. **Error Handling**:
+   - `AdbError`: Sends Discord notification about emulator issues, sets `error_occurred=True`
+   - Generic exceptions: Sends error notification, waits random 0-5 seconds, continues loop
 
 ## Configuration System
 
@@ -157,10 +184,14 @@ YAML configs are in `./configs/games/`. Key parameters:
 ## Important Notes
 
 - **Python Version**: Requires 3.11+ (tested with 3.11, 3.12, 3.13)
-- **Browser Dependency**: Playwright uses `channel="chrome"` requiring Google Chrome installed
-- **Window Titles**: Must match exactly (case-sensitive). Window is automatically restored/activated before capture
-- **Android Target**: Must be a running app package name. Tool validates app is currently active
-- **Template Images**: Should be clear, high-contrast screenshots stored in `./data/*/` directories
-- **Discord Notifications**: Optional feature using `DISCORD_WEBHOOK_URL` environment variable (configured in `.env`)
-- **Logging**: Uses Logfire with configuration in `[tool.logfire]` section of `pyproject.toml`
+- **Browser Dependency**: Playwright uses `channel="chrome"` requiring Google Chrome installed (not Chromium)
+- **Window Titles**: Must match exactly (case-sensitive). Window is automatically restored/activated before capture via `window.activate()`
+- **Android Target**: Must be a running app package name. Tool validates app is currently active via `device.app_current().package`
+- **Template Images**: Should be clear, high-contrast screenshots stored in `./data/*/` directories. LRU cached (maxsize=32) for performance
+- **Discord Notifications**: Optional feature using `DISCORD_WEBHOOK_URL` environment variable (configured in `.env`). Implemented in `cores/notify.py`
+- **Logging**: Uses Logfire with configuration in `[tool.logfire]` section of `pyproject.toml`. Currently set to `send_to_logfire=false` for local-only logging
 - **Code Style**: Google-style docstrings, 99 character line length, Ruff for linting/formatting
+- **CLI Framework**: Uses Python Fire for automatic CLI generation from `AutoClicker` class methods
+- **Entry Points**: Both `cli` and `auto_click` commands point to `auto_click.cli:main` (defined in `[project.scripts]`)
+- **Async Architecture**: All core operations are async-first, with CPU-intensive work offloaded to thread pools
+- **Error Recovery**: Generic errors trigger random 0-5 second delay before retry; ADB errors terminate immediately

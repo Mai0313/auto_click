@@ -1,4 +1,5 @@
 from typing import Any
+import asyncio
 import logging
 from pathlib import Path
 
@@ -12,6 +13,10 @@ logging.getLogger("sqlalchemy.engine.Engine").disabled = True
 
 class AutoClicker(BaseModel):
     config_path: str = Field(default="./configs/games/all_stars.yaml")
+    loop_delay: float = Field(
+        default=0.1,
+        description="Delay in seconds between loop iterations to prevent CPU overuse",
+    )
 
     async def load_yaml(self) -> dict[str, Any]:
         config_obj = Path(self.config_path)
@@ -28,6 +33,8 @@ class AutoClicker(BaseModel):
                 break
             if remote_controller.error_occurred:
                 break
+            # Small delay to prevent CPU overuse
+            await asyncio.sleep(self.loop_delay)
 
 
 def main() -> None:

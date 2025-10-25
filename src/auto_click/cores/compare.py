@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
+import asyncio
 from pathlib import Path
+from functools import lru_cache
 
 import cv2
 import numpy as np
@@ -12,6 +14,49 @@ from .config import ImageModel
 
 if TYPE_CHECKING:
     from cv2.typing import MatLike
+
+
+@lru_cache(maxsize=32)
+def _load_and_convert_template(image_path: str) -> "MatLike":
+    """Load and convert template image to grayscale with caching.
+
+    Args:
+        image_path (str): Path to the template image.
+
+    Returns:
+        MatLike: Grayscale template image.
+
+    Notes:
+        Results are cached using LRU cache to avoid repeated disk I/O.
+    """
+    color_button_image = cv2.imread(image_path)
+    return cv2.cvtColor(color_button_image, cv2.COLOR_BGR2GRAY)
+
+
+def _sync_match_template(
+    gray_screenshot: "MatLike", button_image: "MatLike"
+) -> tuple[float, tuple[int, int]]:
+    """Perform template matching synchronously (CPU-intensive operation).
+
+    Args:
+        gray_screenshot (MatLike): Grayscale screenshot image.
+        button_image (MatLike): Grayscale template image.
+
+    Returns:
+        tuple[float, tuple[int, int]]: (max_val, max_loc) from matching.
+
+    Notes:
+        This function is designed to run in a thread pool for better performance.
+    """
+    gray_matched = cv2.matchTemplate(
+        image=gray_screenshot,
+        templ=button_image,
+        method=cv2.TM_CCOEFF_NORMED,
+        result=None,
+        mask=None,
+    )
+    _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
+    return max_val, max_loc
 
 
 class FoundPosition(BaseModel):
@@ -84,17 +129,29 @@ class ImageComparison(BaseModel):
     screenshot: Image.Image | bytes = Field(..., description="The screenshot image")
 
     async def record_position(self) -> None:
-        position_data = pd.DataFrame()
-        position_log_path = Path("./logs/positions.csv")
-        if position_log_path.exists():
-            position_data = pd.read_csv(position_log_path)
+        """Record position data to CSV file asynchronously.
 
-        data_dict_list = [self.image_cfg.model_dump()]
-        new_position_data = pd.DataFrame(data_dict_list).astype(str)
-        merged_data = pd.concat([position_data, new_position_data], ignore_index=True)
-        merged_data = merged_data.drop_duplicates(subset=["image_name", "image_path"], keep="last")
-        merged_data = merged_data.reset_index(drop=True)
-        merged_data.to_csv(position_log_path.as_posix(), index=False)
+        This method runs the CSV I/O operations in a thread pool to avoid blocking.
+        """
+
+        def _sync_record_position() -> None:
+            """Synchronous helper for CSV operations."""
+            position_data = pd.DataFrame()
+            position_log_path = Path("./logs/positions.csv")
+            if position_log_path.exists():
+                position_data = pd.read_csv(position_log_path)
+
+            data_dict_list = [self.image_cfg.model_dump()]
+            new_position_data = pd.DataFrame(data_dict_list).astype(str)
+            merged_data = pd.concat([position_data, new_position_data], ignore_index=True)
+            merged_data = merged_data.drop_duplicates(
+                subset=["image_name", "image_path"], keep="last"
+            )
+            merged_data = merged_data.reset_index(drop=True)
+            merged_data.to_csv(position_log_path.as_posix(), index=False)
+
+        # Run CSV operations in thread pool to avoid blocking
+        await asyncio.to_thread(_sync_record_position)
 
     async def find(self) -> FoundPosition:
         """Finds the position of a button image within a screenshot.
@@ -104,25 +161,30 @@ class ImageComparison(BaseModel):
 
         Returns:
             FoundPosition: The found position of the button image.
+
+        Notes:
+            CPU-intensive template matching is run in a thread pool for better performance.
         """
-        color_screenshot = np.array(self.screenshot)
-        color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
-        color_button_image = cv2.imread(self.image_cfg.image_path)
+        # Convert screenshot to numpy array and grayscale in one step
+        if isinstance(self.screenshot, bytes):
+            # For bytes, decode directly to grayscale
+            screenshot_array = np.frombuffer(self.screenshot, dtype=np.uint8)
+            color_screenshot = cv2.imdecode(screenshot_array, cv2.IMREAD_COLOR)
+        else:
+            # For PIL Image, convert to array
+            color_screenshot = np.array(self.screenshot)
+            color_screenshot = cv2.cvtColor(color_screenshot, cv2.COLOR_RGB2BGR)
 
-        # Convert both images to grayscale
+        # Convert screenshot to grayscale
         gray_screenshot: MatLike = cv2.cvtColor(color_screenshot, cv2.COLOR_BGR2GRAY)
-        button_image: MatLike = cv2.cvtColor(color_button_image, cv2.COLOR_BGR2GRAY)
 
-        # Match the button image with the screenshot
-        gray_matched = cv2.matchTemplate(
-            image=gray_screenshot,
-            templ=button_image,
-            method=cv2.TM_CCOEFF_NORMED,
-            result=None,
-            mask=None,
+        # Load and convert template image (cached)
+        button_image: MatLike = _load_and_convert_template(self.image_cfg.image_path)
+
+        # Match the button image with the screenshot (run in thread pool)
+        max_val, max_loc = await asyncio.to_thread(
+            _sync_match_template, gray_screenshot, button_image
         )
-
-        _, max_val, _, max_loc = cv2.minMaxLoc(gray_matched)
 
         if max_val > self.image_cfg.confidence:
             logfire.info(

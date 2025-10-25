@@ -124,7 +124,7 @@ class RemoteController(ConfigModel):
                 )
 
                 self.found_result = await image_compare.find()
-                if self.enable and config_dict.enable_click:
+                if self.enable and config_dict.enable_click and self.found_result.button_x:
                     await self.click_button(device_details=device_details)
 
                     if self.found_result.found_button_name_en == "confirm":

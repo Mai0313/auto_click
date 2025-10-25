@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 from pygetwindow import Win32Window, getWindowsWithTitle
 from adbutils._device import AdbDevice
 from playwright_stealth import Stealth
-from playwright.async_api import Page, async_playwright
+from playwright.async_api import Page, Browser, BrowserContext, Playwright, async_playwright
 
 
 class ShiftPosition(BaseModel):
@@ -40,6 +40,25 @@ class Screenshot(BaseModel):
 
 
 class ScreenshotManager(BaseModel):
+    """Manager for capturing screenshots from different sources.
+
+    Attributes:
+        _playwright (Playwright | None): Cached Playwright instance.
+        _browser (Browser | None): Cached browser instance for reuse.
+        _context (BrowserContext | None): Cached browser context for reuse.
+        _browser_page (Page | None): Cached browser page instance for reuse.
+        _adb_device (AdbDevice | None): Cached ADB device instance for reuse.
+        _adb_serial (str | None): Cached serial number for ADB device.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    _playwright: Playwright | None = None
+    _browser: Browser | None = None
+    _context: BrowserContext | None = None
+    _browser_page: Page | None = None
+    _adb_device: AdbDevice | None = None
+    _adb_serial: str | None = None
+
     async def from_window(self, window_title: str) -> Screenshot:
         """Captures a screenshot of the specified window.
 
@@ -54,13 +73,13 @@ class ScreenshotManager(BaseModel):
 
         Notes:
             This method will restore and activate the window if it is minimized.
-            It waits for 1 second after activating the window to ensure it is ready for capture.
+            It waits for 0.1 second after activating the window to ensure it is ready for capture.
         """
         window: Win32Window = getWindowsWithTitle(window_title)[0]
         if window.isMinimized:
             window.restore()
         window.activate()
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         shift_x, shift_y = window.topleft
         width, height = window.size
         bbox = (shift_x, shift_y, shift_x + width, shift_y + height)
@@ -81,14 +100,21 @@ class ScreenshotManager(BaseModel):
 
         Raises:
             Exception: If the current app on the device is not the specified URL.
+
+        Notes:
+            ADB device instance is cached and reused across calls for better performance.
         """
-        adb.connect(serial)
-        device = adb.device(serial=serial)
-        running_app = device.app_current()
+        # Reuse existing ADB connection if serial matches
+        if self._adb_device is None or self._adb_serial != serial:
+            adb.connect(serial)
+            self._adb_device = adb.device(serial=serial)
+            self._adb_serial = serial
+
+        running_app = self._adb_device.app_current()
         if running_app.package != url:
             raise Exception("The current app is not the specified URL")
-        screenshot = device.screenshot()
-        return Screenshot(screenshot=screenshot, device=device)
+        screenshot = self._adb_device.screenshot()
+        return Screenshot(screenshot=screenshot, device=self._adb_device)
 
     async def from_browser(self, url: str) -> Screenshot:
         """Takes a screenshot of a webpage from a given URL using an automated browser.
@@ -108,9 +134,12 @@ class ScreenshotManager(BaseModel):
             - Various arguments and context options are set to avoid detection by anti-bot mechanisms.
             - The function sets a specific user agent and other browser context options.
             - The function uses a stealth mode to further avoid detection.
+            - Browser instance is reused across calls for better performance.
         """
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(
+        # Initialize browser on first call
+        if self._browser_page is None:
+            self._playwright = await async_playwright().start()
+            self._browser = await self._playwright.chromium.launch(
                 channel="chrome",
                 headless=True,
                 # 反反爬蟲
@@ -120,7 +149,7 @@ class ScreenshotManager(BaseModel):
                     "--disable-dev-shm-usage",
                 ],
             )
-            context = await browser.new_context(
+            self._context = await self._browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
                 java_script_enabled=True,
                 accept_downloads=False,
@@ -135,8 +164,34 @@ class ScreenshotManager(BaseModel):
             )
             # 反反爬蟲
             stealth = Stealth(init_scripts_only=True)
-            await stealth.apply_stealth_async(context)
-            page = await context.new_page()
-            await page.goto(url)
-            screenshot = await page.screenshot()
-            return Screenshot(screenshot=screenshot, device=page)
+            await stealth.apply_stealth_async(self._context)
+            self._browser_page = await self._context.new_page()
+
+        # Navigate to URL and take screenshot
+        await self._browser_page.goto(url)
+        screenshot = await self._browser_page.screenshot()
+        return Screenshot(screenshot=screenshot, device=self._browser_page)
+
+    async def cleanup(self) -> None:
+        """Cleanup browser and ADB resources.
+
+        Should be called when the ScreenshotManager is no longer needed.
+        """
+        # Cleanup browser resources
+        if self._browser_page is not None:
+            await self._browser_page.close()
+            self._browser_page = None
+        if self._context is not None:
+            await self._context.close()
+            self._context = None
+        if self._browser is not None:
+            await self._browser.close()
+            self._browser = None
+        if self._playwright is not None:
+            await self._playwright.stop()
+            self._playwright = None
+
+        # Cleanup ADB resources
+        if self._adb_device is not None:
+            self._adb_device = None
+            self._adb_serial = None
