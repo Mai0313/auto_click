@@ -66,3 +66,17 @@ image_list:
     enable_click: False
     enable_screenshot: True
     confidence: 0.8
+
+  # - image_name: 王朝模式
+  #   image_path: ./data/allstars/is_3v3.png
+  #   delay_after_click: 3
+  #   enable_click: False
+  #   enable_screenshot: True
+  #   confidence: 0.7
+
+  # - image_name: 全場模式
+  #   image_path: ./data/allstars/is_5v5.png
+  #   delay_after_click: 3
+  #   enable_click: False
+  #   enable_screenshot: True
+  #   confidence: 0.7
