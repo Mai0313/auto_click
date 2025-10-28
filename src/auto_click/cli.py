@@ -14,8 +14,7 @@ logging.getLogger("sqlalchemy.engine.Engine").disabled = True
 class AutoClicker(BaseModel):
     config_path: str = Field(default="./configs/games/all_stars.yaml")
     loop_delay: float = Field(
-        default=0.1,
-        description="Delay in seconds between loop iterations to prevent CPU overuse",
+        default=0.1, description="Delay in seconds between loop iterations to prevent CPU overuse"
     )
 
     async def load_yaml(self) -> dict[str, Any]:

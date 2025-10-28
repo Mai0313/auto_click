@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 from pygetwindow import Win32Window, getWindowsWithTitle
 from adbutils._device import AdbDevice
 from playwright_stealth import Stealth
-from playwright.async_api import Page, Browser, BrowserContext, Playwright, async_playwright
+from playwright.async_api import Page, Browser, Playwright, BrowserContext, async_playwright
 
 
 class ShiftPosition(BaseModel):

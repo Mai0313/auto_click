@@ -146,11 +146,13 @@ mkdocs gh-deploy --force --clean
 ### Automation Flow
 
 1. **Initialization** (`cli.py`):
+
    - `AutoClicker` loads YAML config via `load_yaml()`
    - Creates `RemoteController` instance with config dict unpacked
    - Enters main loop with `loop_delay` (default 0.1s) to prevent CPU overuse
 
 2. **Main Execution Loop** (`controller.py`):
+
    - `RemoteController.run()` executes each iteration
    - Capture screenshot via `get_screenshot()` which routes to appropriate method
    - For Android targets: `target_serial` computed field automatically detects device on first access
@@ -162,6 +164,7 @@ mkdocs gh-deploy --force --clean
    - Exit conditions: `task_done=True` or `error_occurred=True` breaks the loop
 
 3. **Error Handling**:
+
    - `AdbError`: Sends Discord notification about emulator issues, sets `error_occurred=True`
    - Generic exceptions: Sends error notification, waits random 0-5 seconds, continues loop
 
