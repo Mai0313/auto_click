@@ -1,4 +1,13 @@
 {
+  "image": "python:3.11-slim",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "none",
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers-extra/features/uv:1": {}
+  },
+  "updateContentCommand": "uv sync && uv cache clean",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -35,12 +44,5 @@
         }
       }
     }
-  },
-  "dockerFile": "Dockerfile",
-  "updateContentCommand": "uv sync && uv cache clean",
-  "mounts": [
-    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached,ro",
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached,ro",
-    "source=${localEnv:HOME}/.p10k.zsh,target=/root/.p10k.zsh,type=bind,consistency=cached,ro"
-  ]
+  }
 }
