@@ -46,6 +46,8 @@ repos:
       - id: fix-byte-order-marker
         exclude: docs/CNAME
       - id: mixed-line-ending
+        # .gitattributes checks these out as CRLF on purpose; --fix=lf undoes it.
+        exclude: \.(bat|cmd)$
         args:
           - --fix=lf
       - id: check-docstring-first
